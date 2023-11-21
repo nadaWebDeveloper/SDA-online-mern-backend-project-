@@ -1,13 +1,12 @@
 import express from 'express'
 const router = express.Router()
 
-import ApiError from '../errors/ApiError'
-import { User } from '../models/user'
+import { createUser, getAllUsers, getUserById } from '../controllers/users'
 
-router.get('/', async (_, res) => {
-  const users = await User.find()
-  console.log('products:', users)
-  res.json({ message: 'users are found', users })
-})
+router.get('/', getAllUsers)
+
+router.get('/:id', getUserById)
+
+router.post('/', createUser)
 
 export default router
