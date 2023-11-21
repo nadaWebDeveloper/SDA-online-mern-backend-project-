@@ -6,6 +6,7 @@ import Order from '../../models/order'
 import ApiError from '../../errors/ApiError'
 import { Product } from '../../models/product'
 
+
 router.get('/', async (_, res) => {
   const products = await Product.find()
   console.log('products:', products)

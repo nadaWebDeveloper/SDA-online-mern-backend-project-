@@ -1,7 +1,7 @@
 import express from 'express'
 
 import ApiError from '../../errors/ApiError'
-import User from '../../models/user'
+import { User } from '../../models/user'
 const router = express.Router()
 
 router.param('userId', (req, res, next, userId) => {
