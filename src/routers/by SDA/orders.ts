@@ -1,8 +1,8 @@
 import express from 'express'
 const router = express.Router()
 
-import Order from '../models/order'
-import User from '../models/user'
+import Order from '../../models/order'
+import User from '../../models/user'
 
 router.get('/', async (req, res) => {
   const orders = await Order.find().populate('products')
