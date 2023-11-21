@@ -1,5 +1,6 @@
 import  { NextFunction, Request, Response } from 'express'
 import  * as services from '../services/productService'
+import { MProduct } from '../models/product'
 
 
 
@@ -24,4 +25,37 @@ import  * as services from '../services/productService'
     } catch (error) {
         next(error)
     }
+}
+
+
+
+
+export const getSingleProductById = async (request: Request, response: Response, next: NextFunction) => {
+
+    try {
+        const ID = request.params.id
+        const singleProduct = await services.FindProductById(ID,response )  //MProduct.findOne({_id: ID})
+        response.json({
+            message: `Return a single product `,
+            payload: singleProduct
+        })
+        
+    } catch (error) {
+        next(error)
+    }
+
+}
+
+
+export const deleteSingleProduct = async (request: Request, response: Response, next: NextFunction) => {
+    try {
+        const ID = request.params.id
+        const ProductsAfterDelete = await services.deleteProductById(ID,response ) 
+        response.json({
+            message: `Delete a single product with ID: ${ID}`,
+        })
+    } catch (error) {
+        next(error)
+    }
+
 }
