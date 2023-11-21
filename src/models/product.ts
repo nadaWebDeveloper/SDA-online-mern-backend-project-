@@ -1,5 +1,16 @@
 import mongoose from 'mongoose'
 
+export interface IFProduct extends Document {
+  name: string,
+  price: number,
+  image: string,
+  quantity:number,
+  sold: number,
+  description: string,
+  createAt?: string,
+  updateAt?: string
+}
+
 const productSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -32,4 +43,4 @@ const productSchema = new mongoose.Schema({
   },
 })
 
-export const Product = mongoose.model('Product', productSchema)
+export const MProduct = mongoose.model<IFProduct>('Product', productSchema)

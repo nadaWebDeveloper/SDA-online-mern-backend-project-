@@ -26,3 +26,9 @@ Method: GET, Path: /, Date: 11/21/2023, Time: 11:08:27 AM
 Method: GET, Path: /, Date: 11/21/2023, Time: 11:21:51 AM
 Method: GET, Path: /api/products, Date: 11/21/2023, Time: 11:22:40 AM
 Method: GET, Path: /api/products, Date: 11/21/2023, Time: 11:23:39 AM
+Method: GET, Path: /, Date: 11/21/2023, Time: 10:03:55 AM
+Method: GET, Path: //products, Date: 11/21/2023, Time: 10:06:46 AM
+Method: GET, Path: //products, Date: 11/21/2023, Time: 10:07:57 AM
+Method: GET, Path: /products, Date: 11/21/2023, Time: 10:08:06 AM
+Method: GET, Path: /products, Date: 11/21/2023, Time: 10:08:36 AM
+Method: GET, Path: /products, Date: 11/21/2023, Time: 10:09:34 AM
