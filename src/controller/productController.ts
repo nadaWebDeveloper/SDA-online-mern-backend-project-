@@ -1,6 +1,6 @@
 import  { NextFunction, Request, Response } from 'express'
 import  * as services from '../services/productService'
-import { MProduct } from '../models/product'
+import { MProduct, IFProduct } from '../models/product'
 
 
 
@@ -58,4 +58,26 @@ export const deleteSingleProduct = async (request: Request, response: Response, 
         next(error)
     }
 
+}
+
+
+export const createSingleProduct = async (request: Request, response: Response, next: NextFunction) => {
+    try {
+        const newInput = request.body
+        const productExist = await services.findIfProductExist(newInput , response)
+        const newProduct: IFProduct = new MProduct({
+            name: newInput.name,
+            price: newInput.price,
+            image: newInput.image,
+            quantity:newInput.quantity,
+            sold: newInput.sold,
+            description: newInput.description,
+        })
+        await newProduct.save()
+        response.status(201).json({
+            message: `Create a single product`,
+        })
+    } catch (error) {
+        next(error)
+    }
 }

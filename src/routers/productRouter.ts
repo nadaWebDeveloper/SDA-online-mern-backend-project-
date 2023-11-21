@@ -13,5 +13,8 @@ import * as controller from "../controller/productController";
  //GET: /products/:id -> deleteSingleProduct -> deleteProductById
 router.delete(`/:id`, controller.deleteSingleProduct)
 
+//POST : /products -> createSingleProduct
+router.post('/' ,controller.createSingleProduct)
+
 
  export default router

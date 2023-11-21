@@ -65,3 +65,16 @@ Method: GET, Path: /products/0j, Date: 11/21/2023, Time: 11:53:20 AM
 Method: GET, Path: /products/0j, Date: 11/21/2023, Time: 11:53:49 AM
 Method: DELETE, Path: /products/1, Date: 11/21/2023, Time: 12:19:09 PM
 Method: DELETE, Path: /products/1, Date: 11/21/2023, Time: 12:19:47 PM
+Method: POST, Path: /products, Date: 11/21/2023, Time: 12:42:41 PM
+Method: DELETE, Path: /products/178, Date: 11/21/2023, Time: 12:42:54 PM
+Method: POST, Path: /products, Date: 11/21/2023, Time: 12:54:16 PM
+Method: POST, Path: /products, Date: 11/21/2023, Time: 12:55:21 PM
+Method: POST, Path: /products, Date: 11/21/2023, Time: 12:58:41 PM
+Method: POST, Path: /products, Date: 11/21/2023, Time: 12:58:42 PM
+Method: POST, Path: /products, Date: 11/21/2023, Time: 12:58:43 PM
+Method: POST, Path: /products, Date: 11/21/2023, Time: 12:58:44 PM
+Method: POST, Path: /products, Date: 11/21/2023, Time: 12:58:46 PM
+Method: POST, Path: /products, Date: 11/21/2023, Time: 12:58:47 PM
+Method: POST, Path: /products, Date: 11/21/2023, Time: 12:58:48 PM
+Method: POST, Path: /products, Date: 11/21/2023, Time: 12:58:59 PM
+Method: POST, Path: /products, Date: 11/21/2023, Time: 12:59:16 PM

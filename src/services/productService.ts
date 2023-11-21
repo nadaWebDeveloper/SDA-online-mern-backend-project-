@@ -49,3 +49,17 @@ export const deleteProductById = async (ID: string, response: Response) => {
     }
     return deleteSingleProduct
 }
+
+
+export const findIfProductExist = async (newInput: IFProduct, response: Response) => {
+
+    const productExist =  await MProduct.exists({ name: newInput.name})
+    if(productExist){
+        response.status(409).json({
+            message: `Product already exist with this Name: ${productExist}`
+        })
+        return
+    }
+
+    return productExist
+}
