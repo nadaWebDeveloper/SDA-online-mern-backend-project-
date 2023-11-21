@@ -78,3 +78,5 @@ Method: POST, Path: /products, Date: 11/21/2023, Time: 12:58:47 PM
 Method: POST, Path: /products, Date: 11/21/2023, Time: 12:58:48 PM
 Method: POST, Path: /products, Date: 11/21/2023, Time: 12:58:59 PM
 Method: POST, Path: /products, Date: 11/21/2023, Time: 12:59:16 PM
+Method: PUT, Path: /products/0, Date: 11/21/2023, Time: 1:01:11 PM
+Method: PUT, Path: /products/0, Date: 11/21/2023, Time: 1:05:52 PM

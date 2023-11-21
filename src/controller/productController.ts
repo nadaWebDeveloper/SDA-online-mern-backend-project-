@@ -50,7 +50,7 @@ export const getSingleProductById = async (request: Request, response: Response,
 export const deleteSingleProduct = async (request: Request, response: Response, next: NextFunction) => {
     try {
         const ID = request.params.id
-        const ProductsAfterDelete = await services.deleteProductById(ID,response ) 
+        const ProductsAfterDelete = await services.findAndDeleted(ID,response ) 
         response.json({
             message: `Delete a single product with ID: ${ID}`,
         })
@@ -80,4 +80,21 @@ export const createSingleProduct = async (request: Request, response: Response, 
     } catch (error) {
         next(error)
     }
+}
+
+
+export const updateSingleProduct = async (request: Request, response: Response, next: NextFunction) => {
+    try {
+        const ID = request.params.id
+        const updatedProduct = request.body
+        const productUpdated = await services.findAndUpdated(ID,response ,updatedProduct)
+
+        response.json({
+            message: `Update a single product`,
+            payload: productUpdated
+        })
+    } catch (error) {
+        next(error)
+    }
+
 }

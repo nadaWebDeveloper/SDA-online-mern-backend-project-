@@ -39,7 +39,7 @@ export const FindProductById = async (ID: string, response: Response)  => {
     return singleProduct;
 }
 
-export const deleteProductById = async (ID: string, response: Response) => {
+export const findAndDeleted = async (ID: string, response: Response) => {
     const deleteSingleProduct = await MProduct.findOneAndDelete({id: ID})
     if(!deleteSingleProduct){
         response.status(404).json({
@@ -62,4 +62,16 @@ export const findIfProductExist = async (newInput: IFProduct, response: Response
     }
 
     return productExist
+}
+
+export const findAndUpdated = async (ID: string, response: Response, updatedProduct: Request) => {
+    const productUpdated = await MProduct.findOneAndUpdate({id: ID},updatedProduct, {new: true} )
+    if(!productUpdated){
+        response.status(404).json({
+            message: `Product is not found with this id: ${ID}`
+        })
+        return
+    }
+    return productUpdated  
+    
 }
