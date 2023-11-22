@@ -1,10 +1,10 @@
 import  { NextFunction, Request, Response } from 'express'
+
 import  * as services from '../services/productService'
 import { Product, IProduct } from '../models/product'
 
 
 
- // * GET : /products -> getAllProducts
  export const getAllProducts = async (request: Request, response: Response, next: NextFunction) => {
 
     try {
@@ -28,13 +28,11 @@ import { Product, IProduct } from '../models/product'
 }
 
 
-
-
 export const getSingleProductById = async (request: Request, response: Response, next: NextFunction) => {
 
     try {
         const {id} = request.params
-        const singleProduct = await services.FindProductById(id,response )  //MProduct.findOne({_id: ID})
+        const singleProduct = await services.FindProductById(id , next)  //MProduct.findOne({_id: ID})
         response.json({
             message: `Return a single product `,
             payload: singleProduct
@@ -50,7 +48,7 @@ export const getSingleProductById = async (request: Request, response: Response,
 export const deleteSingleProduct = async (request: Request, response: Response, next: NextFunction) => {
     try {
         const {id} = request.params
-        const deletedProduct = await services.findAndDeleted(id,response ) 
+        const deletedProduct = await services.findAndDeleted(id,next ) 
         response.json({
             message: `Delete a single product with ID: ${id}`,
         })
@@ -64,7 +62,7 @@ export const deleteSingleProduct = async (request: Request, response: Response, 
 export const createSingleProduct = async (request: Request, response: Response, next: NextFunction) => {
     try {
         const newInput = request.body
-        const productExist = await services.findIfProductExist(newInput , response)
+        const productExist = await services.findIfProductExist(newInput , next)
         const newProduct: IProduct = new Product({
             name: newInput.name,
             price: newInput.price,
@@ -87,7 +85,7 @@ export const updateSingleProduct = async (request: Request, response: Response, 
     try {
         const {id} = request.params
         const updatedProduct = request.body
-        const productUpdated = await services.findAndUpdated(id,response ,updatedProduct)
+        const productUpdated = await services.findAndUpdated(id,next ,updatedProduct)
 
         response.json({
             message: `Update a single product`,

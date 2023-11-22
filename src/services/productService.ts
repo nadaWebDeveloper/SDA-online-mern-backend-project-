@@ -1,4 +1,4 @@
-import { Response } from "express"
+import { NextFunction, Response } from "express"
 
 import ApiError from "../errors/ApiError"
 import { IProduct, Product } from "../models/product"
@@ -27,50 +27,40 @@ return  {
 
 }
 
-export const FindProductById = async (id: string, response: Response)  => {
+export const FindProductById = async (id: string, next : NextFunction)  => {
     const singleProduct = await Product.findOne({id: id})
  if(!singleProduct){
-    // next(ApiError.badRequest(`Product is not found with this id: ${ID}`))
-    response.status(404).json({
-        message: `Product is not found with this id: ${id}`
-    })
-    return
+    throw next(ApiError.badRequest(404,`Product is not found with this id: ${id}`))
     }   
     return singleProduct;
 }
 
-export const findAndDeleted = async (id: string, response: Response) => {
+export const findAndDeleted = async (id: string,  next : NextFunction) => {
     const deleteSingleProduct = await Product.findOneAndDelete({id: id})
     if(!deleteSingleProduct){
-        response.status(404).json({
-            message: `Product is not found with this id: ${id}`
-        })
-        return
+     throw next(ApiError.badRequest(404,`Product is not found with this id: ${id}`))
     }
     return deleteSingleProduct
+    // return ProductT.filter((product) => product.id !== id)
+    
 }
 
 
-export const findIfProductExist = async (newInput: IProduct, response: Response) => {
+export const findIfProductExist = async (newInput: IProduct,next : NextFunction) => {
 
     const productExist =  await Product.exists({ name: newInput.name})
     if(productExist){
-        response.status(409).json({
-            message: `Product already exist with this Name: ${productExist}`
-        })
-        return
+        throw next(ApiError.badRequest(409,`Product already exist with this Name: ${productExist}`))
+
     }
 
     return productExist
 }
 
-export const findAndUpdated = async (id: string, response: Response, updatedProduct: Request) => {
+export const findAndUpdated = async (id: string, next : NextFunction, updatedProduct: Request) => {
     const productUpdated = await Product.findOneAndUpdate({id: id},updatedProduct, {new: true} )
     if(!productUpdated){
-        response.status(404).json({
-            message: `Product is not found with this id: ${id}`
-        })
-        return
+        throw next(ApiError.badRequest(404,`Product is not found with this id: ${id}`))
     }
     return productUpdated  
     

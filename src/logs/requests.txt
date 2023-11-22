@@ -80,3 +80,11 @@ Method: POST, Path: /products, Date: 11/21/2023, Time: 12:58:59 PM
 Method: POST, Path: /products, Date: 11/21/2023, Time: 12:59:16 PM
 Method: PUT, Path: /products/0, Date: 11/21/2023, Time: 1:01:11 PM
 Method: PUT, Path: /products/0, Date: 11/21/2023, Time: 1:05:52 PM
+Method: GET, Path: /products/0j, Date: 11/22/2023, Time: 12:46:35 AM
+Method: GET, Path: /products/076, Date: 11/22/2023, Time: 12:46:59 AM
+Method: GET, Path: /products/076, Date: 11/22/2023, Time: 2:09:01 AM
+Method: GET, Path: /products/076, Date: 11/22/2023, Time: 2:13:45 AM
+Method: GET, Path: /products/0, Date: 11/22/2023, Time: 2:43:05 AM
+Method: GET, Path: /products/4, Date: 11/22/2023, Time: 2:43:24 AM
+Method: DELETE, Path: /products/178, Date: 11/22/2023, Time: 2:56:18 AM
+Method: DELETE, Path: /products/1, Date: 11/22/2023, Time: 2:56:32 AM
