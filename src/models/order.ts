@@ -3,22 +3,29 @@ import mongoose, { Document } from 'mongoose'
 export type OrderDocument = Document & {
   // name: string
   products: mongoose.Schema.Types.ObjectId[]
-  user: mongoose.Schema.Types.ObjectId[]
+  user: mongoose.Schema.Types.ObjectId
 }
 
-const orderSchema = new mongoose.Schema({
-  // name: {
-  //   type: String,
-  //   required: true,
-  // },
-  products: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'Product',
+const orderSchema = new mongoose.Schema(
+  {
+    products: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: 'Product',
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    // products: {
+    //   type: String,
+    //   required: true,
+    // },
+    // user: {
+    //   type: String,
+    //   required: true,
+    // },
   },
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  },
-})
+  { timestamps: true }
+)
 
-export default mongoose.model<OrderDocument>('Order', orderSchema)
+export const Order = mongoose.model<OrderDocument>('Orders', orderSchema)

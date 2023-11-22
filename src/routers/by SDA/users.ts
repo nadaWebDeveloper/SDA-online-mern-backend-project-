@@ -7,7 +7,7 @@ const router = express.Router()
 router.param('userId', (req, res, next, userId) => {
   const user = users.find((user) => user.id === userId)
   if (!user) {
-    next(ApiError.badRequest('user id is required.'))
+    // next(ApiError.badRequest('user id is required.'))
     return
   }
   req.user = user
@@ -37,7 +37,7 @@ router.post('/', (req, res, next) => {
   const { id, first_name } = req.body
 
   if (!id || !first_name) {
-    next(ApiError.badRequest('id and username are required'))
+    // next(ApiError.badRequest('id and username are required'))
     return
   }
   const updatedUsers = [{ id, first_name }, ...users]

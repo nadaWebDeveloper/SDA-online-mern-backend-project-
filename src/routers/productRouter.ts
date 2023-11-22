@@ -1,23 +1,22 @@
-import { Router } from "express";
+import { Router } from 'express'
 
-import * as controller from "../controller/productController";
+import * as controller from '../controllers/productsController'
 
- const router = Router()
+const router = Router()
 
- // GET : /products -> getAllProducts
- router.get(`/` , controller.getAllProducts )
+// GET : /products -> getAllProducts
+router.get(`/`, controller.getAllProducts)
 
- //GET: /products/:id -> getSingleProductById -> FindProductById
- router.get(`/:id`, controller.getSingleProductById )
+//GET: /products/:id -> getSingleProductById -> FindProductById
+router.get(`/:id`, controller.getSingleProduct)
 
- //GET: /products/:id -> deleteSingleProduct -> findAndDeleted
-router.delete(`/:id`, controller.deleteSingleProduct)
+//GET: /products/:id -> deleteSingleProduct -> findAndDeleted
+router.delete(`/:id`, controller.deleteProduct)
 
 //POST : /products -> createSingleProduct -> findIfProductExist
-router.post('/' ,controller.createSingleProduct)
+router.post('/', controller.createProduct)
 
 //PUT : /products/:id -> updateSingleProduct -> findAndUpdated
-router.put(`/:id`, controller.updateSingleProduct)
+router.put(`/:id`, controller.updateProduct)
 
-
- export default router
+export default router
