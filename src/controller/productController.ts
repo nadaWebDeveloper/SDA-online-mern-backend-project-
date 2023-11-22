@@ -1,6 +1,6 @@
 import  { NextFunction, Request, Response } from 'express'
 import  * as services from '../services/productService'
-import { MProduct, IFProduct } from '../models/product'
+import { Product, IProduct } from '../models/product'
 
 
 
@@ -10,13 +10,13 @@ import { MProduct, IFProduct } from '../models/product'
     try {
 
         const limit = Number(request.query.limit) 
-        let page = Number(request.query.page) 
-        const {AllProductOnPage, totalPage ,currentPage} = await services.FindAllProduct(page, limit)    
+        const page = Number(request.query.page) 
+        const {allProductOnPage, totalPage ,currentPage} = await services.FindAllProduct(page, limit)    
 
         response.json({
             message: `Return all products `,
             payload : { 
-           AllProductOnPage,
+           allProductOnPage,
               totalPage,
                currentPage
             }
@@ -33,8 +33,8 @@ import { MProduct, IFProduct } from '../models/product'
 export const getSingleProductById = async (request: Request, response: Response, next: NextFunction) => {
 
     try {
-        const ID = request.params.id
-        const singleProduct = await services.FindProductById(ID,response )  //MProduct.findOne({_id: ID})
+        const {id} = request.params
+        const singleProduct = await services.FindProductById(id,response )  //MProduct.findOne({_id: ID})
         response.json({
             message: `Return a single product `,
             payload: singleProduct
@@ -49,10 +49,10 @@ export const getSingleProductById = async (request: Request, response: Response,
 
 export const deleteSingleProduct = async (request: Request, response: Response, next: NextFunction) => {
     try {
-        const ID = request.params.id
-        const ProductsAfterDelete = await services.findAndDeleted(ID,response ) 
+        const {id} = request.params
+        const deletedProduct = await services.findAndDeleted(id,response ) 
         response.json({
-            message: `Delete a single product with ID: ${ID}`,
+            message: `Delete a single product with ID: ${id}`,
         })
     } catch (error) {
         next(error)
@@ -65,7 +65,7 @@ export const createSingleProduct = async (request: Request, response: Response, 
     try {
         const newInput = request.body
         const productExist = await services.findIfProductExist(newInput , response)
-        const newProduct: IFProduct = new MProduct({
+        const newProduct: IProduct = new Product({
             name: newInput.name,
             price: newInput.price,
             image: newInput.image,
@@ -85,9 +85,9 @@ export const createSingleProduct = async (request: Request, response: Response, 
 
 export const updateSingleProduct = async (request: Request, response: Response, next: NextFunction) => {
     try {
-        const ID = request.params.id
+        const {id} = request.params
         const updatedProduct = request.body
-        const productUpdated = await services.findAndUpdated(ID,response ,updatedProduct)
+        const productUpdated = await services.findAndUpdated(id,response ,updatedProduct)
 
         response.json({
             message: `Update a single product`,

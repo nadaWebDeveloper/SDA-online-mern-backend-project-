@@ -1,6 +1,6 @@
 import mongoose, {Document} from 'mongoose'
 
-export interface IFProduct extends Document {
+export interface IProduct extends Document {
   name: string,
   price: number,
   image: string,
@@ -51,4 +51,4 @@ const productSchema = new mongoose.Schema({
   },
 })
 
-export const MProduct = mongoose.model<IFProduct>('Product', productSchema)
+export const Product = mongoose.model<IProduct>('Product', productSchema)

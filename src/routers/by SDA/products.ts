@@ -4,7 +4,7 @@ const router = express.Router()
 // import Product from '../models/product'
 import Order from '../../models/order'
 import ApiError from '../../errors/ApiError'
-import { MProduct } from '../../models/product'
+import { Product } from '../../models/product'
 
 
 // router.get('/', async (_, res) => {
@@ -20,7 +20,7 @@ router.post('/', async (req, res, next) => {
   //   next(ApiError.badRequest('Name and Description are requried'))
   //   return
   // }
-  const product = new MProduct(req.body)
+  const product = new Product(req.body)
 
   await product.save()
   res.json(product)
