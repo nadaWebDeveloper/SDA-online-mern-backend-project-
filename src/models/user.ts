@@ -22,8 +22,8 @@ const userSchema = new mongoose.Schema({
   // here's 1to1 just for the demo
   order: {
     type: [mongoose.Schema.Types.ObjectId],
-    ref: 'Order',
+    ref: 'Orders',
   },
 })
 
-export const User = mongoose.model('User', userSchema)
+export const User = mongoose.model('Users', userSchema)

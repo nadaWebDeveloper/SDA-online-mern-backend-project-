@@ -14,12 +14,12 @@ const PORT = 5050
 // const URL = process.env.ATLAS_URL as string
 const URL = 'mongodb://127.0.0.1:27017/full-stack-demo-db'
 
-app.use(myLogger)
+// app.use(myLogger)
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
 app.use('/api/users', usersRouter)
-// app.use('/api/orders', ordersRouter)
+app.use('/api/orders', ordersRouter)
 app.use('/api/products', productsRouter)
 
 app.use(apiErrorHandler)

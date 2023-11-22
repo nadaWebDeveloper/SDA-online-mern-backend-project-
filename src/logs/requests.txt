@@ -83,3 +83,9 @@ Method: POST, Path: /api/users/, Date: 11/21/2023, Time: 10:11:10 PM
 Method: GET, Path: /api/users/, Date: 11/21/2023, Time: 10:11:14 PM
 Method: GET, Path: /api/users/655ce76923f322908816c08c, Date: 11/21/2023, Time: 10:11:39 PM
 Method: GET, Path: /api/users/655ce76423f322908816c08a, Date: 11/21/2023, Time: 10:12:06 PM
+Method: GET, Path: /api/users/655ce76423f322908816c08a, Date: 11/21/2023, Time: 10:40:21 PM
+Method: GET, Path: /api/users/655ce76423f322908816c08a, Date: 11/21/2023, Time: 10:40:22 PM
+Method: GET, Path: /api/users/, Date: 11/21/2023, Time: 10:40:41 PM
+Method: GET, Path: /api/users/, Date: 11/21/2023, Time: 10:43:20 PM
+Method: GET, Path: /api/products/, Date: 11/21/2023, Time: 10:47:44 PM
+Method: GET, Path: /api/products/, Date: 11/21/2023, Time: 10:47:50 PM
