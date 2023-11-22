@@ -5,6 +5,7 @@ import { config } from 'dotenv'
 import productsRouter from './routers/productRouter'
 import usersRouter from './routers/usersRouter'
 import ordersRouter from './routers/ordersRouter'
+import categoriesRouter from './routers/categoryRouter'
 
 import apiErrorHandler from './middlewares/errorHandler'
 import myLogger from './middlewares/logger'
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
 app.use('/products', productsRouter)
+app.use('/categories', categoriesRouter)
 app.use('/orders', ordersRouter)
 app.use('/users', usersRouter)
 app.get('/', (request: Request, response: Response) => {

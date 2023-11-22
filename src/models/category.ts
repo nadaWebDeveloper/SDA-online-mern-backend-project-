@@ -4,6 +4,8 @@ const categorySchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
+    trim: true,
+    unique: true,
   },
 })
-export default mongoose.model('Categories', categorySchema)
+export const Category = mongoose.model('Categories', categorySchema)
