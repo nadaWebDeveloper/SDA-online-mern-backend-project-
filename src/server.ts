@@ -2,7 +2,7 @@ import express from 'express'
 import mongoose from 'mongoose'
 import { config } from 'dotenv'
 
-import usersRouter from './routers/by SDA/users'
+import usersRouter from './routers/users'
 import productsRouter from './routers/by SDA/products'
 import ordersRouter from './routers/by SDA/orders'
 import apiErrorHandler from './middlewares/errorHandler'
@@ -18,7 +18,7 @@ app.use(myLogger)
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
-// app.use('/api/users', usersRouter)
+app.use('/api/users', usersRouter)
 // app.use('/api/orders', ordersRouter)
 app.use('/api/products', productsRouter)
 
