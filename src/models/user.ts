@@ -1,4 +1,11 @@
 import mongoose from 'mongoose'
+export type UserDocument = Document & {
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  order: mongoose.Schema.Types.ObjectId[]
+}
 
 const userSchema = new mongoose.Schema({
   firstName: {
@@ -18,12 +25,10 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
 
-  // relation between order and user should be many orders to one user
-  // here's 1to1 just for the demo
-  order: {
+  orders: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: 'Orders',
   },
 })
 
-export const User = mongoose.model('Users', userSchema)
+export const User = mongoose.model<UserDocument>('Users', userSchema)

@@ -5,17 +5,17 @@ import ApiError from '../errors/ApiError'
 
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const users = await User.find()
+    const users = await User.find().populate('orders')
 
     res.json({ message: 'users were found', users })
-  } catch (error: any) {
+  } catch (error) {
     next(error)
   }
 }
 
 const getUserById = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = await User.findById(req.params.id)
+    const user = await User.findById(req.params.id).populate('orders')
     if (!user) {
       throw ApiError.badRequest('User was Not Found')
     }
@@ -32,7 +32,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     await user.save()
 
     res.json({ message: 'user was created', user })
-  } catch (error) {
+  } catch (error: any) {
     next(error)
   }
 }
@@ -49,7 +49,7 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     res.json({ message: 'user was updated', user })
-  } catch (error: any) {
+  } catch (error) {
     next(error)
   }
 }
