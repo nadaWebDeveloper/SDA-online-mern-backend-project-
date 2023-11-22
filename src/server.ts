@@ -8,11 +8,10 @@ import myLogger from './middlewares/logger'
 
 config()
 const app = express()
-const PORT = 8080
+const PORT = 5050
 
-// const URL = process.env.ATLAS_URL as string
 mongoose.set('strictQuery', false)
-const URL = 'mongodb://127.0.0.1:27017/full-stack-demo-db'
+const URL = process.env.ATLAS_URL || 'mongodb://127.0.0.1:27017/full-stack-demo-db'
 
 app.use(myLogger)
 app.use(express.urlencoded({ extended: true }))

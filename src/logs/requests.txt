@@ -44,3 +44,8 @@ Method: GET, Path: /orders/655cfe2f48716, Date: 11/22/2023, Time: 1:59:13 PM
 Method: GET, Path: /orders/655cfe2f48716, Date: 11/22/2023, Time: 1:59:15 PM
 Method: GET, Path: /orders/65, Date: 11/22/2023, Time: 1:59:18 PM
 Method: GET, Path: /orders/655cfe484871646570a45009, Date: 11/22/2023, Time: 1:59:26 PM
+Method: PUT, Path: /orders/655cfe434871, Date: 11/22/2023, Time: 2:13:55 PM
+Method: PUT, Path: /orders/655cfe43487, Date: 11/22/2023, Time: 2:15:42 PM
+Method: GET, Path: /orders, Date: 11/22/2023, Time: 2:16:39 PM
+Method: DELETE, Path: /orders/655cfe294871646570a44fff, Date: 11/22/2023, Time: 2:16:49 PM
+Method: PUT, Path: /orders/655cfe294871646570a44fff, Date: 11/22/2023, Time: 2:17:12 PM
