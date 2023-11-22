@@ -2,16 +2,16 @@ import express from 'express'
 import mongoose from 'mongoose'
 import { config } from 'dotenv'
 
-import usersRouter from './routers/by SDA/users'
-import productsRouter from './routers/by SDA/products'
-import ordersRouter from './routers/by SDA/orders'
+import ordersRouter from './routers/ordersRoutes'
 import apiErrorHandler from './middlewares/errorHandler'
 import myLogger from './middlewares/logger'
 
 config()
 const app = express()
-const PORT = 5050
+const PORT = 8080
+
 // const URL = process.env.ATLAS_URL as string
+mongoose.set('strictQuery', false)
 const URL = 'mongodb://127.0.0.1:27017/full-stack-demo-db'
 
 app.use(myLogger)
@@ -20,7 +20,8 @@ app.use(express.json())
 
 // app.use('/api/users', usersRouter)
 // app.use('/api/orders', ordersRouter)
-app.use('/api/products', productsRouter)
+// app.use('/api/products', productsRouter)
+app.use('/orders', ordersRouter)
 
 app.use(apiErrorHandler)
 
