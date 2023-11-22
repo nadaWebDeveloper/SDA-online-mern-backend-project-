@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
+
 import { Order } from '../models/order'
 import ApiError from '../errors/ApiError'
 
@@ -9,7 +10,7 @@ export const getAllOrders = async (request: Request, response: Response, next: N
       throw next(ApiError.badRequest(404, 'There are no orders found'))
     }
     response.status(200).send({
-      message: `Reutrn all orders`,
+      message: `Return all orders`,
       payload: orders,
     })
   } catch (error) {
