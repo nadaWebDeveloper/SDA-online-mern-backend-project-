@@ -8,22 +8,22 @@ export type OrderDocument = Document & {
 
 const orderSchema = new mongoose.Schema(
   {
-    // products: {
-    //   type: [mongoose.Schema.Types.ObjectId],
-    //   ref: 'Product',
-    // },
-    // user: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: 'User',
-    // },
     products: {
-      type: String,
-      required: true,
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: 'Product',
     },
     user: {
-      type: String,
-      required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
     },
+    // products: {
+    //   type: String,
+    //   required: true,
+    // },
+    // user: {
+    //   type: String,
+    //   required: true,
+    // },
   },
   { timestamps: true }
 )
