@@ -2,8 +2,11 @@ import express, { Application, Request , Response} from 'express'
 import mongoose from 'mongoose'
 import { config } from 'dotenv'
 
+
 import productsRouter from './routers/productRouter'
 import usersRouter from './routers/users'
+import ordersRouter from './routers/ordersRoutes'
+
 
 import apiErrorHandler from './middlewares/errorHandler'
 import myLogger from './middlewares/logger'
@@ -19,14 +22,17 @@ app.use(myLogger)
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
-app.use('/api/users', usersRouter)
-// app.use('/api/orders', ordersRouter)
+
+
 app.use('/products', productsRouter)
+app.use('/orders', ordersRouter)
+app.use('/api/users', usersRouter)
 app.get('/', (request: Request, response: Response) => {
   response.json({
       message: 'CheckUp The Server'
   })
 })
+
 
 app.use(apiErrorHandler)
 

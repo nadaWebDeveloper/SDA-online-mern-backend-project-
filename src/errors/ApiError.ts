@@ -3,7 +3,7 @@ class ApiError {
     this.code = code
     this.message = message
   }
-  static badRequest(msg: string) {
+  static badRequest(code: number, msg: string) {
     return new ApiError(400, msg)
   }
   static internal(msg: string) {
