@@ -3,7 +3,7 @@ import mongoose, { Document } from 'mongoose'
 export type OrderDocument = Document & {
   // name: string
   products: mongoose.Schema.Types.ObjectId[]
-  user: mongoose.Schema.Types.ObjectId[]
+  user: mongoose.Schema.Types.ObjectId
 }
 
 const orderSchema = new mongoose.Schema(
@@ -28,4 +28,4 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
-export const Order = mongoose.model<OrderDocument>('Order', orderSchema)
+export const Order = mongoose.model<OrderDocument>('Orders', orderSchema)

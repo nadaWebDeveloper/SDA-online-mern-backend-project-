@@ -17,14 +17,15 @@ export const getAllOrders = async (request: Request, response: Response, next: N
   }
 }
 
-export const getOrderById = async (request: Request, response: Response, next: NextFunction) => {
+export const getSingleOrder = async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const order = await Order.findById({ _id: request.params.id })
+    const { id } = request.params
+    const order = await Order.findById({ _id: id })
     if (!order) {
-      throw next(ApiError.badRequest(404, `No order found with id ${request.params.id}`))
+      throw next(ApiError.badRequest(404, `No order found with id ${id}`))
     }
     response.status(200).send({
-      message: `Reutrn an order with id ${request.params.id}`,
+      message: `Reutrn an order with id ${id}`,
       payload: order,
     })
   } catch (error) {
@@ -49,15 +50,16 @@ export const createOrder = async (request: Request, response: Response, next: Ne
   }
 }
 
-export const deleteOrderById = async (request: Request, response: Response, next: NextFunction) => {
+export const deleteOrder = async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const orderExist = await Order.exists({ _id: request.params.id })
+    const { id } = request.params
+    const orderExist = await Order.exists({ _id: id })
     if (!orderExist) {
-      throw next(ApiError.badRequest(404, `Order with id ${request.params.id} not found`))
+      throw next(ApiError.badRequest(404, `Order with id ${id} not found`))
     }
-    const order = await Order.findOneAndDelete({ _id: request.params.id })
+    const order = await Order.findOneAndDelete({ _id: id })
     response.status(200).send({
-      message: `Deleted order with id ${request.params.id}`,
+      message: `Deleted order with id ${id}`,
       payload: {},
     })
   } catch (error) {
@@ -65,16 +67,17 @@ export const deleteOrderById = async (request: Request, response: Response, next
   }
 }
 
-export const updateOrderById = async (request: Request, response: Response, next: NextFunction) => {
+export const updateOrder = async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const order = await Order.findOneAndUpdate({ _id: request.params.id }, request.body, {
+    const { id } = request.params
+    const order = await Order.findOneAndUpdate({ _id: id }, request.body, {
       new: true,
     })
     if (!order) {
-      throw next(ApiError.badRequest(404, `Order with id ${request.params.id} not found`))
+      throw next(ApiError.badRequest(404, `Order with id ${id} not found`))
     }
     response.status(200).send({
-      message: `Updated order with id ${request.params.id}`,
+      message: `Updated order with id ${id}`,
       payload: order,
     })
   } catch (error) {
