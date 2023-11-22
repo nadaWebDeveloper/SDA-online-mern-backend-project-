@@ -7,11 +7,11 @@ import ApiError from '../../errors/ApiError'
 import { Product } from '../../models/product'
 
 
-router.get('/', async (_, res) => {
-  const products = await Product.find()
-  console.log('products:', products)
-  res.json(products)
-})
+// router.get('/', async (_, res) => {
+//   const products = await MProduct.find()
+//   console.log('products:', products)
+//   res.json(products)
+// })
 
 router.post('/', async (req, res, next) => {
   // const { name, description, quantity,  } = req.body
