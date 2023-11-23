@@ -2,12 +2,15 @@ import { Request, Response, NextFunction } from 'express'
 
 import { User } from '../models/user'
 import ApiError from '../errors/ApiError'
+import * as services from '../services/userService'
 
 const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const users = await User.find().populate('orders')
+    const limit = Number(request.query.limit)
+    const page = Number(request.query.page)
+    const { allUsersOnPage, totalPage, currentPage } = await services.findAllUsers(page, limit)
 
-    response.json({ message: 'users were found', users })
+    response.json({ message: 'users were found', allUsersOnPage, totalPage, currentPage })
   } catch (error) {
     next(error)
   }
