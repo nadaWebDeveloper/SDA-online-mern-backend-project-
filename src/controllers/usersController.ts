@@ -36,7 +36,7 @@ const createUser = async (request: Request, response: Response, next: NextFuncti
     await user.save()
 
     response.json({ message: 'user was created', user })
-  } catch (error: any) {
+  } catch (error) {
     next(error)
   }
 }

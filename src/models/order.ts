@@ -15,20 +15,12 @@ const orderSchema = new mongoose.Schema(
   {
     products: {
       type: [mongoose.Schema.Types.ObjectId],
-      ref: 'Product',
+      ref: 'Products',
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'Users',
     },
-    // products: {
-    //   type: String,
-    //   required: true,
-    // },
-    // user: {
-    //   type: String,
-    //   required: true,
-    // },
   },
   { timestamps: true }
 )
