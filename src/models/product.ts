@@ -1,11 +1,14 @@
-import mongoose, { Document } from 'mongoose'
+import mongoose from 'mongoose'
 
-export interface IProduct extends Document {
+import { ICategory } from './category'
+
+export interface IProduct extends mongoose.Document {
   name: string
   price: number
   image: string
   quantity: number
   sold: number
+  category: ICategory['_id'],
   description: string
   createAt?: string
   updateAt?: string
@@ -24,10 +27,10 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'product price is required'],
   },
-  categories: {
-    // ! will change it later
-    type: String,
-    // default: [],
+  category: {
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Categories' ,
+    required: [true , 'Product category is required'] ,
   },
   image: {
     type: String,

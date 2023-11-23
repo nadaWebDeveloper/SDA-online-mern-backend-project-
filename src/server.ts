@@ -44,5 +44,5 @@ mongoose
   })
 
 app.listen(PORT, () => {
-  console.log('Server running http://localhost:' + PORT)
+  console.log(`Server running http://localhost:${PORT}`)
 })
