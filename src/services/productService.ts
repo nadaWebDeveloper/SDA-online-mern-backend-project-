@@ -1,9 +1,11 @@
-import { NextFunction } from 'express'
+import { NextFunction , Request} from 'express'
 
 import ApiError from '../errors/ApiError'
 import { IProduct, Product } from '../models/product'
 
-export const findAllProduct = async (page = 1, limit = 3) => {
+export const findAllProduct = async (request: Request) => {
+  const limit = Number(request.query.limit) || 1
+  let page = Number(request.query.page) || 3
   //how many have products
   const countPage = await Product.countDocuments()
   //total page

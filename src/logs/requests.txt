@@ -92,3 +92,11 @@ Method: PUT, Path: /categories/655f175ef16ffa8ec70ffdd9, Date: 11/23/2023, Time:
 Method: PUT, Path: /categories/655f1765f16ffa8ec706fddb, Date: 11/23/2023, Time: 12:17:06 PM
 Method: PUT, Path: /categories/655f1765f16ffa8ec706fddb, Date: 11/23/2023, Time: 12:19:34 PM
 Method: PUT, Path: /categories/655f1765f16ffa8ec706fddb, Date: 11/23/2023, Time: 12:19:39 PM
+Method: GET, Path: /products, Date: 11/23/2023, Time: 8:05:37 AM
+Method: GET, Path: /products, Date: 11/23/2023, Time: 8:05:55 AM
+Method: GET, Path: /products, Date: 11/23/2023, Time: 8:06:19 AM
+Method: GET, Path: /products, Date: 11/23/2023, Time: 8:06:42 AM
+Method: GET, Path: /products, Date: 11/23/2023, Time: 8:06:49 AM
+Method: GET, Path: /products, Date: 11/23/2023, Time: 8:06:56 AM
+Method: GET, Path: /products, Date: 11/23/2023, Time: 8:07:18 AM
+Method: GET, Path: /products, Date: 11/23/2023, Time: 8:07:23 AM

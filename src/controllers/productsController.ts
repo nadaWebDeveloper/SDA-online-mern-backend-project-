@@ -6,9 +6,8 @@ import { Product, IProduct } from '../models/product'
 // * GET : /products -> getAllProducts
 export const getAllProducts = async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const limit = Number(request.query.limit)
-    const page = Number(request.query.page)
-    const { allProductOnPage, totalPage, currentPage } = await services.findAllProduct(page, limit)
+
+    const { allProductOnPage, totalPage, currentPage } = await services.findAllProduct(request)
 
     response.json({
       message: `Return all products `,
