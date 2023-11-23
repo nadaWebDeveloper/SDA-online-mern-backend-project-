@@ -4,7 +4,7 @@ import { User } from '../models/user'
 import ApiError from '../errors/ApiError'
 import * as services from '../services/userService'
 
-const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
+ export const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const limit = Number(request.query.limit)
     const page = Number(request.query.page)
@@ -16,7 +16,7 @@ const getAllUsers = async (request: Request, response: Response, next: NextFunct
   }
 }
 
-const getSingleUser = async (request: Request, response: Response, next: NextFunction) => {
+ export const getSingleUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
     const user = await User.findById(id).populate('orders')
@@ -30,7 +30,7 @@ const getSingleUser = async (request: Request, response: Response, next: NextFun
   }
 }
 
-const createUser = async (request: Request, response: Response, next: NextFunction) => {
+ export const createUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const user = new User(request.body)
     await user.save()
@@ -41,7 +41,7 @@ const createUser = async (request: Request, response: Response, next: NextFuncti
   }
 }
 
-const updateUser = async (request: Request, response: Response, next: NextFunction) => {
+ export const updateUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
     const updatedUser = request.body
@@ -58,7 +58,7 @@ const updateUser = async (request: Request, response: Response, next: NextFuncti
   }
 }
 
-const deleteUser = async (request: Request, response: Response, next: NextFunction) => {
+ export const deleteUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
 
@@ -73,5 +73,3 @@ const deleteUser = async (request: Request, response: Response, next: NextFuncti
     next(error)
   }
 }
-
-export { getAllUsers, getSingleUser, createUser, updateUser, deleteUser }
