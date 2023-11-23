@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import bcrypt from 'bcrypt'
 export type UserDocument = Document & {
   firstName: string
   lastName: string
@@ -43,6 +44,7 @@ const userSchema = new mongoose.Schema(
       required: [true, 'password is required'],
       trim: true,
       minlength: [8, 'password must be at least 8 characters'],
+      set: (password: string) => bcrypt.hashSync(password, 10),
     },
 
     role: {
