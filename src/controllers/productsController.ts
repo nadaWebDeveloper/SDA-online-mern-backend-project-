@@ -6,9 +6,7 @@ import { Product, IProduct } from '../models/product'
 // * GET : /products -> getAllProducts
 export const getAllProducts = async (request: Request, response: Response, next: NextFunction) => {
   try {
-
     const { allProductOnPage, totalPage, currentPage } = await services.findAllProduct(request)
-
     response.json({
       message: `Return all products `,
       payload: {
@@ -25,7 +23,8 @@ export const getAllProducts = async (request: Request, response: Response, next:
 export const getSingleProduct = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
-    const singleProduct = await services.findProductById(id, next) //MProduct.findOne({_id: ID})
+
+    const singleProduct = await services.findProductById(id, next) 
     response.json({
       message: `Return a single product `,
       payload: singleProduct,
@@ -58,6 +57,7 @@ export const createProduct = async (request: Request, response: Response, next: 
       quantity: newInput.quantity,
       sold: newInput.sold,
       description: newInput.description,
+      category: newInput.category
     })
     await newProduct.save()
     response.status(201).json({

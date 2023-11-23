@@ -10,6 +10,7 @@ export interface IProduct extends mongoose.Document {
   sold: number
   category: ICategory['_id'],
   description: string
+  category: mongoose.Schema.Types.ObjectId
   createAt?: string
   updateAt?: string
 }
@@ -55,3 +56,4 @@ const productSchema = new mongoose.Schema({
 })
 
 export const Product = mongoose.model<IProduct>('Products', productSchema)
+

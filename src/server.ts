@@ -40,7 +40,7 @@ mongoose
     console.log('Database connected')
   })
   .catch((err) => {
-    console.log('MongoDB connection error, ', err)
+    console.log(`MongoDB connection error: ${err}`)
   })
 
 app.listen(PORT, () => {
