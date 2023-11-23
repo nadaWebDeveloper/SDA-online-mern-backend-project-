@@ -1,4 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
+
+
 import { IOrder, Order } from '../models/order'
 import ApiError from '../errors/ApiError'
 
@@ -9,7 +11,7 @@ export const getAllOrders = async (request: Request, response: Response, next: N
       throw next(ApiError.badRequest(404, 'There are no orders found'))
     }
     response.status(200).send({
-      message: `Reutrn all orders`,
+      message: `Return all orders`,
       payload: orders,
     })
   } catch (error) {
@@ -25,7 +27,7 @@ export const getSingleOrder = async (request: Request, response: Response, next:
       throw next(ApiError.badRequest(404, `No order found with id ${id}`))
     }
     response.status(200).send({
-      message: `Reutrn an order with id ${id}`,
+      message: `Return an order with id ${id}`,
       payload: order,
     })
   } catch (error) {
