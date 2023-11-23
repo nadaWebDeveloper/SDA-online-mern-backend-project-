@@ -14,21 +14,21 @@ const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      required: [true, 'firstname is required'],
+      required: [true, 'Firstname is required'],
       trim: true,
-      minlength: [3, 'firstname must be at least 3 characters'],
-      maxlength: [30, 'firstname must be at most 30 characters'],
+      minlength: [3, 'Firstname must be at least 3 characters'],
+      maxlength: [30, 'Firstname must be at most 30 characters'],
     },
     lastName: {
       type: String,
-      required: [true, 'lastname is required'],
+      required: [true, 'Lastname is required'],
       trim: true,
-      minlength: [3, 'lastname must be at least 3 characters'],
-      maxlength: [30, 'lastname must be at most 30 characters'],
+      minlength: [3, 'Lastname must be at least 3 characters'],
+      maxlength: [30, 'Lastname must be at most 30 characters'],
     },
     email: {
       type: String,
-      required: [true, 'email is required'],
+      required: [true, 'Email is required'],
       trim: true,
       unique: true,
       lowercase: true,
@@ -36,14 +36,14 @@ const userSchema = new mongoose.Schema(
         validator: function (value: string) {
           return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(value)
         },
-        message: 'please,enter valid email',
+        message: 'Please, enter valid email',
       },
     },
     password: {
       type: String,
-      required: [true, 'password is required'],
+      required: [true, 'Password is required'],
       trim: true,
-      minlength: [8, 'password must be at least 8 characters'],
+      minlength: [8, 'Password must be at least 8 characters'],
       set: (password: string) => bcrypt.hashSync(password, 10),
     },
 

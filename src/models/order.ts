@@ -16,10 +16,12 @@ const orderSchema = new mongoose.Schema(
     products: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: 'Products',
+      required: [true, 'One porduct at least is required'],
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Users',
+      required: [true, 'User is required'],
     },
   },
   { timestamps: true }

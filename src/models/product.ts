@@ -17,12 +17,12 @@ const productSchema = new mongoose.Schema({
     index: true,
     required: [true, 'Product name is required'],
     trim: true,
-    minlength: [3, 'name must be at least 3 characters'],
-    maxlength: [30, 'name must be at most 30 characters'],
+    minlength: [3, 'Name must be at least 3 characters'],
+    maxlength: [30, 'Name must be at most 30 characters'],
   },
   price: {
     type: Number,
-    required: [true, 'Product price is required'],
+    required: [true, 'product price is required'],
   },
   categories: {
     // ! will change it later
@@ -37,8 +37,9 @@ const productSchema = new mongoose.Schema({
   description: {
     type: String,
     required: [true, 'Product description is required'],
-    minlength: [3, 'description must be at least 3 characters'],
-    maxlength: [100, 'description must be at most 100 characters'],
+    minlength: [3, 'Description must be at least 3 characters'],
+    maxlength: [100, 'Description must be at most 100 characters'],
+    trim: true,
   },
   quantity: {
     type: Number,

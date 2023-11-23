@@ -25,10 +25,10 @@ export const getSingleCategory = async (
   try {
     const { id } = request.params
     const category = await Category.findById(id)
-    response.json({ message: 'Category is returned', payload: category })
     if (!category) {
       throw next(ApiError.badRequest(404, `No category found with id ${id}`))
     }
+    response.json({ message: 'Category is returned', payload: category })
   } catch (error) {
     next(error)
   }
@@ -52,11 +52,12 @@ export const createCategory = async (request: Request, response: Response, next:
 export const deleteCategory = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
+
     const category = await Category.findByIdAndDelete(id)
-    response.json({ message: 'Category is deleted', payload: category })
     if (!category) {
       throw next(ApiError.badRequest(404, `Category with id ${id} not found`))
     }
+    response.json({ message: 'Category is deleted', payload: category })
   } catch (error) {
     next(error)
   }
@@ -70,10 +71,10 @@ export const updateCategory = async (request: Request, response: Response, next:
     const category = await Category.findByIdAndUpdate(id, updatedCategory, {
       new: true,
     })
-    response.json({ message: 'Category is updated', payload: category })
     if (!category) {
       throw next(ApiError.badRequest(404, `Category with id ${id} not found`))
     }
+    response.json({ message: 'Category is updated', payload: category })
   } catch (error) {
     next(error)
   }
