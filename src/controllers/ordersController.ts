@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from 'express'
 
-import { Order } from '../models/order'
+
+import { IOrder, Order } from '../models/order'
 import ApiError from '../errors/ApiError'
 
 export const getAllOrders = async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const orders = await Order.find()
+    const orders: IOrder[] = await Order.find()
     if (orders.length === 0) {
       throw next(ApiError.badRequest(404, 'There are no orders found'))
     }
@@ -21,7 +22,7 @@ export const getAllOrders = async (request: Request, response: Response, next: N
 export const getSingleOrder = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
-    const order = await Order.findById({ _id: id })
+    const order: IOrder | null = await Order.findById({ _id: id })
     if (!order) {
       throw next(ApiError.badRequest(404, `No order found with id ${id}`))
     }
@@ -37,7 +38,7 @@ export const getSingleOrder = async (request: Request, response: Response, next:
 export const createOrder = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { products, user } = request.body
-    const newOrder = new Order({
+    const newOrder: IOrder = new Order({
       products: products,
       user: user,
     })
@@ -71,7 +72,7 @@ export const deleteOrder = async (request: Request, response: Response, next: Ne
 export const updateOrder = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
-    const order = await Order.findOneAndUpdate({ _id: id }, request.body, {
+    const order: IOrder | null = await Order.findOneAndUpdate({ _id: id }, request.body, {
       new: true,
     })
     if (!order) {

@@ -21,9 +21,7 @@ export const getAllProducts = async (request: Request, response: Response, next:
         currentPage,
       },
     })
-  } catch (error: any) {
-    console.log(error.message)
-
+  } catch (error) {
     next(error)
   }
 }
@@ -74,9 +72,7 @@ export const createProduct = async (request: Request, response: Response, next: 
     response.status(201).json({
       message: `Create a single product`,
     })
-  } catch (error: any) {
-    console.log(error.message)
-
+  } catch (error) {
     next(error)
   }
 }

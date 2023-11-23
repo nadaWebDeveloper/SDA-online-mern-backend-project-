@@ -1,9 +1,11 @@
 import mongoose from 'mongoose'
 
 const categorySchema = new mongoose.Schema({
-  title: {
+  name: {
     type: String,
-    required: true,
+    required: [true, 'Name is required'],
+    trim: true,
+    unique: true,
   },
 })
-export default mongoose.model('Categories', categorySchema)
+export const Category = mongoose.model('Categories', categorySchema)
