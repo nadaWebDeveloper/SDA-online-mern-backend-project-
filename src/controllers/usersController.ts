@@ -4,7 +4,7 @@ import { User } from '../models/user'
 import ApiError from '../errors/ApiError'
 import * as services from '../services/userService'
 
- export const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
+export const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const limit = Number(request.query.limit)
     const page = Number(request.query.page)
@@ -16,7 +16,7 @@ import * as services from '../services/userService'
   }
 }
 
- export const getSingleUser = async (request: Request, response: Response, next: NextFunction) => {
+export const getSingleUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
     const user = await User.findById(id).populate('orders')
@@ -30,7 +30,7 @@ import * as services from '../services/userService'
   }
 }
 
- export const createUser = async (request: Request, response: Response, next: NextFunction) => {
+export const createUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const user = new User(request.body)
     await user.save()
@@ -41,7 +41,7 @@ import * as services from '../services/userService'
   }
 }
 
- export const updateUser = async (request: Request, response: Response, next: NextFunction) => {
+export const updateUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
     const updatedUser = request.body
@@ -58,7 +58,7 @@ import * as services from '../services/userService'
   }
 }
 
- export const deleteUser = async (request: Request, response: Response, next: NextFunction) => {
+export const deleteUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
 
@@ -69,6 +69,23 @@ import * as services from '../services/userService'
     }
 
     response.json({ message: 'user was updated', user })
+  } catch (error) {
+    next(error)
+  }
+}
+
+// search users
+export const searchUsers = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { firstName } = request.params
+
+    // search users by name
+    const searchResult = await services.searchUsersByName(firstName, next)
+
+    response.status(200).send({
+      message: `Results found`,
+      payload: searchResult,
+    })
   } catch (error) {
     next(error)
   }

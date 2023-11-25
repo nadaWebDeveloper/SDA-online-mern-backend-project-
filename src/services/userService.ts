@@ -1,4 +1,4 @@
-import { Response } from 'express'
+import { NextFunction, Response } from 'express'
 
 import ApiError from '../errors/ApiError'
 import { UserDocument, User } from '../models/user'
@@ -44,4 +44,17 @@ export const findAllUsersOnPage = async (page = 1, limit = 3) => {
     totalPage,
     currentPage: page,
   }
+}
+
+// search users by name
+export const searchUsersByName = async (firstName: string, next: NextFunction) => {
+  const searchResult = await User.find({
+    $or: [{ firstName: { $regex: firstName } }],
+  })
+
+  if (searchResult.length === 0) {
+    next(ApiError.badRequest(404, `No results found with the keyword ${firstName}`))
+    return
+  }
+  return searchResult
 }

@@ -2,15 +2,16 @@ import { NextFunction, Request, Response } from 'express'
 
 import * as services from '../services/productService'
 import { Product, IProduct } from '../models/product'
+import ApiError from '../errors/ApiError'
 
 // * GET : /products -> getAllProducts
 export const getAllProducts = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const limit = Number(request.query.limit)
     const page = Number(request.query.page)
-    console.log(page);
-    console.log(limit);
-    
+    console.log(page)
+    console.log(limit)
+
     const { allProductOnPage, totalPage, currentPage } = await services.findAllProduct(page, limit)
 
     response.json({
@@ -33,7 +34,7 @@ export const getSingleProduct = async (
 ) => {
   try {
     const { id } = request.params
-    const singleProduct = await services.findProductById(id, next) 
+    const singleProduct = await services.findProductById(id, next)
     response.json({
       message: `Return a single product `,
       payload: singleProduct,
@@ -66,7 +67,7 @@ export const createProduct = async (request: Request, response: Response, next: 
       quantity: newInput.quantity,
       sold: newInput.sold,
       description: newInput.description,
-      category: newInput.category
+      category: newInput.category,
     })
     await newProduct.save()
     response.status(201).json({
@@ -86,6 +87,23 @@ export const updateProduct = async (request: Request, response: Response, next: 
     response.json({
       message: `Update a single product`,
       payload: productUpdated,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+// search products
+export const searchProducts = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { name } = request.params
+
+    // search products by name
+    const searchResult = await services.searchProductsByName(name, next)
+
+    response.status(200).send({
+      message: `Results found`,
+      payload: searchResult,
     })
   } catch (error) {
     next(error)
