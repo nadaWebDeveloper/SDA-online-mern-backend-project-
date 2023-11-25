@@ -7,7 +7,7 @@ router.get('/', controller.getAllUsers)
 
 router.get('/:id', controller.getSingleUser)
 
-router.post('/', controller.createUser)
+router.post('/register', controller.registUser)
 
 router.put('/:id', controller.updateUser)
 

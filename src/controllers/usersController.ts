@@ -1,8 +1,11 @@
 import { Request, Response, NextFunction } from 'express'
+import jwt from 'jsonwebtoken'
 
-import { User, UserDocument } from '../models/user'
+import { User } from '../models/user'
 import ApiError from '../errors/ApiError'
+import { sendEmail } from '../helper/sendEmail'
 import * as services from '../services/userService'
+import { dev } from '../config'
 
 const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
@@ -38,15 +41,21 @@ const getSingleUser = async (request: Request, response: Response, next: NextFun
   }
 }
 
-const createUser = async (request: Request, response: Response, next: NextFunction) => {
+const registUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { email } = request.body
     const userExists = await services.isUserEmailExists(email)
 
-    const user = new User(request.body)
-    await user.save()
+    const token = jwt.sign(request.body, dev.app.jwsUserActivationKey, { expiresIn: '1m' })
+    const emailData = {
+      email: email,
+      subject: 'Activate your account',
+      html: ` 
+      <h1> Hello</h1>
+      <p>Please activate your account by <a href= "http://127.0.0.1:5050/users/activate/${token}">click here</a></p>`,
+    }
 
-    response.json({ message: 'User was created', user })
+    response.json({ message: 'Check your email to activate the account ', token })
   } catch (error) {
     next(error)
   }
@@ -90,4 +99,4 @@ const deleteUser = async (request: Request, response: Response, next: NextFuncti
   }
 }
 
-export { getAllUsers, getSingleUser, createUser, updateUser, deleteUser }
+export { getAllUsers, getSingleUser, registUser, updateUser, deleteUser }
