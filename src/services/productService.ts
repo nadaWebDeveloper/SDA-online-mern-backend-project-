@@ -1,5 +1,5 @@
 
-import { NextFunction , Request} from 'express'
+import { NextFunction , Request, Response} from 'express'
 
 
 import ApiError from '../errors/ApiError'
@@ -8,6 +8,31 @@ import { IProduct, Product } from '../models/product'
 export const findAllProduct = async (request: Request) => {
   const limit = Number(request.query.limit) || 1
   let page = Number(request.query.page) || 3
+  const { category } = request.query || { $gte: 0 }
+
+  let priceFilter;
+//filter by price
+switch (category) {
+  case 'range1':
+    priceFilter = { $gte: 0, $lte: 99 };
+    break;
+  case 'range2':
+    priceFilter = { $gte: 100, $lte: 199 };
+    break;
+  case 'range3':
+    priceFilter = { $gte: 200, $lte: 399 };
+    break;
+  case 'range4':
+    priceFilter = { $gte: 400, $lte: 699 };
+    break;
+  case 'range5':
+    priceFilter = { $gte: 1000, $lte: Number.MAX_SAFE_INTEGER };
+    break;
+  default:
+    return(ApiError.badRequest(400,'Invalid range price'))
+
+}
+
   //how many have products
   const countPage = await Product.countDocuments()
   //total page
@@ -16,11 +41,12 @@ export const findAllProduct = async (request: Request) => {
     page = totalPage
   }
   const skip = (page - 1) * limit
-
-  const allProductOnPage: IProduct[] = await Product.find()
-    .populate('Products')
+  const allProductOnPage: IProduct[] = await Product.find({ price: priceFilter })
+    .populate('Categories')
     .skip(skip)
     .limit(limit)
+    // .sort({price : -1})
+    
   return {
     allProductOnPage,
     totalPage,
@@ -28,10 +54,11 @@ export const findAllProduct = async (request: Request) => {
   }
 }
 
-export const findProductById = async (id: string, next: NextFunction) => {
+
+export const findProductById = async (id: string, next: NextFunction)=> {    
   const singleProduct = await Product.findOne({ _id: id })
   if (!singleProduct) {
-    next(ApiError.badRequest(404,`Product is not found with this id: ${id}`))
+    throw(ApiError.badRequest(404,`Product is not found with this id: ${id}`))
   }
   return singleProduct
 }
@@ -39,8 +66,8 @@ export const findProductById = async (id: string, next: NextFunction) => {
 
 export const findAndDeleted = async (id: string, next: NextFunction) => {
   const deleteSingleProduct = await Product.findOneAndDelete({ _id: id })
-  if (!deleteSingleProduct) {
-    next(ApiError.badRequest(404,`Product is not found with this id: ${id}`))
+  if(!deleteSingleProduct) {
+    throw(ApiError.badRequest(404,`Product is not found with this id: ${id}`))
   }
   return deleteSingleProduct
 }
@@ -50,16 +77,16 @@ export const findIfProductExist = async (newInput: IProduct, next: NextFunction)
   const nameInput = newInput.name
   const productExist = await Product.exists({ name: nameInput })
   if (productExist) {
- next(ApiError.badRequest(409,`Product already exist with this Name: ${nameInput}`))
+    throw(ApiError.badRequest(409,`Product already exist with this Name: ${nameInput}`))
 
   }
     return productExist 
 }
 
 export const findAndUpdated = async (id: string, next: NextFunction, updatedProduct: Request) => {
-  const productUpdated = await Product.findOneAndUpdate({ _id: id }, updatedProduct, { new: true })
-  if (!productUpdated) {
-  next(ApiError.badRequest(404,`Product is not found with this id: ${id}`))
+  const productUpdated = await Product.findByIdAndUpdate( id , updatedProduct, { new: true ,runValidators: true})
+  if(!productUpdated) {
+  throw(ApiError.badRequest(404,`Product is not found with this id: ${id}`))
   }
   return productUpdated
 }

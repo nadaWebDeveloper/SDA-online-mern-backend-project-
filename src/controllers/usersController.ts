@@ -1,4 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
+import mongoose from 'mongoose'
+
 
 import { User } from '../models/user'
 import ApiError from '../errors/ApiError'
@@ -26,7 +28,13 @@ import * as services from '../services/userService'
 
     response.json({ message: 'user was found', user })
   } catch (error) {
-    next(error)
+    if(error instanceof mongoose.Error.CastError){
+      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
+    
+    }else{
+      next(error)
+    
+    } 
   }
 }
 
@@ -54,7 +62,13 @@ import * as services from '../services/userService'
 
     response.json({ message: 'user was updated', user })
   } catch (error) {
-    next(error)
+    if(error instanceof mongoose.Error.CastError){
+      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
+    
+    }else{
+      next(error)
+    
+    } 
   }
 }
 
@@ -70,6 +84,12 @@ import * as services from '../services/userService'
 
     response.json({ message: 'user was updated', user })
   } catch (error) {
-    next(error)
+    if(error instanceof mongoose.Error.CastError){
+      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
+    
+    }else{
+      next(error)
+    
+    } 
   }
 }
