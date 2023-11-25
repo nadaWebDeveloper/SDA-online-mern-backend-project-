@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import jwt from 'jsonwebtoken'
+import jwt, { TokenExpiredError } from 'jsonwebtoken'
 
 import { User } from '../models/user'
 import ApiError from '../errors/ApiError'
@@ -63,6 +63,31 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
   }
 }
 
+const activateUser = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { token } = request.body
+
+    if (!token) {
+      throw ApiError.badRequest(404, 'Token was not provided')
+    }
+
+    const decodedUser = jwt.verify(token, dev.app.jwsUserActivationKey)
+
+    if (!decodedUser) {
+      throw ApiError.badRequest(401, 'Token was invalid')
+    }
+    const user = new User(decodedUser)
+    await user.save()
+
+    response.status(201).json({ message: 'User was activated ', user })
+  } catch (error) {
+    if (error instanceof TokenExpiredError) {
+      next(ApiError.badRequest(401, 'Token was expired'))
+    } else {
+      next(error)
+    }
+  }
+}
 const updateUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
@@ -101,4 +126,4 @@ const deleteUser = async (request: Request, response: Response, next: NextFuncti
   }
 }
 
-export { getAllUsers, getSingleUser, registUser, updateUser, deleteUser }
+export { getAllUsers, getSingleUser, registUser, activateUser, updateUser, deleteUser }

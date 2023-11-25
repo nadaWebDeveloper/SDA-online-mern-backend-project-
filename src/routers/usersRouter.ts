@@ -9,6 +9,8 @@ router.get('/:id', controller.getSingleUser)
 
 router.post('/register', controller.registUser)
 
+router.post('/activate', controller.activateUser)
+
 router.put('/:id', controller.updateUser)
 
 router.delete('/:id', controller.deleteUser)
