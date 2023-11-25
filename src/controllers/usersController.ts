@@ -55,6 +55,8 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
       <p>Please activate your account by <a href= "http://127.0.0.1:5050/users/activate/${token}">click here</a></p>`,
     }
 
+    sendEmail(emailData)
+
     response.json({ message: 'Check your email to activate the account ', token })
   } catch (error) {
     next(error)
