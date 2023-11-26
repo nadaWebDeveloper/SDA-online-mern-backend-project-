@@ -1,6 +1,9 @@
-import { NextFunction, Response } from 'express'
+import { NextFunction } from 'express'
+import jwt, { TokenExpiredError } from 'jsonwebtoken'
 
+import { dev } from '../config'
 import ApiError from '../errors/ApiError'
+import { sendEmail } from '../helper/sendEmail'
 import { UserDocument, User } from '../models/user'
 
 export const findAllUsers = async () => {
@@ -33,9 +36,69 @@ export const findAllUsersOnPage = async (page = 1, limit = 3) => {
   }
 }
 
+export const findUserByID = async (id: string) => {
+  const user = await User.findById(id).populate('orders')
+  if (!user) {
+    throw ApiError.badRequest(404, `User with ${id} was not found`)
+  }
+  return user
+}
+
 export const isUserEmailExists = async (inputEmail: string, inputId: string | null = null) => {
   const user = await User.exists({ $and: [{ _id: { $ne: inputId } }, { email: inputEmail }] })
   if (user) {
     throw ApiError.badRequest(409, 'This email is already exists')
   }
+}
+
+export const sendTokenByEmail = (email: string, token: string) => {
+  const emailData = {
+    email: email,
+    subject: 'Activate your account',
+    html: ` 
+  <h1> Hello</h1>
+  <p>Please activate your account by <a href= "http://127.0.0.1:5050/users/activate/${token}">click here</a></p>`,
+  }
+
+  sendEmail(emailData)
+}
+
+export const checkTokenAndActivate = async (token: string) => {
+  try {
+    if (!token) {
+      throw ApiError.badRequest(404, 'Token was not provided')
+    }
+
+    const decodedUser = jwt.verify(token, dev.app.jwsUserActivationKey)
+
+    if (!decodedUser) {
+      throw ApiError.badRequest(401, 'Token was invalid')
+    }
+    const user = new User(decodedUser)
+    await user.save()
+    return user
+  } catch (error) {
+    if (error instanceof TokenExpiredError) {
+      throw ApiError.badRequest(401, 'Token was expired')
+    } else {
+      throw error
+    }
+  }
+}
+
+export const findUserAndUpdate = async (id: string, inputUser: UserDocument) => {
+  const user = await User.findByIdAndUpdate(id, inputUser, { new: true })
+  if (!user) {
+    throw ApiError.badRequest(404, 'User was Not Found')
+  }
+  return user
+}
+
+export const findUserAndDelete = async (id: string) => {
+  const user = await User.findByIdAndDelete(id)
+
+  if (!user) {
+    throw ApiError.badRequest(404, `User with ${id} was not found`)
+  }
+  return user
 }
