@@ -10,7 +10,6 @@ export interface IProduct extends mongoose.Document {
   quantity: number
   sold: number,
   category: mongoose.Schema.Types.ObjectId[]
-  // category: ICategory['_id'],
   description: string,
   title: String,
   dateAdded: Date,
@@ -32,8 +31,8 @@ const productSchema = new mongoose.Schema({
     required: [true, 'product price is required'],
   },
   category: {
-    type: [mongoose.Schema.Types.ObjectId], 
-    ref: 'Categories' ,
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'categories' ,
     required: [true , 'Product category is required'] ,
   },
   image: {

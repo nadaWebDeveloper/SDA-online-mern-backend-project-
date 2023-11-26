@@ -33,10 +33,8 @@ export const getSingleProduct = async (request: Request, response: Response, nex
   } catch (error) {
 if(error instanceof mongoose.Error.CastError){
   next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
-
 }else{
   next(error)
-
 }  
 }
 }
@@ -77,8 +75,13 @@ export const createProduct = async (request: Request, response: Response, next: 
       message: `Create a single product`,
     })
   } catch (error) {
-    next(error)
-  }
+    if(error instanceof mongoose.Error.CastError){
+      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
+    
+    }else{
+      next(error)
+    
+    }   }
 }
 
 export const updateProduct = async (request: Request, response: Response, next: NextFunction) => {
@@ -99,5 +102,23 @@ export const updateProduct = async (request: Request, response: Response, next: 
       next(error)
     } 
   }
+}
+
+export const sortProductByDate = async (request: Request, response: Response, next: NextFunction) => {
+ 
+  try {
+    const { sortBy } = request.query;
+    let sortOption = {};
+
+    if (sortBy) {
+      // Set the sorting option based on the query parameter
+      sortOption = { sortBy: 1 }; // 1 for ascending, -1 for descending
+    }
+
+    const products = await Product.find().sort(sortOption);
+    response.json(products);
+  } catch (error) {
+    next(error) 
+}
 }
 

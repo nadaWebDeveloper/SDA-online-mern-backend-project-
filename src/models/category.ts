@@ -17,4 +17,4 @@ const categorySchema = new mongoose.Schema({
     unique: true,
   },
 })
-export const Category = mongoose.model('Categories', categorySchema)
+export const Category = mongoose.model('categories', categorySchema)

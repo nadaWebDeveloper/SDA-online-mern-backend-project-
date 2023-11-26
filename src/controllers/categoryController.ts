@@ -52,7 +52,13 @@ export const createCategory = async (request: Request, response: Response, next:
     await newCategory.save()
     response.json({ message: 'Category is created' })
   } catch (error) {
-    next(error)
+    if(error instanceof mongoose.Error.CastError){
+      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
+    
+    }else{
+      next(error)
+    
+    }
   }
 }
 
