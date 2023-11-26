@@ -7,6 +7,7 @@ export interface IProduct extends Document {
   quantity: number
   sold: number
   description: string
+  category: mongoose.Schema.Types.ObjectId
   createAt?: string
   updateAt?: string
 }
@@ -24,10 +25,10 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'product price is required'],
   },
-  categories: {
-    // ! will change it later
-    type: String,
-    // default: [],
+  category: {
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Categories' ,
+    required: [true , 'Product category is required'] ,
   },
   image: {
     type: String,
@@ -52,3 +53,4 @@ const productSchema = new mongoose.Schema({
 })
 
 export const Product = mongoose.model<IProduct>('Products', productSchema)
+

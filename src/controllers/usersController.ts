@@ -6,7 +6,7 @@ import ApiError from '../errors/ApiError'
 import * as services from '../services/userService'
 import mongoose, { Mongoose } from 'mongoose'
 
-const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
+ const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const limit = Number(request.query.limit)
     const page = Number(request.query.page)
@@ -27,7 +27,7 @@ const getAllUsers = async (request: Request, response: Response, next: NextFunct
   }
 }
 
-const getSingleUser = async (request: Request, response: Response, next: NextFunction) => {
+ const getSingleUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
     const user = await services.findUserByID(id)
@@ -56,6 +56,7 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
 }
 
 const activateUser = async (request: Request, response: Response, next: NextFunction) => {
+
   try {
     const { token } = request.body
     const user = await services.checkTokenAndActivate(token)
@@ -66,7 +67,7 @@ const activateUser = async (request: Request, response: Response, next: NextFunc
   }
 }
 
-const updateUser = async (request: Request, response: Response, next: NextFunction) => {
+ const updateUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
     const { email } = request.body
@@ -86,7 +87,7 @@ const updateUser = async (request: Request, response: Response, next: NextFuncti
   }
 }
 
-const deleteUser = async (request: Request, response: Response, next: NextFunction) => {
+ const deleteUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
     const user = await services.findUserAndDelete(id)
@@ -102,3 +103,4 @@ const deleteUser = async (request: Request, response: Response, next: NextFuncti
 }
 
 export { getAllUsers, getSingleUser, registUser, activateUser, updateUser, deleteUser }
+
