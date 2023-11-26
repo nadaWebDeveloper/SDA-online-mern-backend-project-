@@ -9,8 +9,11 @@ router.get('/', controller.getAllUsers)
 //GET --> get a single user by ID
 router.get('/:id', controller.getSingleUser)
 
-//POST --> create a user
-router.post('/', controller.createUser)
+//POST --> register a user
+router.post('/register', controller.registUser)
+
+//POST --> activate a user
+router.post('/activate', controller.activateUser)
 
 //PUT --> update a single user by ID
 router.put('/:id', controller.updateUser)
