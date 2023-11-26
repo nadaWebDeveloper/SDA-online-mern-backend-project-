@@ -55,9 +55,11 @@ export const searchUsersByName = async (firstName: string, next: NextFunction) =
     return
   }
   return searchResult
+}
 
 export const isUserEmailExists = async (inputEmail: string, inputId: string | null = null) => {
   const user = await User.exists({ $and: [{ _id: { $ne: inputId } }, { email: inputEmail }] })
+
   if (user) {
     throw ApiError.badRequest(409, 'This email is already exists')
   }
@@ -113,5 +115,4 @@ export const findUserAndDelete = async (id: string) => {
     throw ApiError.badRequest(404, `User with ${id} was not found`)
   }
   return user
-
 }

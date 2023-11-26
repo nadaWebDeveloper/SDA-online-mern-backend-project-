@@ -2,14 +2,11 @@ import jwt from 'jsonwebtoken'
 import { Request, Response, NextFunction } from 'express'
 import mongoose from 'mongoose'
 
-
 import { dev } from '../config'
 import ApiError from '../errors/ApiError'
 import * as services from '../services/userService'
-import mongoose, { Mongoose } from 'mongoose'
 
-
- const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
+const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const limit = Number(request.query.limit)
     const page = Number(request.query.page)
@@ -30,8 +27,7 @@ import mongoose, { Mongoose } from 'mongoose'
   }
 }
 
- const getSingleUser = async (request: Request, response: Response, next: NextFunction) => {
-
+const getSingleUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
     const user = await services.findUserByID(id)
@@ -55,16 +51,13 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
 
     response.json({ message: 'Check your email to activate the account ', token })
   } catch (error) {
-    if(error instanceof mongoose.Error.CastError){
-      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
-    
-    }else{
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
       next(error)
-    
-    } 
+    }
   }
 }
-
 
 const activateUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
@@ -77,8 +70,7 @@ const activateUser = async (request: Request, response: Response, next: NextFunc
   }
 }
 
-
- const updateUser = async (request: Request, response: Response, next: NextFunction) => {
+const updateUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
     const { email } = request.body
@@ -90,20 +82,15 @@ const activateUser = async (request: Request, response: Response, next: NextFunc
 
     response.json({ message: 'User was updated', user })
   } catch (error) {
-
-    if(error instanceof mongoose.Error.CastError){
-      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
-    
-    }else{
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
       next(error)
-    
-    } 
-
+    }
   }
 }
 
-
- const deleteUser = async (request: Request, response: Response, next: NextFunction) => {
+const deleteUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
     const user = await services.findUserAndDelete(id)
@@ -119,7 +106,7 @@ const activateUser = async (request: Request, response: Response, next: NextFunc
 }
 
 // search users
- const searchUsers = async (request: Request, response: Response, next: NextFunction) => {
+const searchUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { firstName } = request.params
 
@@ -131,16 +118,12 @@ const activateUser = async (request: Request, response: Response, next: NextFunc
       payload: searchResult,
     })
   } catch (error) {
-    if(error instanceof mongoose.Error.CastError){
-      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
-    
-    }else{
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
       next(error)
-    
-    } 
+    }
   }
 }
- 
-export { getAllUsers, getSingleUser, registUser, activateUser, updateUser, deleteUser }
 
-
+export { getAllUsers, getSingleUser, registUser, activateUser, updateUser, deleteUser, searchUsers }
