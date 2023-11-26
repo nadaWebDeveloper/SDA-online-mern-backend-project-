@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from 'express'
 import { dev } from '../config'
 import ApiError from '../errors/ApiError'
 import * as services from '../services/userService'
+import mongoose, { Mongoose } from 'mongoose'
 
 const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
@@ -32,7 +33,11 @@ const getSingleUser = async (request: Request, response: Response, next: NextFun
     const user = await services.findUserByID(id)
     response.json({ message: 'User was found', user })
   } catch (error) {
-    next(error)
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, 'Id format is not valid'))
+    } else {
+      next(error)
+    }
   }
 }
 
@@ -73,7 +78,11 @@ const updateUser = async (request: Request, response: Response, next: NextFuncti
 
     response.json({ message: 'User was updated', user })
   } catch (error) {
-    next(error)
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, 'Id format is not valid'))
+    } else {
+      next(error)
+    }
   }
 }
 
@@ -84,7 +93,11 @@ const deleteUser = async (request: Request, response: Response, next: NextFuncti
 
     response.json({ message: 'User was deleted', user })
   } catch (error) {
-    next(error)
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, 'Id format is not valid'))
+    } else {
+      next(error)
+    }
   }
 }
 
