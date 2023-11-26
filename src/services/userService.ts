@@ -1,4 +1,4 @@
-import { NextFunction } from 'express'
+import { NextFunction, Response } from 'express'
 import jwt, { TokenExpiredError } from 'jsonwebtoken'
 
 import { dev } from '../config'
@@ -43,6 +43,18 @@ export const findUserByID = async (id: string) => {
   }
   return user
 }
+
+// search users by name
+export const searchUsersByName = async (firstName: string, next: NextFunction) => {
+  const searchResult = await User.find({
+    $or: [{ firstName: { $regex: firstName } }],
+  })
+
+  if (searchResult.length === 0) {
+    next(ApiError.badRequest(404, `No results found with the keyword ${firstName}`))
+    return
+  }
+  return searchResult
 
 export const isUserEmailExists = async (inputEmail: string, inputId: string | null = null) => {
   const user = await User.exists({ $and: [{ _id: { $ne: inputId } }, { email: inputEmail }] })
@@ -101,4 +113,5 @@ export const findUserAndDelete = async (id: string) => {
     throw ApiError.badRequest(404, `User with ${id} was not found`)
   }
   return user
+
 }

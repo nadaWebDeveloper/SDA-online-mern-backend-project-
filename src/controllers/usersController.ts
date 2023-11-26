@@ -6,6 +6,7 @@ import ApiError from '../errors/ApiError'
 import * as services from '../services/userService'
 import mongoose, { Mongoose } from 'mongoose'
 
+
  const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const limit = Number(request.query.limit)
@@ -28,6 +29,7 @@ import mongoose, { Mongoose } from 'mongoose'
 }
 
  const getSingleUser = async (request: Request, response: Response, next: NextFunction) => {
+
   try {
     const { id } = request.params
     const user = await services.findUserByID(id)
@@ -55,8 +57,8 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
   }
 }
 
-const activateUser = async (request: Request, response: Response, next: NextFunction) => {
 
+const activateUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { token } = request.body
     const user = await services.checkTokenAndActivate(token)
@@ -66,6 +68,7 @@ const activateUser = async (request: Request, response: Response, next: NextFunc
     next(error)
   }
 }
+
 
  const updateUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
@@ -87,6 +90,7 @@ const activateUser = async (request: Request, response: Response, next: NextFunc
   }
 }
 
+
  const deleteUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
@@ -102,5 +106,23 @@ const activateUser = async (request: Request, response: Response, next: NextFunc
   }
 }
 
+// search users
+ const searchUsers = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { firstName } = request.params
+
+    // search users by name
+    const searchResult = await services.searchUsersByName(firstName, next)
+
+    response.status(200).send({
+      message: `Results found`,
+      payload: searchResult,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+ 
 export { getAllUsers, getSingleUser, registUser, activateUser, updateUser, deleteUser }
+
 

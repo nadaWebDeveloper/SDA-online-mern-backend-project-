@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
 
-
 import { IOrder, Order } from '../models/order'
 import * as services from '../services/orderService'
+import mongoose from 'mongoose'
+import ApiError from '../errors/ApiError'
 
 // get all orders
 export const getAllOrders = async (request: Request, response: Response, next: NextFunction) => {
@@ -35,6 +36,9 @@ export const getSingleOrder = async (request: Request, response: Response, next:
       payload: singleOrder,
     })
   } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      throw next(ApiError.badRequest(400, 'Id format is not valide'))
+    }
     next(error)
   }
 }
@@ -71,6 +75,9 @@ export const deleteOrder = async (request: Request, response: Response, next: Ne
       payload: {},
     })
   } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      throw next(ApiError.badRequest(400, 'Id format is not valide'))
+    }
     next(error)
   }
 }
@@ -89,6 +96,9 @@ export const updateOrder = async (request: Request, response: Response, next: Ne
       payload: order,
     })
   } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      throw next(ApiError.badRequest(400, 'Id format is not valide'))
+    }
     next(error)
   }
 }
