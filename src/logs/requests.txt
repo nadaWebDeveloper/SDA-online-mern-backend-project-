@@ -58,6 +58,7 @@ Method: PUT, Path: /users/655df8c12258f6256d8a88ca, Date: 11/22/2023, Time: 3:52
 Method: GET, Path: /users, Date: 11/22/2023, Time: 3:52:41 PM
 Method: POST, Path: /users/, Date: 11/22/2023, Time: 3:54:14 PM
 Method: GET, Path: /users, Date: 11/22/2023, Time: 3:54:28 PM
+<<<<<<< HEAD
 Method: GET, Path: /orders, Date: 11/25/2023, Time: 9:25:14 PM
 Method: GET, Path: /orders, Date: 11/25/2023, Time: 9:25:47 PM
 Method: GET, Path: /orders, Date: 11/25/2023, Time: 9:26:47 PM
@@ -144,3 +145,5 @@ Method: GET, Path: /orders/search/655, Date: 11/25/2023, Time: 11:22:02 PM
 Method: GET, Path: /users/, Date: 11/26/2023, Time: 3:22:37 PM
 Method: PUT, Path: /users/655f8af14aabe8db2ef2b1a9, Date: 11/26/2023, Time: 3:23:26 PM
 Method: PUT, Path: /users/655f8af14aabe8db2ef2b1a9, Date: 11/26/2023, Time: 3:29:17 PM
+=======
+>>>>>>> main

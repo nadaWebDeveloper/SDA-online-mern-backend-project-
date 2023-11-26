@@ -10,7 +10,7 @@ const apiErrorHandler = (err: Error, req: Request, res: Response, next: NextFunc
   }
 
   res.status(500).json({ msg: err.message })
-  
+
 }
 
 export default apiErrorHandler

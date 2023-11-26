@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from 'express'
+import express, { Application, Request, Response, NextFunction } from 'express'
 import mongoose from 'mongoose'
 import { config } from 'dotenv'
 
@@ -9,6 +9,8 @@ import categoriesRouter from './routers/categoryRouter'
 
 import apiErrorHandler from './middlewares/errorHandler'
 import myLogger from './middlewares/logger'
+import ApiError from './errors/ApiError'
+
 
 config()
 const app: Application = express()
@@ -32,6 +34,10 @@ app.get('/', (request: Request, response: Response) => {
   })
 })
 
+app.use((request: Request, response: Response, next: NextFunction) => {
+  next(ApiError.badRequest(404,`Router not Found`))
+
+})
 app.use(apiErrorHandler)
 
 mongoose
