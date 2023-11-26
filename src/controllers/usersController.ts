@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { Request, Response, NextFunction } from 'express'
+import mongoose from 'mongoose'
+
 
 import { dev } from '../config'
 import ApiError from '../errors/ApiError'
@@ -53,7 +55,13 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
 
     response.json({ message: 'Check your email to activate the account ', token })
   } catch (error) {
-    next(error)
+    if(error instanceof mongoose.Error.CastError){
+      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
+    
+    }else{
+      next(error)
+    
+    } 
   }
 }
 
@@ -82,11 +90,15 @@ const activateUser = async (request: Request, response: Response, next: NextFunc
 
     response.json({ message: 'User was updated', user })
   } catch (error) {
-    if (error instanceof mongoose.Error.CastError) {
-      next(ApiError.badRequest(400, 'Id format is not valid'))
-    } else {
+
+    if(error instanceof mongoose.Error.CastError){
+      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
+    
+    }else{
       next(error)
-    }
+    
+    } 
+
   }
 }
 
@@ -119,7 +131,13 @@ const activateUser = async (request: Request, response: Response, next: NextFunc
       payload: searchResult,
     })
   } catch (error) {
-    next(error)
+    if(error instanceof mongoose.Error.CastError){
+      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
+    
+    }else{
+      next(error)
+    
+    } 
   }
 }
  

@@ -1,5 +1,14 @@
 import mongoose from 'mongoose'
 
+
+export interface ICategory extends mongoose.Document {
+  _id: string,
+  name: string,
+  createAt?: string,
+  updateAt?: string,
+  __v: number
+}
+
 const categorySchema = new mongoose.Schema({
   name: {
     type: String,
@@ -8,4 +17,4 @@ const categorySchema = new mongoose.Schema({
     unique: true,
   },
 })
-export const Category = mongoose.model('Categories', categorySchema)
+export const Category = mongoose.model('categories', categorySchema)

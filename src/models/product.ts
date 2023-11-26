@@ -1,13 +1,18 @@
-import mongoose, { Document } from 'mongoose'
+import mongoose from 'mongoose'
 
-export interface IProduct extends Document {
+import { ICategory } from './category'
+
+export interface IProduct extends mongoose.Document {
+  _id: string,
   name: string
   price: number
   image: string
   quantity: number
-  sold: number
-  description: string
-  category: mongoose.Schema.Types.ObjectId
+  sold: number,
+  category: mongoose.Schema.Types.ObjectId[]
+  description: string,
+  title: String,
+  dateAdded: Date,
   createAt?: string
   updateAt?: string
 }
@@ -27,7 +32,7 @@ const productSchema = new mongoose.Schema({
   },
   category: {
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Categories' ,
+    ref: 'categories' ,
     required: [true , 'Product category is required'] ,
   },
   image: {
@@ -50,7 +55,8 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-})
+},
+{timestamps: true})
 
 export const Product = mongoose.model<IProduct>('Products', productSchema)
 

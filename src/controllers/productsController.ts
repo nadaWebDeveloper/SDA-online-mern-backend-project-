@@ -1,4 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
+import mongoose from 'mongoose'
+
 
 import * as services from '../services/productService'
 import { Product, IProduct } from '../models/product'
@@ -7,19 +9,13 @@ import ApiError from '../errors/ApiError'
 // * GET : /products -> getAllProducts
 export const getAllProducts = async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const limit = Number(request.query.limit)
-    const page = Number(request.query.page)
-    console.log(page)
-    console.log(limit)
 
-    const { allProductOnPage, totalPage, currentPage } = await services.findAllProduct(page, limit)
+    const  products  = await services.findAllProduct(request)
 
     response.json({
       message: `Return all products `,
       payload: {
-        allProductOnPage,
-        totalPage,
-        currentPage,
+        products
       },
     })
   } catch (error) {
@@ -27,21 +23,23 @@ export const getAllProducts = async (request: Request, response: Response, next:
   }
 }
 
-export const getSingleProduct = async (
-  request: Request,
-  response: Response,
-  next: NextFunction
-) => {
+export const getSingleProduct = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
-    const singleProduct = await services.findProductById(id, next)
+
+    const singleProduct = await services.findProductById(id, next) 
+
     response.json({
       message: `Return a single product `,
       payload: singleProduct,
     })
   } catch (error) {
-    next(error)
-  }
+if(error instanceof mongoose.Error.CastError){
+  next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
+}else{
+  next(error)
+}  
+}
 }
 
 export const deleteProduct = async (request: Request, response: Response, next: NextFunction) => {
@@ -52,7 +50,13 @@ export const deleteProduct = async (request: Request, response: Response, next: 
       message: `Delete a single product with ID: ${id}`,
     })
   } catch (error) {
-    next(error)
+    if(error instanceof mongoose.Error.CastError){
+      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
+    
+    }else{
+      next(error)
+    
+    } 
   }
 }
 
@@ -74,8 +78,13 @@ export const createProduct = async (request: Request, response: Response, next: 
       message: `Create a single product`,
     })
   } catch (error) {
-    next(error)
-  }
+    if(error instanceof mongoose.Error.CastError){
+      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
+    
+    }else{
+      next(error)
+    
+    }   }
 }
 
 export const updateProduct = async (request: Request, response: Response, next: NextFunction) => {
@@ -89,9 +98,34 @@ export const updateProduct = async (request: Request, response: Response, next: 
       payload: productUpdated,
     })
   } catch (error) {
-    next(error)
+    if(error instanceof mongoose.Error.CastError){
+      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
+    
+    }else{
+      next(error)
+    } 
   }
 }
+
+
+export const sortProductByDate = async (request: Request, response: Response, next: NextFunction) => {
+ 
+  try {
+    const { sortBy } = request.query;
+    let sortOption = {};
+
+    if (sortBy) {
+      // Set the sorting option based on the query parameter
+      sortOption = { sortBy: 1 }; // 1 for ascending, -1 for descending
+    }
+
+    const products = await Product.find().sort(sortOption);
+    response.json(products);
+  } catch (error) {
+    next(error) 
+}
+}
+
 
 // search products
 export const searchProducts = async (request: Request, response: Response, next: NextFunction) => {
@@ -109,3 +143,4 @@ export const searchProducts = async (request: Request, response: Response, next:
     next(error)
   }
 }
+

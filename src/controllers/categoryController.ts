@@ -1,4 +1,6 @@
 import { Response, Request, NextFunction } from 'express'
+import mongoose from 'mongoose'
+
 import { Category } from '../models/category'
 import ApiError from '../errors/ApiError'
 
@@ -30,7 +32,13 @@ export const getSingleCategory = async (
     }
     response.json({ message: 'Category is returned', payload: category })
   } catch (error) {
-    next(error)
+    if(error instanceof mongoose.Error.CastError){
+      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
+    
+    }else{
+      next(error)
+    
+    } 
   }
 }
 
@@ -44,7 +52,13 @@ export const createCategory = async (request: Request, response: Response, next:
     await newCategory.save()
     response.json({ message: 'Category is created' })
   } catch (error) {
-    next(error)
+    if(error instanceof mongoose.Error.CastError){
+      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
+    
+    }else{
+      next(error)
+    
+    }
   }
 }
 
@@ -59,7 +73,13 @@ export const deleteCategory = async (request: Request, response: Response, next:
     }
     response.json({ message: 'Category is deleted', payload: category })
   } catch (error) {
-    next(error)
+    if(error instanceof mongoose.Error.CastError){
+      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
+    
+    }else{
+      next(error)
+    
+    } 
   }
 }
 
@@ -76,7 +96,13 @@ export const updateCategory = async (request: Request, response: Response, next:
     }
     response.json({ message: 'Category is updated', payload: category })
   } catch (error) {
-    next(error)
+    if(error instanceof mongoose.Error.CastError){
+      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
+    
+    }else{
+      next(error)
+    
+    } 
   }
 }
 
