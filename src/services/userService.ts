@@ -9,7 +9,7 @@ import { UserDocument, User } from '../models/user'
 export const findAllUsers = async () => {
   const countPage = await User.countDocuments()
 
-  const allUsers: UserDocument[] = await User.find().populate('orders')
+  const allUsers: UserDocument[] = await User.find({}, { password: 0 }).populate('orders')
 
   return {
     allUsers,
@@ -25,7 +25,7 @@ export const findAllUsersOnPage = async (page = 1, limit = 3) => {
   }
   const skip = (page - 1) * limit
 
-  const allUsersOnPage: UserDocument[] = await User.find()
+  const allUsersOnPage: UserDocument[] = await User.find({}, { password: 0 })
     .populate('Products')
     .skip(skip)
     .limit(limit)
@@ -37,7 +37,7 @@ export const findAllUsersOnPage = async (page = 1, limit = 3) => {
 }
 
 export const findUserByID = async (id: string) => {
-  const user = await User.findById(id).populate('orders')
+  const user = await User.findById(id, { password: 0 }).populate('orders')
   if (!user) {
     throw ApiError.badRequest(404, `User with ${id} was not found`)
   }
