@@ -10,11 +10,13 @@ const getAllUsers = async (request: Request, response: Response, next: NextFunct
   try {
     const limit = Number(request.query.limit)
     const page = Number(request.query.page)
+    const search = request.query.search as string
 
-    if (limit || page) {
+    if (limit || page || search) {
       const { allUsersOnPage, totalPage, currentPage } = await services.findAllUsersOnPage(
         page,
-        limit
+        limit,
+        search
       )
 
       return response.json({ message: 'users were found', allUsersOnPage, totalPage, currentPage })
@@ -105,25 +107,4 @@ const deleteUser = async (request: Request, response: Response, next: NextFuncti
   }
 }
 
-// search users
-const searchUsers = async (request: Request, response: Response, next: NextFunction) => {
-  try {
-    const { firstName } = request.params
-
-    // search users by name
-    const searchResult = await services.searchUsersByName(firstName, next)
-
-    response.status(200).send({
-      message: `Results found`,
-      payload: searchResult,
-    })
-  } catch (error) {
-    if (error instanceof mongoose.Error.CastError) {
-      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
-    } else {
-      next(error)
-    }
-  }
-}
-
-export { getAllUsers, getSingleUser, registUser, activateUser, updateUser, deleteUser, searchUsers }
+export { getAllUsers, getSingleUser, registUser, activateUser, updateUser, deleteUser }

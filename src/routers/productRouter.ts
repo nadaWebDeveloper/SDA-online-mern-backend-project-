@@ -19,7 +19,4 @@ router.post('/', controller.createProduct)
 //PUT : /products/:id -> updateSingleProduct -> findAndUpdated
 router.put(`/:id`, controller.updateProduct)
 
-//GET : /products/search/:name -> searchProducts -> searchProductsByName
-router.get('/search/:name', controller.searchProducts)
-
 export default router

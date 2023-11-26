@@ -2,11 +2,9 @@ import { NextFunction, Request, Response } from 'express'
 
 import mongoose from 'mongoose'
 
+import ApiError from '../errors/ApiError'
 import { IOrder, Order } from '../models/order'
 import * as services from '../services/orderService'
-import ApiError from '../errors/ApiError'
-
-
 
 // get all orders
 export const getAllOrders = async (request: Request, response: Response, next: NextFunction) => {
@@ -15,12 +13,21 @@ export const getAllOrders = async (request: Request, response: Response, next: N
     const page = Number(request.query.page)
 
     // return all orders with pagenation feature
-    const { allOrdersOnPage, totalPage, currentPage } = await services.findAllOrders(page, limit)
+    if (limit || page) {
+      const { allOrdersOnPage, totalPage, currentPage } = await services.findAllOrdersOnPage(
+        page,
+        limit
+      )
 
-    response.status(200).send({
-      message: `Reutrn all orders`,
-      payload: { allOrdersOnPage, totalPage, currentPage },
-    })
+      response.status(200).send({
+        message: `Orders were found`,
+        payload: { allOrdersOnPage, totalPage, currentPage },
+      })
+    } else {
+      // return all orders
+      const { allOrders } = await services.findAllOrders()
+      return response.json({ message: 'Orders were found', allOrders })
+    }
   } catch (error) {
     next(error)
   }
@@ -39,15 +46,11 @@ export const getSingleOrder = async (request: Request, response: Response, next:
       payload: singleOrder,
     })
   } catch (error) {
-
-    if(error instanceof mongoose.Error.CastError){
-      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
-    
-    }else{
+    if (error instanceof mongoose.Error.CastError) {
+      throw ApiError.badRequest(400, `ID format is Invalid must be 24 characters`)
+    } else {
       next(error)
-    
-    } 
-
+    }
   }
 }
 
@@ -83,15 +86,11 @@ export const deleteOrder = async (request: Request, response: Response, next: Ne
       payload: {},
     })
   } catch (error) {
-
-    if(error instanceof mongoose.Error.CastError){
-      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
-    
-    }else{
+    if (error instanceof mongoose.Error.CastError) {
+      throw ApiError.badRequest(400, `ID format is Invalid must be 24 characters`)
+    } else {
       next(error)
-    
-    } 
-
+    }
   }
 }
 
@@ -109,14 +108,10 @@ export const updateOrder = async (request: Request, response: Response, next: Ne
       payload: order,
     })
   } catch (error) {
-
-    if(error instanceof mongoose.Error.CastError){
-      next(ApiError.badRequest(400,`ID format is Invalid must be 24 characters`))
-    
-    }else{
+    if (error instanceof mongoose.Error.CastError) {
+      throw ApiError.badRequest(400, `ID format is Invalid must be 24 characters`)
+    } else {
       next(error)
-    
-    } 
-
+    }
   }
 }

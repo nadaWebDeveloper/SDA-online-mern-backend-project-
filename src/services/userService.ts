@@ -16,7 +16,15 @@ export const findAllUsers = async () => {
   }
 }
 
-export const findAllUsersOnPage = async (page = 1, limit = 3) => {
+export const findAllUsersOnPage = async (page = 1, limit = 3, search = '') => {
+  const searchRegularExpression = new RegExp('.*' + search + '.*', 'i')
+  const searchFilter = {
+    $or: [
+      { firstName: { $regex: searchRegularExpression } },
+      { lastName: { $regex: searchRegularExpression } },
+    ],
+  }
+
   const countPage = await User.countDocuments()
 
   const totalPage = Math.ceil(countPage / limit)
@@ -25,10 +33,9 @@ export const findAllUsersOnPage = async (page = 1, limit = 3) => {
   }
   const skip = (page - 1) * limit
 
-  const allUsersOnPage: UserDocument[] = await User.find({}, { password: 0 })
-    .populate('Products')
-    .skip(skip)
-    .limit(limit)
+  const allUsersOnPage: UserDocument[] = search
+    ? await User.find(searchFilter).populate('Products').skip(skip).limit(limit)
+    : await User.find({}, { password: 0 }).populate('Products').skip(skip).limit(limit)
   return {
     allUsersOnPage,
     totalPage,
@@ -42,19 +49,6 @@ export const findUserByID = async (id: string) => {
     throw ApiError.badRequest(404, `User with ${id} was not found`)
   }
   return user
-}
-
-// search users by name
-export const searchUsersByName = async (firstName: string, next: NextFunction) => {
-  const searchResult = await User.find({
-    $or: [{ firstName: { $regex: firstName } }],
-  })
-
-  if (searchResult.length === 0) {
-    next(ApiError.badRequest(404, `No results found with the keyword ${firstName}`))
-    return
-  }
-  return searchResult
 }
 
 export const isUserEmailExists = async (inputEmail: string, inputId: string | null = null) => {

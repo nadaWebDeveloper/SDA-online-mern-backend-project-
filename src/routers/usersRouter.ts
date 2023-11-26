@@ -21,7 +21,4 @@ router.put('/:id', controller.updateUser)
 //DELETE --> delete a single user by ID
 router.delete('/:id', controller.deleteUser)
 
-//GET --> search users by name
-router.get('/search/:firstName', controller.searchUsers)
-
 export default router
