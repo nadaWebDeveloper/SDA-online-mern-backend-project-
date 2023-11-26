@@ -141,3 +141,6 @@ Method: GET, Path: /orders, Date: 11/25/2023, Time: 11:21:42 PM
 Method: GET, Path: /orders/search/655f0c28cc712182597f7f03, Date: 11/25/2023, Time: 11:21:51 PM
 Method: GET, Path: /orders/search/655f0c28c, Date: 11/25/2023, Time: 11:21:58 PM
 Method: GET, Path: /orders/search/655, Date: 11/25/2023, Time: 11:22:02 PM
+Method: GET, Path: /users/, Date: 11/26/2023, Time: 3:22:37 PM
+Method: PUT, Path: /users/655f8af14aabe8db2ef2b1a9, Date: 11/26/2023, Time: 3:23:26 PM
+Method: PUT, Path: /users/655f8af14aabe8db2ef2b1a9, Date: 11/26/2023, Time: 3:29:17 PM

@@ -59,6 +59,7 @@ export const searchUsersByName = async (firstName: string, next: NextFunction) =
 
 export const isUserEmailExists = async (inputEmail: string, inputId: string | null = null) => {
   const user = await User.exists({ $and: [{ _id: { $ne: inputId } }, { email: inputEmail }] })
+
   if (user) {
     throw ApiError.badRequest(409, 'This email is already exists')
   }
