@@ -1,14 +1,10 @@
 import mongoose, { Document } from 'mongoose'
 
-// export type OrderDocument = Document & {
-//   // name: string
-//   products: mongoose.Schema.Types.ObjectId[]
-//   user: mongoose.Schema.Types.ObjectId
-// }
-
 export interface IOrder extends Document {
   products: mongoose.Schema.Types.ObjectId[]
   user: mongoose.Schema.Types.ObjectId
+  createdAt: Date
+  updatedAt: Date
 }
 
 const orderSchema = new mongoose.Schema(

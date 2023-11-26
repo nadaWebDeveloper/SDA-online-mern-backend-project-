@@ -1,4 +1,4 @@
-import { Response } from 'express'
+import { NextFunction, Response } from 'express'
 
 import ApiError from '../errors/ApiError'
 import { IOrder, Order } from '../models/order'
@@ -12,7 +12,12 @@ export const findAllOrders = async (page = 1, limit = 3) => {
   }
   const skip = (page - 1) * limit
 
-  const allOrdersOnPage: IOrder[] = await Order.find().populate('Orders').skip(skip).limit(limit)
+  const allOrdersOnPage: IOrder[] = await Order.find()
+    .populate('products')
+    .populate('user')
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: -1 })
   if (allOrdersOnPage.length === 0) {
     throw ApiError.badRequest(404, 'There are no orders found')
   } else {
@@ -61,3 +66,4 @@ export const findOrderAndUpdated = async (
   }
   return orderUpdated
 }
+

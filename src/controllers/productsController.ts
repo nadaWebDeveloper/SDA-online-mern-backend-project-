@@ -9,7 +9,9 @@ import ApiError from '../errors/ApiError'
 // * GET : /products -> getAllProducts
 export const getAllProducts = async (request: Request, response: Response, next: NextFunction) => {
   try {
+
     const  products  = await services.findAllProduct(request)
+
     response.json({
       message: `Return all products `,
       payload: {
@@ -26,6 +28,7 @@ export const getSingleProduct = async (request: Request, response: Response, nex
     const { id } = request.params
 
     const singleProduct = await services.findProductById(id, next) 
+
     response.json({
       message: `Return a single product `,
       payload: singleProduct,
@@ -68,7 +71,7 @@ export const createProduct = async (request: Request, response: Response, next: 
       quantity: newInput.quantity,
       sold: newInput.sold,
       description: newInput.description,
-      category: newInput.category
+      category: newInput.category,
     })
     await newProduct.save()
     response.status(201).json({
@@ -104,6 +107,7 @@ export const updateProduct = async (request: Request, response: Response, next: 
   }
 }
 
+
 export const sortProductByDate = async (request: Request, response: Response, next: NextFunction) => {
  
   try {
@@ -120,5 +124,23 @@ export const sortProductByDate = async (request: Request, response: Response, ne
   } catch (error) {
     next(error) 
 }
+}
+
+
+// search products
+export const searchProducts = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { name } = request.params
+
+    // search products by name
+    const searchResult = await services.searchProductsByName(name, next)
+
+    response.status(200).send({
+      message: `Results found`,
+      payload: searchResult,
+    })
+  } catch (error) {
+    next(error)
+  }
 }
 

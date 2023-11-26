@@ -105,3 +105,30 @@ export const updateCategory = async (request: Request, response: Response, next:
     } 
   }
 }
+
+// search categories
+export const searchCategories = async (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
+  try {
+    const { name } = request.params
+
+    // search categoreis by name
+    const searchResult = await Category.find({
+      $or: [{ name: { $regex: name } }],
+    })
+
+    if (searchResult.length === 0) {
+      throw next(ApiError.badRequest(404, `No results found with the keyword ${name}`))
+    }
+
+    response.status(200).send({
+      message: `Results found`,
+      payload: searchResult,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
