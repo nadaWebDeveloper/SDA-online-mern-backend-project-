@@ -99,11 +99,25 @@ export const findUserAndUpdate = async (id: string, inputUser: UserDocument) => 
   return user
 }
 
+export const banUserById = async (id: string) => {
+  const user = await User.findByIdAndUpdate(id, { isBanned: true }, { new: true })
+  if (!user) {
+    throw ApiError.badRequest(404, 'User was not found')
+  }
+  return user
+}
+
+export const unBanUserById = async (id: string) => {
+  const user = await User.findByIdAndUpdate(id, { isBanned: false }, { new: true })
+  if (!user) {
+    throw ApiError.badRequest(404, 'User was not found')
+  }
+}
+
 export const findUserAndDelete = async (id: string) => {
   const user = await User.findByIdAndDelete(id)
 
   if (!user) {
     throw ApiError.badRequest(404, `User with ${id} was not found`)
   }
-  return user
 }

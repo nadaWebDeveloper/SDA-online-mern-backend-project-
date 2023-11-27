@@ -91,6 +91,36 @@ const updateUser = async (request: Request, response: Response, next: NextFuncti
   }
 }
 
+const banUser = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { id } = request.params
+    const user = await services.banUserById(id)
+
+    response.json({ message: 'User was banned' })
+  } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
+      next(error)
+    }
+  }
+}
+
+const unBanUser = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { id } = request.params
+    const user = await services.unBanUserById(id)
+
+    response.json({ message: 'User was Unbanned' })
+  } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
+      next(error)
+    }
+  }
+}
+
 const deleteUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
@@ -127,4 +157,14 @@ const searchUsers = async (request: Request, response: Response, next: NextFunct
   }
 }
 
-export { getAllUsers, getSingleUser, registUser, activateUser, updateUser, deleteUser, searchUsers }
+export {
+  getAllUsers,
+  getSingleUser,
+  registUser,
+  activateUser,
+  updateUser,
+  banUser,
+  unBanUser,
+  deleteUser,
+  searchUsers,
+}
