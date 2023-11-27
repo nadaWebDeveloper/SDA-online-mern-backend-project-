@@ -1,6 +1,7 @@
 import express, { Application, Request, Response, NextFunction } from 'express'
 import mongoose from 'mongoose'
 import { config } from 'dotenv'
+import cookieParser from 'cookie-parser'
 
 import productsRouter from './routers/productRouter'
 import usersRouter from './routers/usersRouter'
@@ -20,8 +21,9 @@ mongoose.set('strictPopulate', false)
 const URL = process.env.ATLAS_URL || 'mongodb://127.0.0.1:27017/full-stack-demo-db'
 
 app.use(myLogger)
-app.use(express.urlencoded({ extended: true }))
+app.use(cookieParser())
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 app.use('/products', productsRouter)
 app.use('/categories', categoriesRouter)
