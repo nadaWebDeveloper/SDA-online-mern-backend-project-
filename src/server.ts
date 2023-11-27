@@ -1,13 +1,16 @@
-import express, { Application, Request, Response } from 'express'
+import express, { Application, Request, Response, NextFunction } from 'express'
 import mongoose from 'mongoose'
 import { config } from 'dotenv'
 
 import productsRouter from './routers/productRouter'
 import usersRouter from './routers/usersRouter'
 import ordersRouter from './routers/ordersRouter'
+import categoriesRouter from './routers/categoryRouter'
 
 import apiErrorHandler from './middlewares/errorHandler'
 import myLogger from './middlewares/logger'
+import ApiError from './errors/ApiError'
+
 
 config()
 const app: Application = express()
@@ -22,6 +25,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
 app.use('/products', productsRouter)
+app.use('/categories', categoriesRouter)
 app.use('/orders', ordersRouter)
 app.use('/users', usersRouter)
 app.get('/', (request: Request, response: Response) => {
@@ -30,6 +34,10 @@ app.get('/', (request: Request, response: Response) => {
   })
 })
 
+app.use((request: Request, response: Response, next: NextFunction) => {
+  next(ApiError.badRequest(404,`Router not Found`))
+
+})
 app.use(apiErrorHandler)
 
 mongoose
@@ -38,9 +46,9 @@ mongoose
     console.log('Database connected')
   })
   .catch((err) => {
-    console.log('MongoDB connection error, ', err)
+    console.log(`MongoDB connection error: ${err}`)
   })
 
 app.listen(PORT, () => {
-  console.log('Server running http://localhost:' + PORT)
+  console.log(`Server running http://localhost:${PORT}`)
 })

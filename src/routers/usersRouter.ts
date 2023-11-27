@@ -5,14 +5,26 @@ import * as controller from '../controllers/usersController'
 import { userRegistrationValidation } from '../validation/userValidation'
 import { runValidation } from '../validation/runValidation'
 
+//GET --> get all users
 router.get('/', controller.getAllUsers)
 
+//GET --> get a single user by ID
 router.get('/:id', controller.getSingleUser)
 
-router.post('/', userRegistrationValidation, runValidation, controller.createUser)
 
+//POST --> register a user
+router.post('/register', userRegistrationValidation, runValidation, controller.registUser)
+
+//POST --> activate a user
+router.post('/activate', controller.activateUser)
+
+//PUT --> update a single user by ID
 router.put('/:id', controller.updateUser)
 
+//DELETE --> delete a single user by ID
 router.delete('/:id', controller.deleteUser)
+
+//GET --> search users by name
+router.get('/search/:firstName', controller.searchUsers)
 
 export default router

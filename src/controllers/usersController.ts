@@ -1,13 +1,27 @@
+import jwt from 'jsonwebtoken'
 import { Request, Response, NextFunction } from 'express'
+import mongoose from 'mongoose'
 
-import { User } from '../models/user'
+import { dev } from '../config'
 import ApiError from '../errors/ApiError'
+import * as services from '../services/userService'
 
 const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const users = await User.find().populate('orders')
+    const limit = Number(request.query.limit)
+    const page = Number(request.query.page)
 
-    response.json({ message: 'users were found', users })
+    if (limit || page) {
+      const { allUsersOnPage, totalPage, currentPage } = await services.findAllUsersOnPage(
+        page,
+        limit
+      )
+
+      return response.json({ message: 'users were found', allUsersOnPage, totalPage, currentPage })
+    } else {
+      const { allUsers } = await services.findAllUsers()
+      return response.json({ message: 'Users were found', allUsers })
+    }
   } catch (error) {
     next(error)
   }
@@ -16,24 +30,42 @@ const getAllUsers = async (request: Request, response: Response, next: NextFunct
 const getSingleUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
-    const user = await User.findById(id).populate('orders')
-    if (!user) {
-      throw ApiError.badRequest(404, 'User was Not Found')
-    }
-
-    response.json({ message: 'user was found', user })
+    const user = await services.findUserByID(id)
+    response.json({ message: 'User was found', user })
   } catch (error) {
-    next(error)
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, 'Id format is not valid'))
+    } else {
+      next(error)
+    }
   }
 }
 
-const createUser = async (request: Request, response: Response, next: NextFunction) => {
+const registUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const user = new User(request.body)
-    await user.save()
+    const { email } = request.body
+    const userExists = await services.isUserEmailExists(email)
 
-    response.json({ message: 'user was created', user })
-  } catch (error: any) {
+    const token = jwt.sign(request.body, dev.app.jwsUserActivationKey, { expiresIn: '1m' })
+    services.sendTokenByEmail(email, token)
+
+    response.json({ message: 'Check your email to activate the account ', token })
+  } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
+      next(error)
+    }
+  }
+}
+
+const activateUser = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { token } = request.body
+    const user = await services.checkTokenAndActivate(token)
+
+    response.status(201).json({ message: 'User was activated ', user })
+  } catch (error) {
     next(error)
   }
 }
@@ -41,34 +73,57 @@ const createUser = async (request: Request, response: Response, next: NextFuncti
 const updateUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
+    const { email } = request.body
     const updatedUser = request.body
 
-    const user = await User.findByIdAndUpdate(id, updatedUser)
+    const userExists = await services.isUserEmailExists(email, id)
 
-    if (!user) {
-      throw ApiError.badRequest(404, 'User was Not Found')
-    }
+    const user = await services.findUserAndUpdate(id, updatedUser)
 
-    response.json({ message: 'user was updated', user })
+    response.json({ message: 'User was updated', user })
   } catch (error) {
-    next(error)
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
+      next(error)
+    }
   }
 }
 
 const deleteUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
+    const user = await services.findUserAndDelete(id)
 
-    const user = await User.findByIdAndDelete(id)
-
-    if (!user) {
-      throw ApiError.badRequest(404, 'User was Not Found')
-    }
-
-    response.json({ message: 'user was updated', user })
+    response.json({ message: 'User was deleted', user })
   } catch (error) {
-    next(error)
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, 'Id format is not valid'))
+    } else {
+      next(error)
+    }
   }
 }
 
-export { getAllUsers, getSingleUser, createUser, updateUser, deleteUser }
+// search users
+const searchUsers = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { firstName } = request.params
+
+    // search users by name
+    const searchResult = await services.searchUsersByName(firstName, next)
+
+    response.status(200).send({
+      message: `Results found`,
+      payload: searchResult,
+    })
+  } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
+      next(error)
+    }
+  }
+}
+
+export { getAllUsers, getSingleUser, registUser, activateUser, updateUser, deleteUser, searchUsers }
