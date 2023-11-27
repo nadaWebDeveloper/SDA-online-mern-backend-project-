@@ -21,7 +21,7 @@ router.put('/:id', controller.updateUser)
 //PUT --> ban a single user by ID
 router.put('/ban/:id', controller.banUser)
 
-//PUT --> ban a single user by ID
+//PUT --> unban a single user by ID
 router.put('/unban/:id', controller.unBanUser)
 
 //DELETE --> delete a single user by ID

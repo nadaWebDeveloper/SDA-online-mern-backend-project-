@@ -11,16 +11,12 @@ const getAllUsers = async (request: Request, response: Response, next: NextFunct
     const limit = Number(request.query.limit) || 0
     const page = Number(request.query.page) || 1
 
-    const { allUsersOnPage, totalPage, limited, currentPage } = await services.findAllUsers(
-      page,
-      limit
-    )
+    const { allUsersOnPage, totalPage, currentPage } = await services.findAllUsers(page, limit)
 
     return response.json({
       message: 'users were found',
       allUsersOnPage,
       totalPage,
-      limited,
       currentPage,
     })
   } catch (error) {
@@ -45,6 +41,11 @@ const getSingleUser = async (request: Request, response: Response, next: NextFun
 const registUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { email } = request.body
+    const registedUser = request.body
+
+    if (registedUser.isBanned || registedUser.role) {
+      throw ApiError.badRequest(403, 'you do not have permission to ban user or modify its role')
+    }
     const userExists = await services.isUserEmailExists(email)
 
     const token = jwt.sign(request.body, dev.app.jwsUserActivationKey, { expiresIn: '1m' })
@@ -76,6 +77,10 @@ const updateUser = async (request: Request, response: Response, next: NextFuncti
     const { id } = request.params
     const { email } = request.body
     const updatedUser = request.body
+
+    if (updatedUser.isBanned || updatedUser.role) {
+      throw ApiError.badRequest(403, 'you do not have permission to ban user or modify its role')
+    }
 
     const userExists = await services.isUserEmailExists(email, id)
 
