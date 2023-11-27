@@ -1,10 +1,23 @@
-import { NextFunction, Response } from 'express'
+import { Response } from 'express'
 
 import ApiError from '../errors/ApiError'
 import { IOrder, Order } from '../models/order'
 
+// return all orders based on descending date
+export const findAllOrders = async () => {
+  const countPage = await Order.countDocuments()
+  const allOrders: IOrder[] = await Order.find()
+    .populate('products')
+    .populate('user')
+    .sort({ createdAt: -1 })
+
+  return {
+    allOrders,
+  }
+}
+
 // return all orders using pagenation
-export const findAllOrders = async (page = 1, limit = 3) => {
+export const findAllOrdersOnPage = async (page = 1, limit = 3) => {
   const countPage = await Order.countDocuments()
   const totalPage = Math.ceil(countPage / limit)
   if (page > totalPage) {
@@ -66,4 +79,3 @@ export const findOrderAndUpdated = async (
   }
   return orderUpdated
 }
-

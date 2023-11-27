@@ -8,14 +8,16 @@ import * as services from '../services/userService'
 
 const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
+
     const limit = Number(request.query.limit) || 0
     const page = Number(request.query.page) || 1
+     const search = request.query.search as string || ""
 
-    const { allUsersOnPage, totalPage, currentPage } = await services.findAllUsers(page, limit)
+    const { allUsersOnPage, totalPage, currentPage } = await services.findAllUsers(page, limit,  search)
 
     return response.json({
       message: 'users were found',
-      allUsersOnPage,
+      allUsers,
       totalPage,
       currentPage,
     })
@@ -171,26 +173,6 @@ const deleteUser = async (request: Request, response: Response, next: NextFuncti
   }
 }
 
-// search users
-const searchUsers = async (request: Request, response: Response, next: NextFunction) => {
-  try {
-    const { firstName } = request.params
-
-    // search users by name
-    const searchResult = await services.searchUsersByName(firstName, next)
-
-    response.status(200).send({
-      message: `Results found`,
-      payload: searchResult,
-    })
-  } catch (error) {
-    if (error instanceof mongoose.Error.CastError) {
-      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
-    } else {
-      next(error)
-    }
-  }
-}
 
 export {
   getAllUsers,
@@ -203,5 +185,5 @@ export {
   downgradeUserRole,
   unBanUser,
   deleteUser,
-  searchUsers,
 }
+

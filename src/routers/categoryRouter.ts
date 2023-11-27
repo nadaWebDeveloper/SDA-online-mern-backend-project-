@@ -4,7 +4,6 @@ import {
   deleteCategory,
   getAllCategories,
   getSingleCategory,
-  searchCategories,
   updateCategory,
 } from '../controllers/categoryController'
 
@@ -24,8 +23,5 @@ router.delete('/:id', deleteCategory)
 
 //PUT --> update a single category by ID
 router.put('/:id', updateCategory)
-
-//GET --> search categories by name
-router.get('/search/:name', searchCategories)
 
 export default router
