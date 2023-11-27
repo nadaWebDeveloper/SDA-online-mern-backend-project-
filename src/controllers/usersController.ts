@@ -126,6 +126,36 @@ const unBanUser = async (request: Request, response: Response, next: NextFunctio
   }
 }
 
+const upgradeUserRole = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { id } = request.params
+    const user = await services.upgradeUserRoleById(id)
+
+    response.json({ message: 'admin permession was granted' })
+  } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
+      next(error)
+    }
+  }
+}
+
+const downgradeUserRole = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const { id } = request.params
+    const user = await services.downgradeUserRoleById(id)
+
+    response.json({ message: 'admin permession was removed' })
+  } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
+      next(error)
+    }
+  }
+}
+
 const deleteUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
@@ -169,6 +199,8 @@ export {
   activateUser,
   updateUser,
   banUser,
+  upgradeUserRole,
+  downgradeUserRole,
   unBanUser,
   deleteUser,
   searchUsers,

@@ -22,13 +22,12 @@ export const findAllUsers = async (page: number, limit: number) => {
   return {
     allUsersOnPage,
     totalPage,
-    limited: limit,
     currentPage: page,
   }
 }
 
 export const findUserByID = async (id: string) => {
-  const user = await User.findById(id, { password: 0 }).populate('orders')
+  const user = await User.findById(id).populate('orders')
   if (!user) {
     throw ApiError.badRequest(404, `User with ${id} was not found`)
   }
@@ -109,6 +108,21 @@ export const banUserById = async (id: string) => {
 
 export const unBanUserById = async (id: string) => {
   const user = await User.findByIdAndUpdate(id, { isBanned: false }, { new: true })
+  if (!user) {
+    throw ApiError.badRequest(404, 'User was not found')
+  }
+}
+
+export const upgradeUserRoleById = async (id: string) => {
+  const user = await User.findByIdAndUpdate(id, { isAdmin: true }, { new: true })
+  if (!user) {
+    throw ApiError.badRequest(404, 'User was not found')
+  }
+  return user
+}
+
+export const downgradeUserRoleById = async (id: string) => {
+  const user = await User.findByIdAndUpdate(id, { isAdmin: false }, { new: true })
   if (!user) {
     throw ApiError.badRequest(404, 'User was not found')
   }

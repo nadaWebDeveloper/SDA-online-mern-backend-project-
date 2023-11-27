@@ -24,6 +24,12 @@ router.put('/ban/:id', controller.banUser)
 //PUT --> unban a single user by ID
 router.put('/unban/:id', controller.unBanUser)
 
+//PUT --> upgrade single user role to admin
+router.put('/admin/:id', controller.upgradeUserRole)
+
+//PUT --> downgrade single user role to admin
+router.put('/notadmin/:id', controller.downgradeUserRole)
+
 //DELETE --> delete a single user by ID
 router.delete('/:id', controller.deleteUser)
 
