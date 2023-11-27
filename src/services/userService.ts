@@ -22,6 +22,7 @@ export const findAllUsersOnPage = async (page = 1, limit = 3, search = '') => {
     $or: [
       { firstName: { $regex: searchRegularExpression } },
       { lastName: { $regex: searchRegularExpression } },
+      { email: { $regex: searchRegularExpression } },
     ],
   }
 
@@ -34,7 +35,7 @@ export const findAllUsersOnPage = async (page = 1, limit = 3, search = '') => {
   const skip = (page - 1) * limit
 
   const allUsersOnPage: UserDocument[] = search
-    ? await User.find(searchFilter).populate('Products').skip(skip).limit(limit)
+    ? await User.find(searchFilter, { password: 0 }).populate('Products').skip(skip).limit(limit)
     : await User.find({}, { password: 0 }).populate('Products').skip(skip).limit(limit)
   return {
     allUsersOnPage,
