@@ -1,6 +1,8 @@
 import { Router } from 'express'
 
 import * as controller from '../controllers/productsController'
+import { productValidation } from '../validation/productsValidation'
+import { runValidation } from '../validation/runValidation'
 
 const router = Router()
 
@@ -14,10 +16,10 @@ router.get(`/:id`, controller.getSingleProduct)
 router.delete(`/:id`, controller.deleteProduct)
 
 //POST : /products -> createSingleProduct -> findIfProductExist
-router.post('/', controller.createProduct)
+router.post('/', productValidation, runValidation, controller.createProduct)
 
 //PUT : /products/:id -> updateSingleProduct -> findAndUpdated
-router.put(`/:id`, controller.updateProduct)
+router.put(`/:id`, productValidation, runValidation, controller.updateProduct)
 
 //GET : /products/search/:name -> searchProducts -> searchProductsByName
 router.get('/search/:name', controller.searchProducts)
