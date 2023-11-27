@@ -1,4 +1,8 @@
-import mongoose from 'mongoose'
+import mongoose, { Document } from 'mongoose'
+
+export interface ICategory extends Document {
+  name: string
+}
 
 
 export interface ICategory extends mongoose.Document {
@@ -17,4 +21,5 @@ const categorySchema = new mongoose.Schema({
     unique: true,
   },
 })
-export const Category = mongoose.model('categories', categorySchema)
+
+export const Category = mongoose.model<ICategory>('categories', categorySchema)

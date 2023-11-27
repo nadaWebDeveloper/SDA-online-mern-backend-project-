@@ -1,4 +1,4 @@
-import { NextFunction, Response } from 'express'
+import { NextFunction } from 'express'
 import jwt, { TokenExpiredError } from 'jsonwebtoken'
 
 import { dev } from '../config'
@@ -6,17 +6,8 @@ import ApiError from '../errors/ApiError'
 import { sendEmail } from '../helper/sendEmail'
 import { UserDocument, User } from '../models/user'
 
-export const findAllUsers = async () => {
+export const findAllUsers = async (page: number, limit: number, search: string) => {
   const countPage = await User.countDocuments()
-
-  const allUsers: UserDocument[] = await User.find({}, { password: 0 }).populate('orders')
-
-  return {
-    allUsers,
-  }
-}
-
-export const findAllUsersOnPage = async (page = 1, limit = 3, search = '') => {
   const searchRegularExpression = new RegExp('.*' + search + '.*', 'i')
   const searchFilter = {
     $or: [
@@ -26,26 +17,26 @@ export const findAllUsersOnPage = async (page = 1, limit = 3, search = '') => {
     ],
   }
 
-  const countPage = await User.countDocuments()
-
-  const totalPage = Math.ceil(countPage / limit)
+ const totalPage = limit ? Math.ceil(countPage / limit) : 1
   if (page > totalPage) {
     page = totalPage
   }
   const skip = (page - 1) * limit
-
+  
   const allUsersOnPage: UserDocument[] = search
-    ? await User.find(searchFilter, { password: 0 }).populate('Products').skip(skip).limit(limit)
-    : await User.find({}, { password: 0 }).populate('Products').skip(skip).limit(limit)
+    ? await User.find(searchFilter, { password: 0 }).populate('orders').skip(skip).limit(limit)
+    : await User.find({}, { password: 0 }).populate('orders').skip(skip).limit(limit)
+
   return {
-    allUsersOnPage,
-    totalPage,
-    currentPage: page,
+    allUsers,
+     totalPage,
+     currentPage: page,
   }
 }
 
+
 export const findUserByID = async (id: string) => {
-  const user = await User.findById(id, { password: 0 }).populate('orders')
+  const user = await User.findById(id).populate('orders')
   if (!user) {
     throw ApiError.badRequest(404, `User with ${id} was not found`)
   }
@@ -103,11 +94,40 @@ export const findUserAndUpdate = async (id: string, inputUser: UserDocument) => 
   return user
 }
 
+export const banUserById = async (id: string) => {
+  const user = await User.findByIdAndUpdate(id, { isBanned: true }, { new: true })
+  if (!user) {
+    throw ApiError.badRequest(404, 'User was not found')
+  }
+  return user
+}
+
+export const unBanUserById = async (id: string) => {
+  const user = await User.findByIdAndUpdate(id, { isBanned: false }, { new: true })
+  if (!user) {
+    throw ApiError.badRequest(404, 'User was not found')
+  }
+}
+
+export const upgradeUserRoleById = async (id: string) => {
+  const user = await User.findByIdAndUpdate(id, { isAdmin: true }, { new: true })
+  if (!user) {
+    throw ApiError.badRequest(404, 'User was not found')
+  }
+  return user
+}
+
+export const downgradeUserRoleById = async (id: string) => {
+  const user = await User.findByIdAndUpdate(id, { isAdmin: false }, { new: true })
+  if (!user) {
+    throw ApiError.badRequest(404, 'User was not found')
+  }
+}
+
 export const findUserAndDelete = async (id: string) => {
   const user = await User.findByIdAndDelete(id)
 
   if (!user) {
     throw ApiError.badRequest(404, `User with ${id} was not found`)
   }
-  return user
 }
