@@ -1,4 +1,4 @@
-import { NextFunction, Response } from 'express'
+import { NextFunction } from 'express'
 import jwt, { TokenExpiredError } from 'jsonwebtoken'
 
 import { dev } from '../config'
@@ -6,32 +6,23 @@ import ApiError from '../errors/ApiError'
 import { sendEmail } from '../helper/sendEmail'
 import { UserDocument, User } from '../models/user'
 
-export const findAllUsers = async () => {
+export const findAllUsers = async (page: number, limit: number) => {
   const countPage = await User.countDocuments()
 
-  const allUsers: UserDocument[] = await User.find({}, { password: 0 }).populate('orders')
-
-  return {
-    allUsers,
-  }
-}
-
-export const findAllUsersOnPage = async (page = 1, limit = 3) => {
-  const countPage = await User.countDocuments()
-
-  const totalPage = Math.ceil(countPage / limit)
+  const totalPage = limit ? Math.ceil(countPage / limit) : 1
   if (page > totalPage) {
     page = totalPage
   }
   const skip = (page - 1) * limit
 
   const allUsersOnPage: UserDocument[] = await User.find({}, { password: 0 })
-    .populate('Products')
+    .populate('orders')
     .skip(skip)
     .limit(limit)
   return {
     allUsersOnPage,
     totalPage,
+    limited: limit,
     currentPage: page,
   }
 }
