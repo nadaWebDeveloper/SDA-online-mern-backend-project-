@@ -4,12 +4,11 @@ export interface ICategory extends Document {
   name: string
 }
 
-
 export interface ICategory extends mongoose.Document {
-  _id: string,
-  name: string,
-  createAt?: string,
-  updateAt?: string,
+  _id: string
+  name: string
+  createAt?: string
+  updateAt?: string
   __v: number
 }
 
@@ -22,4 +21,4 @@ const categorySchema = new mongoose.Schema({
   },
 })
 
-export const Category = mongoose.model<ICategory>('categories', categorySchema)
+export const Category = mongoose.model<ICategory>('Categories', categorySchema)

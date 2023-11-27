@@ -5,12 +5,11 @@ import { config } from 'dotenv'
 import productsRouter from './routers/productRouter'
 import usersRouter from './routers/usersRouter'
 import ordersRouter from './routers/ordersRouter'
-import categoriesRouter from './routers/categoryRouter'
+import categoriesRouter from './routers/categoriesRouter'
 
 import apiErrorHandler from './middlewares/errorHandler'
 import myLogger from './middlewares/logger'
 import ApiError from './errors/ApiError'
-
 
 config()
 const app: Application = express()
@@ -28,6 +27,7 @@ app.use('/products', productsRouter)
 app.use('/categories', categoriesRouter)
 app.use('/orders', ordersRouter)
 app.use('/users', usersRouter)
+
 app.get('/', (request: Request, response: Response) => {
   response.json({
     message: 'CheckUp The Server',
@@ -35,8 +35,7 @@ app.get('/', (request: Request, response: Response) => {
 })
 
 app.use((request: Request, response: Response, next: NextFunction) => {
-  next(ApiError.badRequest(404,`Router not Found`))
-
+  next(ApiError.badRequest(404, `Router not Found`))
 })
 app.use(apiErrorHandler)
 

@@ -29,7 +29,7 @@ export const productValidation = [
     .withMessage('Description must be at least 3 charachters')
     .isLength({ max: 300 })
     .withMessage('Description must be less than 300 chaacters'),
-  check('category').trim().notEmpty().withMessage('At least 1 category must be selected'),
+  check('categories').trim().notEmpty().withMessage('At least 1 category must be selected'),
   check('quantity').trim().default(1).isInt().withMessage('Quantity must be non-decimal number'),
   check('sold').trim().default(0).isInt().withMessage('Sold must be non-decimal number'),
 ]

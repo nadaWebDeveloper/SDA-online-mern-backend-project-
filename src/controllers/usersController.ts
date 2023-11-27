@@ -8,12 +8,11 @@ import * as services from '../services/userService'
 
 const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
-
     const limit = Number(request.query.limit) || 0
     const page = Number(request.query.page) || 1
-     const search = request.query.search as string || ""
+    const search = (request.query.search as string) || ''
 
-    const { allUsersOnPage, totalPage, currentPage } = await services.findAllUsers(page, limit,  search)
+    const { allUsers, totalPage, currentPage } = await services.findAllUsers(page, limit, search)
 
     return response.json({
       message: 'users were found',
@@ -45,7 +44,7 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
     const { email } = request.body
     const registedUser = request.body
 
-    if (registedUser.isBanned || registedUser.role) {
+    if (registedUser.isBanned || registedUser.isAdmin) {
       throw ApiError.badRequest(403, 'you do not have permission to ban user or modify its role')
     }
     const userExists = await services.isUserEmailExists(email)
@@ -80,7 +79,7 @@ const updateUser = async (request: Request, response: Response, next: NextFuncti
     const { email } = request.body
     const updatedUser = request.body
 
-    if (updatedUser.isBanned || updatedUser.role) {
+    if (updatedUser.isBanned || updatedUser.isAdmin) {
       throw ApiError.badRequest(403, 'you do not have permission to ban user or modify its role')
     }
 
@@ -173,7 +172,6 @@ const deleteUser = async (request: Request, response: Response, next: NextFuncti
   }
 }
 
-
 export {
   getAllUsers,
   getSingleUser,
@@ -186,4 +184,3 @@ export {
   unBanUser,
   deleteUser,
 }
-

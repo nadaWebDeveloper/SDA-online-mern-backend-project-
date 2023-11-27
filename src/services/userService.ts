@@ -17,23 +17,22 @@ export const findAllUsers = async (page: number, limit: number, search: string) 
     ],
   }
 
- const totalPage = limit ? Math.ceil(countPage / limit) : 1
+  const totalPage = limit ? Math.ceil(countPage / limit) : 1
   if (page > totalPage) {
     page = totalPage
   }
   const skip = (page - 1) * limit
-  
-  const allUsersOnPage: UserDocument[] = search
+
+  const allUsers: UserDocument[] = search
     ? await User.find(searchFilter, { password: 0 }).populate('orders').skip(skip).limit(limit)
     : await User.find({}, { password: 0 }).populate('orders').skip(skip).limit(limit)
 
   return {
     allUsers,
-     totalPage,
-     currentPage: page,
+    totalPage,
+    currentPage: page,
   }
 }
-
 
 export const findUserByID = async (id: string) => {
   const user = await User.findById(id).populate('orders')

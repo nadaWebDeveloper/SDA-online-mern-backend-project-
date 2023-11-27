@@ -21,4 +21,5 @@ router.post('/', categoryValidation, runValidation, createCategory)
 router.delete('/:id', deleteCategory)
 //PUT --> update a single category by ID
 router.put('/:id', categoryValidation, runValidation, updateCategory)
+
 export default router

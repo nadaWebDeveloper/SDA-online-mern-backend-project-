@@ -3,11 +3,11 @@ import { NextFunction } from 'express'
 import ApiError from '../errors/ApiError'
 import { ICategory, Category } from '../models/category'
 
-export const findAllCategories = async (page = 1, limit = 3) => {
+export const findAllCategories = async (page: number, limit: number, search: string) => {
   //how many have categories
   const countPage = await Category.countDocuments()
   //total page
-  const totalPage = Math.ceil(countPage / limit)
+  const totalPage = limit ? Math.ceil(countPage / limit) : 1
   if (page > totalPage) {
     page = totalPage
   }

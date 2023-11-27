@@ -71,7 +71,7 @@ export const createProduct = async (request: Request, response: Response, next: 
       quantity: newInput.quantity,
       sold: newInput.sold,
       description: newInput.description,
-      category: newInput.category,
+      categories: newInput.categories,
     })
     await newProduct.save()
     response.status(201).json({

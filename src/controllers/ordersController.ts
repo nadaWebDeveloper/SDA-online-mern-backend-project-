@@ -9,25 +9,16 @@ import * as services from '../services/orderService'
 // get all orders
 export const getAllOrders = async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const limit = Number(request.query.limit)
-    const page = Number(request.query.page)
+    const limit = Number(request.query.limit) || 0
+    const page = Number(request.query.page) || 1
 
     // return all orders with pagenation feature
-    if (limit || page) {
-      const { allOrdersOnPage, totalPage, currentPage } = await services.findAllOrdersOnPage(
-        page,
-        limit
-      )
+    const { allOrdersOnPage, totalPage, currentPage } = await services.findAllOrders(page, limit)
 
-      response.status(200).send({
-        message: `Orders were found`,
-        payload: { allOrdersOnPage, totalPage, currentPage },
-      })
-    } else {
-      // return all orders
-      const { allOrders } = await services.findAllOrders()
-      return response.json({ message: 'Orders were found', allOrders })
-    }
+    response.status(200).send({
+      message: `Orders were found`,
+      payload: { allOrdersOnPage, totalPage, currentPage },
+    })
   } catch (error) {
     next(error)
   }
@@ -39,7 +30,7 @@ export const getSingleOrder = async (request: Request, response: Response, next:
     const { id } = request.params
 
     // find an order by its id
-    const singleOrder: IOrder | undefined = await services.findOrderById(id, response)
+    const singleOrder: IOrder = await services.findOrderById(id, response)
 
     response.status(200).send({
       message: `Reutrn an order with id ${id}`,
@@ -58,13 +49,10 @@ export const getSingleOrder = async (request: Request, response: Response, next:
 export const createOrder = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const newOrderInput = request.body
-    const newOrder: IOrder = new Order({
-      products: newOrderInput.products,
-      user: newOrderInput.user,
-    })
-    await newOrder.save()
+    const newOrder = await services.createNewOrder(newOrderInput)
+
     response.status(201).send({
-      message: `Order is created`,
+      message: 'Order is created',
       payload: newOrder,
     })
   } catch (error) {
@@ -77,20 +65,17 @@ export const deleteOrder = async (request: Request, response: Response, next: Ne
   try {
     const { id } = request.params
 
-    // check if order exist
-    const isOrderExist = await services.findOrderById(id, response)
+    await services.findAndDeleteOrder(id)
 
-    const order = await Order.findOneAndDelete({ _id: id })
     response.status(200).send({
       message: `Deleted order with id ${id}`,
       payload: {},
     })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
-      throw ApiError.badRequest(400, `ID format is Invalid must be 24 characters`)
-    } else {
-      next(error)
+      throw next(ApiError.badRequest(400, 'Id format is not valid'))
     }
+    next(error)
   }
 }
 

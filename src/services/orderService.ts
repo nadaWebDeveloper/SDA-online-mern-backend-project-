@@ -3,23 +3,10 @@ import { Response } from 'express'
 import ApiError from '../errors/ApiError'
 import { IOrder, Order } from '../models/order'
 
-// return all orders based on descending date
-export const findAllOrders = async () => {
-  const countPage = await Order.countDocuments()
-  const allOrders: IOrder[] = await Order.find()
-    .populate('products')
-    .populate('user')
-    .sort({ createdAt: -1 })
-
-  return {
-    allOrders,
-  }
-}
-
 // return all orders using pagenation
-export const findAllOrdersOnPage = async (page = 1, limit = 3) => {
+export const findAllOrders = async (page: number, limit: number) => {
   const countPage = await Order.countDocuments()
-  const totalPage = Math.ceil(countPage / limit)
+  const totalPage = limit ? Math.ceil(countPage / limit) : 1
   if (page > totalPage) {
     page = totalPage
   }
@@ -53,15 +40,12 @@ export const findOrderById = async (id: string, response: Response) => {
 }
 
 // find and delete order by id
-export const findOrderAndDelete = async (id: string, response: Response) => {
-  const deleteSingleOrder = await Order.findOneAndDelete({ _id: id })
-  if (!deleteSingleOrder) {
-    response.status(404).json({
-      message: `Order is not found with this id: ${id}`,
-    })
-    return
+export const findAndDeleteOrder = async (id: string) => {
+  const order = await Order.findOneAndDelete({ _id: id })
+
+  if (!order) {
+    throw ApiError.badRequest(404, `No order found with id ${id}`)
   }
-  return deleteSingleOrder
 }
 
 // find and update order by id
@@ -78,4 +62,16 @@ export const findOrderAndUpdated = async (
     return
   }
   return orderUpdated
+}
+
+// create new order
+export const createNewOrder = async (newOrderInput: IOrder): Promise<IOrder> => {
+  const newOrder: IOrder = new Order({
+    products: newOrderInput.products,
+    user: newOrderInput.user,
+  })
+
+  await newOrder.save()
+
+  return newOrder
 }

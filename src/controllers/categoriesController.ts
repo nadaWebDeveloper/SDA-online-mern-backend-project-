@@ -10,12 +10,14 @@ export const getAllCategories = async (
   next: NextFunction
 ) => {
   try {
-    const limit = Number(request.query.limit)
-    const page = Number(request.query.page)
+    const limit = Number(request.query.limit) || 0
+    const page = Number(request.query.page) || 1
+    const search = (request.query.search as string) || ''
 
     const { allCategoriesOnPage, totalPage, currentPage } = await services.findAllCategories(
       page,
-      limit
+      limit,
+      search
     )
 
     response.json({

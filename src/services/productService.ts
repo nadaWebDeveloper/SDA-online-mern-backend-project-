@@ -60,7 +60,7 @@ export const findAllProduct = async (request: Request) => {
   const allProductOnPage: IProduct[] = await Product.find({
     $and: [searchFilter, { price: priceFilter }],
   })
-    .populate('category')
+    .populate('categories')
     .skip(skip)
     .limit(limit)
 

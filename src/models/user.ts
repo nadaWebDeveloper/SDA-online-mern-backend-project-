@@ -5,7 +5,7 @@ export type UserDocument = Document & {
   lastName: string
   email: string
   password: string
-  role: string
+  isAdmin: boolean
   isBanned: boolean
   order: mongoose.Schema.Types.ObjectId[]
 }
@@ -47,9 +47,9 @@ const userSchema = new mongoose.Schema(
       set: (password: string) => bcrypt.hashSync(password, 10),
     },
 
-    role: {
-      type: String,
-      default: 'visitor',
+    isAdmin: {
+      type: Boolean,
+      default: false,
     },
 
     isBanned: {
