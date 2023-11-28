@@ -1,4 +1,3 @@
-import { NextFunction } from 'express'
 import jwt, { TokenExpiredError } from 'jsonwebtoken'
 
 import { dev } from '../config'
