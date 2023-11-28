@@ -4,8 +4,10 @@ import * as services from '../services/authService'
 const login = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { email, password } = request.body
+
     const user = await services.isEmailMatch(email)
     await services.isPassworMatch(user, password)
+    services.isBanned(user)
 
     response.json({ message: 'you are logged in ' })
   } catch (error) {
