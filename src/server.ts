@@ -2,14 +2,15 @@ import express, { Application, Request, Response, NextFunction } from 'express'
 import mongoose from 'mongoose'
 import { config } from 'dotenv'
 
-import productsRouter from './routers/productRouter'
+import authRouter from './routers/authRouter'
 import usersRouter from './routers/usersRouter'
 import ordersRouter from './routers/ordersRouter'
+import productsRouter from './routers/productRouter'
 import categoriesRouter from './routers/categoriesRouter'
 
-import apiErrorHandler from './middlewares/errorHandler'
-import myLogger from './middlewares/logger'
 import ApiError from './errors/ApiError'
+import myLogger from './middlewares/logger'
+import apiErrorHandler from './middlewares/errorHandler'
 
 config()
 const app: Application = express()
@@ -27,6 +28,7 @@ app.use('/products', productsRouter)
 app.use('/categories', categoriesRouter)
 app.use('/orders', ordersRouter)
 app.use('/users', usersRouter)
+app.use('/auth', authRouter)
 
 app.get('/', (request: Request, response: Response) => {
   response.json({

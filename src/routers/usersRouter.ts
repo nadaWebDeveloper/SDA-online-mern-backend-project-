@@ -1,16 +1,16 @@
 import express from 'express'
-const router = express.Router()
 
 import * as controller from '../controllers/usersController'
-import { userRegistrationValidation } from '../validation/userValidation'
 import { runValidation } from '../validation/runValidation'
+import { userRegistrationValidation } from '../validation/userValidation'
+
+const router = express.Router()
 
 //GET --> get all users
 router.get('/', controller.getAllUsers)
 
-//GET --> get a single user by ID
+// GET --> get a single user by ID
 router.get('/:id', controller.getSingleUser)
-
 
 //POST --> register a user
 router.post('/register', userRegistrationValidation, runValidation, controller.registUser)

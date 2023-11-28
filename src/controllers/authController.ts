@@ -13,7 +13,7 @@ const login = async (request: Request, response: Response, next: NextFunction) =
     services.isUserBanned(user)
 
     const accessToken = jwt.sign({ _id: user.id }, dev.app.jwsAccessKey, {
-      expiresIn: '1m',
+      expiresIn: '15m',
     })
     response.cookie('access_token', accessToken, {
       maxAge: 5 * 60 * 1000,

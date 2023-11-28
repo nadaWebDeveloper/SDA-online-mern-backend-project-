@@ -3,6 +3,7 @@ export const dev = {
   app: {
     port: process.env.SERVER_PORT || 5050,
     jwsUserActivationKey: process.env.JWT_USER_ACTIVATION_KEY || 'dfjkldjglkjdljl',
+    jwsAccessKey: process.env.JWT_ACCESS_KEY || 'jhjhkhjhk',
     smtpUserName: process.env.SMTP_USERNAME || 'wejdanabdulaziz.alghamdi@integrify.io',
     smtpPassword: process.env.SMTP_PASSWORD || 'vesf vjdg ncwm goky',
   },
