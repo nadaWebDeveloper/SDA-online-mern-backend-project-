@@ -277,3 +277,22 @@ Method: POST, Path: /orders, Date: 11/28/2023, Time: 1:50:20 PM
 Method: GET, Path: /products, Date: 11/28/2023, Time: 1:50:40 PM
 Method: POST, Path: /orders, Date: 11/28/2023, Time: 1:50:55 PM
 Method: GET, Path: /orders, Date: 11/28/2023, Time: 1:51:05 PM
+Method: GET, Path: /users, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١٢:٣٩:٠٦ ص
+Method: POST, Path: /users/register, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١٢:٤٢:٢٥ ص
+Method: POST, Path: /users/register, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١٢:٤٣:٥٣ ص
+Method: GET, Path: /users, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١٢:٤٤:١٤ ص
+Method: POST, Path: /users/register, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١٢:٤٥:٢٩ ص
+Method: POST, Path: /users/register, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١٢:٤٦:٣٩ ص
+Method: GET, Path: /users/activate/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXJzdE5hbWUiOiJzYXJhIiwibGFzdE5hbWUiOiJhbGdoYW1kaSIsImVtYWlsIjoic2FyYWhtb3NhYWQuYWxnaGFtZGlAaW50ZWdyaWZ5LmlvIiwicGFzc3dvcmQiOiIxMjM0NSIsImlhdCI6MTcwMTIwNzk5OSwiZXhwIjoxNzAxMjA4MDU5fQ.w6IOBWSsYH-9t28UQ6w4s9r_Gm6H888dGTWVaDdxRsQ, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١٢:٤٧:٠٣ ص
+Method: GET, Path: /favicon.ico, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١٢:٤٧:٠٣ ص
+Method: GET, Path: /users, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١٢:٤٧:٢٩ ص
+Method: GET, Path: /users, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١٢:٤٧:٣١ ص
+Method: GET, Path: /users/activate/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXJzdE5hbWUiOiJzYXJhIiwibGFzdE5hbWUiOiJhbGdoYW1kaSIsImVtYWlsIjoic2FyYWhtb3NhYWQuYWxnaGFtZGlAaW50ZWdyaWZ5LmlvIiwicGFzc3dvcmQiOiIxMjM0NSIsImlhdCI6MTcwMTIwNzk5OSwiZXhwIjoxNzAxMjA4MDU5fQ.w6IOBWSsYH-9t28UQ6w4s9r_Gm6H888dGTWVaDdxRsQ, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١٢:٤٧:٤٦ ص
+Method: GET, Path: /users, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١٢:٤٨:٠١ ص
+Method: GET, Path: /users/activate/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXJzdE5hbWUiOiJzYXJhIiwibGFzdE5hbWUiOiJhbGdoYW1kaSIsImVtYWlsIjoic2FyYWhtb3NhYWQuYWxnaGFtZGlAaW50ZWdyaWZ5LmlvIiwicGFzc3dvcmQiOiIxMjM0NSIsImlhdCI6MTcwMTIwNzk5OSwiZXhwIjoxNzAxMjA4MDU5fQ.w6IOBWSsYH-9t28UQ6w4s9r_Gm6H888dGTWVaDdxRsQ, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١٢:٤٨:٢٣ ص
+Method: GET, Path: /users, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١٢:٤٨:٢٩ ص
+Method: POST, Path: /users/register, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١٢:٤٨:٤٢ ص
+Method: GET, Path: /users, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١٢:٤٩:١٧ ص
+Method: GET, Path: /users, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١٢:٤٩:٢٨ ص
+Method: GET, Path: /users, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١:٠٨:٥٢ ص
+Method: GET, Path: /users, Date: ١٥‏/٥‏/١٤٤٥ هـ, Time: ١:١١:٤٣ ص
