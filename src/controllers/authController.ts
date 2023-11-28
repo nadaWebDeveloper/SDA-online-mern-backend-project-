@@ -10,7 +10,7 @@ const login = async (request: Request, response: Response, next: NextFunction) =
 
     const user = await services.isEmailMatch(email)
     await services.isPassworMatch(user, password)
-    services.isBanned(user)
+    services.isUserBanned(user)
 
     const accessToken = jwt.sign({ _id: user.id }, dev.app.jwsAccessKey, {
       expiresIn: '1m',
@@ -20,10 +20,19 @@ const login = async (request: Request, response: Response, next: NextFunction) =
       httpOnly: true,
       sameSite: 'none',
     })
-    response.json({ message: 'you are logged in ' })
+    response.json({ message: 'you logged in ' })
   } catch (error) {
     next(error)
   }
 }
 
-export { login }
+const logout = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    response.clearCookie('access_token')
+    response.json({ message: 'you logged out ' })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export { login, logout }
