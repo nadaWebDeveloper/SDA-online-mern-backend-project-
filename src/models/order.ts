@@ -1,6 +1,8 @@
 import mongoose, { Document } from 'mongoose'
 
 export interface IOrder extends Document {
+  _id: String
+  quantity: Number
   products: mongoose.Schema.Types.ObjectId[]
   user: mongoose.Schema.Types.ObjectId
   createdAt: Date
@@ -9,6 +11,10 @@ export interface IOrder extends Document {
 
 const orderSchema = new mongoose.Schema(
   {
+    quantity: {
+      type: Number,
+      required: [true, 'One product at least is required'],
+    },
     products: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: 'Products',
