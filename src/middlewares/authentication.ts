@@ -6,6 +6,7 @@ interface CustomeRequest extends Request {
   userId?: string
 }
 
+// check if admin
 export const isAdmin = async (request: CustomeRequest, response: Response, next: NextFunction) => {
   try {
     const user = await User.findById(request.userId)
