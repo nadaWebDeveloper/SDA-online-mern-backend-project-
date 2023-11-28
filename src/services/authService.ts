@@ -12,7 +12,7 @@ export const isEmailMatch = async (inputEmail: string) => {
 }
 
 export const isPassworMatch = async (user: UserDocument, password: string) => {
-  const passwordCompare = await bycrypt.compare(user.password, password)
+  const passwordCompare = await bycrypt.compare(password, user.password)
   if (!passwordCompare) {
     throw ApiError.badRequest(401, 'The password does not match')
   }
