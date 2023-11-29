@@ -8,6 +8,7 @@ import {
 } from '../controllers/categoriesController'
 import { categoryValidation } from '../validation/categoriesValidation'
 import { runValidation } from '../validation/runValidation'
+import { isAdmin, isLoggedIn } from '../middlewares/authentication'
 
 const router = Router()
 
@@ -16,10 +17,10 @@ router.get('/', getAllCategories)
 //GET --> get a single category by ID
 router.get('/:id', getSingleCategory)
 //POST --> create a category
-router.post('/', categoryValidation, runValidation, createCategory)
+router.post('/', isLoggedIn, isAdmin, categoryValidation, runValidation, createCategory)
 //DELETE --> delete a single category by ID
-router.delete('/:id', deleteCategory)
+router.delete('/:id', isLoggedIn, isAdmin, deleteCategory)
 //PUT --> update a single category by ID
-router.put('/:id', categoryValidation, runValidation, updateCategory)
+router.put('/:id', isLoggedIn, isAdmin, categoryValidation, runValidation, updateCategory)
 
 export default router

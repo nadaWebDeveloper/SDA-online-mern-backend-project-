@@ -54,11 +54,7 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
 
     response.json({ message: 'Check your email to activate the account ', token })
   } catch (error) {
-    if (error instanceof mongoose.Error.CastError) {
-      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
-    } else {
-      next(error)
-    }
+    next(error)
   }
 }
 
@@ -80,7 +76,7 @@ const updateUser = async (request: Request, response: Response, next: NextFuncti
     const updatedUser = request.body
 
     if (updatedUser.isBanned || updatedUser.isAdmin) {
-      throw ApiError.badRequest(403, 'you do not have permission to ban user or modify its role')
+      throw ApiError.badRequest(403, 'you do not have permission to ban users or modify thier role')
     }
 
     const userExists = await services.isUserEmailExists(email, id)

@@ -3,6 +3,7 @@ import { Router } from 'express'
 import * as controller from '../controllers/productsController'
 import { productValidation } from '../validation/productsValidation'
 import { runValidation } from '../validation/runValidation'
+import { isAdmin, isLoggedIn } from '../middlewares/authentication'
 
 const router = Router()
 
@@ -12,13 +13,13 @@ router.get(`/`, controller.getAllProducts)
 //GET: /products/:id -> getSingleProductById -> findProductById
 router.get(`/:id`, controller.getSingleProduct)
 
-//GET: /products/:id -> deleteSingleProduct -> findAndDeleted
-router.delete(`/:id`, controller.deleteProduct)
+//DELETE: /products/:id -> deleteSingleProduct -> findAndDeleted
+router.delete(`/:id`, isLoggedIn, isAdmin, controller.deleteProduct)
 
 //POST : /products -> createSingleProduct -> findIfProductExist
-router.post('/', productValidation, runValidation, controller.createProduct)
+router.post('/', isLoggedIn, isAdmin, productValidation, runValidation, controller.createProduct)
 
 //PUT : /products/:id -> updateSingleProduct -> findAndUpdated
-router.put(`/:id`, productValidation, runValidation, controller.updateProduct)
+router.put(`/:id`, isLoggedIn, isAdmin, productValidation, runValidation, controller.updateProduct)
 
 export default router

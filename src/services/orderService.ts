@@ -66,9 +66,13 @@ export const findOrderAndUpdated = async (
 
 // create new order
 export const createNewOrder = async (newOrderInput: IOrder): Promise<IOrder> => {
+  if (!newOrderInput.user || !newOrderInput.products) {
+    throw ApiError.badRequest(404, `Order must contain products and user data`)
+  }
   const newOrder: IOrder = new Order({
     products: newOrderInput.products,
     user: newOrderInput.user,
+    quantity: newOrderInput.products.length,
   })
 
   await newOrder.save()
