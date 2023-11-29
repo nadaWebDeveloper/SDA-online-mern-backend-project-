@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose, { SortOrder } from 'mongoose'
 import jwt from 'jsonwebtoken'
 import { Request, Response, NextFunction } from 'express'
 
@@ -10,15 +10,30 @@ const getAllUsers = async (request: Request, response: Response, next: NextFunct
   try {
     const limit = Number(request.query.limit) || 0
     const page = Number(request.query.page) || 1
+    const sort = request.query.sort as SortOrder
     const search = (request.query.search as string) || ''
+    const isAdmin = request.query.isAdmin as string
+    const isBanned = request.query.isBanned as string
 
-    const { allUsers, totalPage, currentPage } = await services.findAllUsers(page, limit, search)
+    const { allUsers, totalPage, currentPage } = await services.findAllUsers(
+      page,
+      limit,
+      search,
+      sort,
+      isAdmin,
+      isBanned
+    )
+    if (allUsers.length) {
+      return response.status(200).json({
+        message: 'users were found',
+        allUsers,
+        totalPage,
+        currentPage,
+      })
+    }
 
-    return response.json({
-      message: 'users were found',
-      allUsers,
-      totalPage,
-      currentPage,
+    return response.status(200).json({
+      message: 'there are no matching results',
     })
   } catch (error) {
     next(error)

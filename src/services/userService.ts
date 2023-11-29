@@ -4,9 +4,16 @@ import { dev } from '../config'
 import ApiError from '../errors/ApiError'
 import { sendEmail } from '../helper/sendEmail'
 import { UserDocument, User } from '../models/user'
+import { SortOrder } from 'mongoose'
 
-export const findAllUsers = async (page: number, limit: number, search: string) => {
-  const countPage = await User.countDocuments()
+export const findAllUsers = async (
+  page: number,
+  limit: number,
+  search: string,
+  sort: SortOrder,
+  isAdmin: string,
+  isBanned: string
+) => {
   const searchRegularExpression = new RegExp('.*' + search + '.*', 'i')
   const searchFilter = {
     $or: [
@@ -16,15 +23,39 @@ export const findAllUsers = async (page: number, limit: number, search: string) 
     ],
   }
 
+  const roleFilter = isAdmin ? { isAdmin: isAdmin } : {}
+
+  const bannedUsersFilter = isBanned ? { isBanned: isBanned } : {}
+  const filters = { $and: [roleFilter, bannedUsersFilter, searchFilter] }
+  const countPage = await User.countDocuments()
   const totalPage = limit ? Math.ceil(countPage / limit) : 1
   if (page > totalPage) {
     page = totalPage
   }
   const skip = (page - 1) * limit
 
-  const allUsers: UserDocument[] = search
-    ? await User.find(searchFilter, { password: 0 }).populate('orders').skip(skip).limit(limit)
-    : await User.find({}, { password: 0 }).populate('orders').skip(skip).limit(limit)
+  // const allUsers: UserDocument[] = search
+  //   ? await User.find({ searchFilter }, { password: 0, orders: 0 })
+  //       .populate('orders')
+  //       .skip(skip)
+  //       .limit(limit)
+  //   : await User.find({}, { password: 0, orders: 0 })
+  //       .populate('orders')
+  //       .skip(skip)
+  //       .limit(limit)
+  //       .sort(sort ? { firstName: sortOrder, lastName: sortOrder } : '')
+
+  const allUsers: UserDocument[] = await User.find(
+    { $and: [filters, searchFilter] },
+    {
+      password: 0,
+      orders: 0,
+    }
+  )
+    .populate('orders')
+    .skip(skip)
+    .limit(limit)
+    .sort({ firstName: sort, lastName: sort })
 
   return {
     allUsers,
