@@ -17,10 +17,9 @@ export const getAllProducts = async (request: Request, response: Response, next:
       },
     })
   } catch (error) {
-    next(error)
-  }
-}
-
+      next(error)
+}}
+  
 export const getSingleProduct = async (
   request: Request,
   response: Response,
@@ -53,8 +52,14 @@ export const deleteProduct = async (request: Request, response: Response, next: 
     })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
-      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
-    } else {
+      if (error.path === '_id' && error.kind === 'ObjectId') {
+        next(ApiError.badRequest(400, `Invalid ID format: ID format is Invalid must be 24 characters on schema  feild : ${ error.path} : ${error.message}`))
+      } else {
+        next(ApiError.badRequest(400, `Invalid data format. Please check your input`))
+
+      }
+    }
+     else {
       next(error)
     }
   }
@@ -73,14 +78,21 @@ export const createProduct = async (request: Request, response: Response, next: 
       description: newInput.description,
       categories: newInput.categories,
     })
-    await newProduct.save()
+    if(newProduct){
+      await newProduct.save()
+    }else{
+      next(ApiError.badRequest(400, `Invalid document`))
+
+    }
     response.status(201).json({
       message: `Create a single product`,
     })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
-      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
-    } else {
+      throw(ApiError.badRequest(400, `Invalid ID format: ID format is Invalid must be 24 characters`))
+    }
+
+  else {
       next(error)
     }
   }
@@ -98,30 +110,10 @@ export const updateProduct = async (request: Request, response: Response, next: 
     })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
-      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+      throw ApiError.badRequest(400, `ID format is Invalid must be 24 characters`)
     } else {
       next(error)
     }
   }
 }
 
-export const sortProductByDate = async (
-  request: Request,
-  response: Response,
-  next: NextFunction
-) => {
-  try {
-    const { sortBy } = request.query
-    let sortOption = {}
-
-    if (sortBy) {
-      // Set the sorting option based on the query parameter
-      sortOption = { sortBy: 1 } // 1 for ascending, -1 for descending
-    }
-
-    const products = await Product.find().sort(sortOption)
-    response.json(products)
-  } catch (error) {
-    next(error)
-  }
-}

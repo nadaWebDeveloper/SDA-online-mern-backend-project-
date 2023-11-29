@@ -10,8 +10,10 @@ const router = express.Router()
 //GET --> get all users
 router.get('/', isLoggedIn, isAdmin, controller.getAllUsers)
 
+
 // GET --> get a single user by ID
 router.get('/:id', isLoggedIn, controller.getSingleUser)
+
 
 //POST --> register a user
 router.post(

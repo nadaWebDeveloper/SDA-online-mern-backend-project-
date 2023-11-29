@@ -1,9 +1,8 @@
 import mongoose from 'mongoose'
 
-import { ICategory } from './category'
 
 export interface IProduct extends mongoose.Document {
-  _id: string
+  _id: mongoose.Schema.Types.ObjectId
   name: string
   price: number
   image: string
@@ -12,9 +11,8 @@ export interface IProduct extends mongoose.Document {
   categories: mongoose.Schema.Types.ObjectId[]
   description: string
   title: String
-  dateAdded: Date
-  createAt?: string
-  updateAt?: string
+  createAt?: Date
+  updateAt?: Date
 }
 
 const productSchema = new mongoose.Schema(
@@ -56,6 +54,7 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
   },
   { timestamps: true }
 )

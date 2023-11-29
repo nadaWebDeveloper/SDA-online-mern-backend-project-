@@ -3,15 +3,20 @@ import { NextFunction, Request } from 'express'
 import ApiError from '../errors/ApiError'
 import { IProduct, Product } from '../models/product'
 
+
 export const findAllProduct = async (request: Request) => {
-  const limit = Number(request.query.limit) || 3
+  const limit = Number(request.query.limit) || 0
   let page = Number(request.query.page) || 1
   const search = (request.query.search as string) || ''
   const { rangeId } = request.query || { $gte: 0 }
+  //sort 
+  const sortName  = String(request.query.sortName) || ''
+  let sortOption: Record<string, any>= {}
+  let sortNum =request.query.sortNum || 1
 
   let priceFilter = { $gte: 0, $lte: Number.MAX_SAFE_INTEGER }
 
-  // serach products
+  // search products
   const searchRegularExpression = new RegExp('.*' + search + '.*', 'i')
   const searchFilter = {
     $or: [
@@ -46,11 +51,15 @@ export const findAllProduct = async (request: Request) => {
     }
   }
 
+  //sort http://localhost:5050/products?sortName=name&sortNum=1
+  //http://localhost:5050/products?sortName=createAt&sortNum=1
+  sortNum?  -1 :1
+  sortOption[sortName]=   sortNum;
   //how many have products
   const countPage = await Product.countDocuments()
 
   //total page
-  const totalPage = Math.ceil(countPage / limit)
+  const totalPage = limit ? Math.ceil(countPage / limit) : 1
   if (page > totalPage) {
     page = totalPage
   }
@@ -63,8 +72,11 @@ export const findAllProduct = async (request: Request) => {
     .populate('categories')
     .skip(skip)
     .limit(limit)
+     .sort(sortOption) 
+ 
 
-  if (allProductOnPage.length === 0) {
+  
+  if (allProductOnPage.length === 0 ) {
     throw ApiError.badRequest(404, 'No matching results')
   }
   return {
