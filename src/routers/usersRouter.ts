@@ -3,12 +3,12 @@ import express from 'express'
 import * as controller from '../controllers/usersController'
 import { runValidation } from '../validation/runValidation'
 import { userRegistrationValidation } from '../validation/userValidation'
-import { isLoggedIn, isLoggedOut } from '../middlewares/authentication'
+import { isAdmin, isLoggedIn, isLoggedOut } from '../middlewares/authentication'
 
 const router = express.Router()
 
 //GET --> get all users
-router.get('/', isLoggedIn, controller.getAllUsers)
+router.get('/', isLoggedIn, isAdmin, controller.getAllUsers)
 
 // GET --> get a single user by ID
 router.get('/:id', isLoggedIn, controller.getSingleUser)
@@ -29,18 +29,18 @@ router.post('/activate', controller.activateUser)
 router.put('/:id', isLoggedIn, controller.updateUser)
 
 //PUT --> ban a single user by ID
-router.put('/ban/:id', isLoggedIn, controller.banUser)
+router.put('/ban/:id', isLoggedIn, isAdmin, controller.banUser)
 
 //PUT --> unban a single user by ID
-router.put('/unban/:id', isLoggedIn, controller.unBanUser)
+router.put('/unban/:id', isLoggedIn, isAdmin, controller.unBanUser)
 
 //PUT --> upgrade single user role to admin
-router.put('/admin/:id', isLoggedIn, controller.upgradeUserRole)
+router.put('/admin/:id', isLoggedIn, isAdmin, controller.upgradeUserRole)
 
-//PUT --> downgrade single user role to admin
-router.put('/notadmin/:id', isLoggedIn, controller.downgradeUserRole)
+//PUT --> downgrade single admin role to user
+router.put('/notadmin/:id', isLoggedIn, isAdmin, controller.downgradeUserRole)
 
 //DELETE --> delete a single user by ID
-router.delete('/:id', isLoggedIn, controller.deleteUser)
+router.delete('/:id', isLoggedIn, isAdmin, controller.deleteUser)
 
 export default router
