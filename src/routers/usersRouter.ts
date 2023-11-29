@@ -11,7 +11,6 @@ router.get('/', controller.getAllUsers)
 //GET --> get a single user by ID
 router.get('/:id', controller.getSingleUser)
 
-
 //POST --> register a user
 router.post('/register', userRegistrationValidation, runValidation, controller.registUser)
 

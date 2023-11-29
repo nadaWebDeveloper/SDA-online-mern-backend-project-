@@ -19,6 +19,7 @@ mongoose.set('strictQuery', false)
 mongoose.set('strictPopulate', false)
 const URL = process.env.ATLAS_URL || 'mongodb://127.0.0.1:27017/full-stack-demo-db'
 
+
 app.use(myLogger)
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
@@ -37,6 +38,7 @@ app.get('/', (request: Request, response: Response) => {
 app.use((request: Request, response: Response, next: NextFunction) => {
   next(ApiError.badRequest(404, `Router not Found`))
 })
+
 app.use(apiErrorHandler)
 
 mongoose
