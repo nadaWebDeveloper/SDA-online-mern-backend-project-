@@ -42,6 +42,7 @@ router.put('/admin/:id', isLoggedIn, isAdmin, controller.upgradeUserRole)
 //PUT --> downgrade single admin role to user
 router.put('/notadmin/:id', isLoggedIn, isAdmin, controller.downgradeUserRole)
 
+
 //DELETE --> delete a single user by ID
 router.delete('/:id', isLoggedIn, isAdmin, controller.deleteUser)
 
