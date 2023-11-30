@@ -1,10 +1,17 @@
-import jwt, { TokenExpiredError } from 'jsonwebtoken'
+import { SortOrder } from 'mongoose'
+import { TokenExpiredError } from 'jsonwebtoken'
 
 import { dev } from '../config'
 import ApiError from '../errors/ApiError'
-import { sendEmail } from '../helper/sendEmail'
+import { sendEmail } from '../utils/sendEmail'
+import { vertifyToken } from '../utils/tokenHandle'
 import { UserDocument, User } from '../models/user'
-import { SortOrder } from 'mongoose'
+
+type UsersPaginationType = {
+  allUsers: UserDocument[]
+  totalPage: number
+  currentPage: number
+}
 
 export const findAllUsers = async (
   page: number,
@@ -13,7 +20,7 @@ export const findAllUsers = async (
   sort: SortOrder,
   isAdmin: string,
   isBanned: string
-) => {
+): Promise<UsersPaginationType> => {
   const searchRegularExpression = new RegExp('.*' + search + '.*', 'i')
   const searchFilter = {
     $or: [
@@ -35,7 +42,7 @@ export const findAllUsers = async (
   const skip = (page - 1) * limit
 
   // const allUsers: UserDocument[] = search
-  //   ? await User.find({ searchFilter }, { password: 0, orders: 0 })
+  //   ? await User.find({ searchFilter }, { password: 0})
   //       .populate('orders')
   //       .skip(skip)
   //       .limit(limit)
@@ -43,15 +50,11 @@ export const findAllUsers = async (
   //       .populate('orders')
   //       .skip(skip)
   //       .limit(limit)
-  //       .sort(sort ? { firstName: sortOrder, lastName: sortOrder } : '')
+  //       .sort({ firstName: sort, lastName: sort })
 
-  const allUsers: UserDocument[] = await User.find(
-    { $and: [filters, searchFilter] },
-    {
-      password: 0,
-      orders: 0,
-    }
-  )
+  const allUsers = await User.find(filters, {
+    password: 0,
+  })
     .populate('orders')
     .skip(skip)
     .limit(limit)
@@ -64,7 +67,7 @@ export const findAllUsers = async (
   }
 }
 
-export const findUserByID = async (id: string) => {
+export const findUserByID = async (id: string): Promise<UserDocument> => {
   const user = await User.findById(id).populate('orders')
   if (!user) {
     throw ApiError.badRequest(404, `User with ${id} was not found`)
@@ -98,7 +101,7 @@ export const checkTokenAndActivate = async (token: string) => {
       throw ApiError.badRequest(404, 'Token was not provided')
     }
 
-    const decodedUser = jwt.verify(token, dev.app.jwsUserActivationKey)
+    const decodedUser = vertifyToken(token, dev.app.jwsUserActivationKey)
 
     if (!decodedUser) {
       throw ApiError.badRequest(401, 'Token was invalid')
@@ -115,7 +118,10 @@ export const checkTokenAndActivate = async (token: string) => {
   }
 }
 
-export const findUserAndUpdate = async (id: string, inputUser: UserDocument) => {
+export const findUserAndUpdate = async (
+  id: string,
+  inputUser: UserDocument
+): Promise<UserDocument> => {
   const user = await User.findByIdAndUpdate(id, inputUser, { new: true })
   if (!user) {
     throw ApiError.badRequest(404, 'User was Not Found')
@@ -123,36 +129,26 @@ export const findUserAndUpdate = async (id: string, inputUser: UserDocument) => 
   return user
 }
 
-export const banUserById = async (id: string) => {
-  const user = await User.findByIdAndUpdate(id, { isBanned: true }, { new: true })
+export const updateUserRoleById = async (id: string, isAdmin: boolean): Promise<UserDocument> => {
+  const update = { isAdmin: isAdmin }
+  const user = await User.findByIdAndUpdate(id, update, { new: true })
+
   if (!user) {
     throw ApiError.badRequest(404, 'User was not found')
   }
+
   return user
 }
+export const updateBanStatusById = async (id: string, isBanned: boolean): Promise<UserDocument> => {
+  const update = { isBanned: isBanned }
+  const user = await User.findByIdAndUpdate(id, update, { new: true })
 
-export const unBanUserById = async (id: string) => {
-  const user = await User.findByIdAndUpdate(id, { isBanned: false }, { new: true })
   if (!user) {
     throw ApiError.badRequest(404, 'User was not found')
   }
-}
 
-export const upgradeUserRoleById = async (id: string) => {
-  const user = await User.findByIdAndUpdate(id, { isAdmin: true }, { new: true })
-  if (!user) {
-    throw ApiError.badRequest(404, 'User was not found')
-  }
   return user
 }
-
-export const downgradeUserRoleById = async (id: string) => {
-  const user = await User.findByIdAndUpdate(id, { isAdmin: false }, { new: true })
-  if (!user) {
-    throw ApiError.badRequest(404, 'User was not found')
-  }
-}
-
 export const findUserAndDelete = async (id: string) => {
   const user = await User.findByIdAndDelete(id)
 

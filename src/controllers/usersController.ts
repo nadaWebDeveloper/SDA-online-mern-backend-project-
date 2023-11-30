@@ -1,10 +1,10 @@
 import mongoose, { SortOrder } from 'mongoose'
-import jwt from 'jsonwebtoken'
 import { Request, Response, NextFunction } from 'express'
 
 import { dev } from '../config'
 import ApiError from '../errors/ApiError'
 import * as services from '../services/userService'
+import { generateToken } from '../utils/tokenHandle'
 
 const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
@@ -44,7 +44,7 @@ const getSingleUser = async (request: Request, response: Response, next: NextFun
   try {
     const { id } = request.params
     const user = await services.findUserByID(id)
-    response.json({ message: 'User was found', user })
+    response.status(200).json({ message: 'User was found', user })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       next(ApiError.badRequest(400, 'Id format is not valid'))
@@ -63,11 +63,10 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
       throw ApiError.badRequest(403, 'you do not have permission to ban user or modify its role')
     }
     const userExists = await services.isUserEmailExists(email)
-
-    const token = jwt.sign(request.body, dev.app.jwsUserActivationKey, { expiresIn: '1m' })
+    const token = generateToken(request.body, dev.app.jwsUserActivationKey, '2m')
     services.sendTokenByEmail(email, token)
 
-    response.json({ message: 'Check your email to activate the account ', token })
+    response.status(200).json({ message: 'Check your email to activate the account ', token })
   } catch (error) {
     next(error)
   }
@@ -98,7 +97,7 @@ const updateUser = async (request: Request, response: Response, next: NextFuncti
 
     const user = await services.findUserAndUpdate(id, updatedUser)
 
-    response.json({ message: 'User was updated', user })
+    response.status(200).json({ message: 'User was updated', user })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
@@ -111,9 +110,9 @@ const updateUser = async (request: Request, response: Response, next: NextFuncti
 const banUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
-    const user = await services.banUserById(id)
+    const user = await services.updateBanStatusById(id, true)
 
-    response.json({ message: 'User was banned' })
+    response.status(204).json({ message: 'User was banned' })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
@@ -126,9 +125,9 @@ const banUser = async (request: Request, response: Response, next: NextFunction)
 const unBanUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
-    const user = await services.unBanUserById(id)
+    const user = await services.updateBanStatusById(id, false)
 
-    response.json({ message: 'User was Unbanned' })
+    response.status(204).json({ message: 'User was Unbanned' })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
@@ -141,9 +140,9 @@ const unBanUser = async (request: Request, response: Response, next: NextFunctio
 const upgradeUserRole = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
-    const user = await services.upgradeUserRoleById(id)
+    const user = await services.updateUserRoleById(id, true)
 
-    response.json({ message: 'admin permession was granted' })
+    response.status(204).json({ message: 'admin permession was granted' })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
@@ -156,9 +155,9 @@ const upgradeUserRole = async (request: Request, response: Response, next: NextF
 const downgradeUserRole = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
-    const user = await services.downgradeUserRoleById(id)
+    const user = await services.updateUserRoleById(id, false)
 
-    response.json({ message: 'admin permession was removed' })
+    response.status(204).json({ message: 'admin permession was removed' })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
@@ -173,7 +172,7 @@ const deleteUser = async (request: Request, response: Response, next: NextFuncti
     const { id } = request.params
     const user = await services.findUserAndDelete(id)
 
-    response.json({ message: 'User was deleted', user })
+    response.status(204).json({ message: 'User was deleted' })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       next(ApiError.badRequest(400, 'ID format is Invalid must be 24 characters'))
