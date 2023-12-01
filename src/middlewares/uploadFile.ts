@@ -15,9 +15,13 @@ import ApiError from '../errors/ApiError'
 
   const fileFilter = (request: Request, file :Express.Multer.File , cb: FileFilterCallback ) => {
         const allowedType = ['image/jpeg','image/png','image/jpg']
-        if(! allowedType.includes((file.mimetype))){
-          return cb(new Error( `Only upload images `))
+        if(! file.mimetype.startsWith('image/')){
+          return cb(new Error( `File is not image`))
         }
+        if(! allowedType.includes((file.mimetype))){
+          return cb(new Error( `Only upload images this type: ${file.mimetype} not allowed`))
+        }
+        cb(null, true)
   }
   
-  export const upload = multer({ storage: productStorage ,fileFilter: fileFilter })
+  export const upload = multer({ storage: productStorage ,fileFilter: fileFilter, limits: {fieldSize: 1024 * 1024 * 1} })
