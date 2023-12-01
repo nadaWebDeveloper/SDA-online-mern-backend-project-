@@ -720,3 +720,4 @@ Method: POST, Path: /products, Date: 11/30/2023, Time: 4:12:20 PM
 Method: POST, Path: /products, Date: 11/30/2023, Time: 4:12:55 PM
 Method: POST, Path: /auth/login, Date: 11/30/2023, Time: 4:16:39 PM
 Method: POST, Path: /products, Date: 11/30/2023, Time: 4:16:49 PM
+Method: GET, Path: /products, Date: 11/30/2023, Time: 4:20:23 PM

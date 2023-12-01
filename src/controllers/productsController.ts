@@ -76,11 +76,13 @@ export const createProduct = async (request: Request, response: Response, next: 
       price: newInput.price,
       quantity: newInput.quantity,
       sold: newInput.sold,
-      image: imagePath,
+      // image: imagePath,
       description: newInput.description,
       categories: newInput.categories,
     })
-  
+    if(imagePath){
+      newProduct.image = imagePath
+    }
     if(newProduct){
       await newProduct.save()
     }else{
