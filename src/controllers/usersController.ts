@@ -43,13 +43,14 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
   try {
     const { email } = request.body
     const registedUser = request.body
-
+ 
     if (registedUser.isBanned || registedUser.isAdmin) {
       throw ApiError.badRequest(403, 'you do not have permission to ban user or modify its role')
     }
     const userExists = await services.isUserEmailExists(email)
 
-    const token = jwt.sign(request.body, dev.app.jwsUserActivationKey, { expiresIn: '1m' })
+
+    const token = jwt.sign(registedUser, dev.app.jwsUserActivationKey, { expiresIn: '1m' })
     services.sendTokenByEmail(email, token)
 
     response.json({ message: 'Check your email to activate the account ', token })
@@ -62,7 +63,6 @@ const activateUser = async (request: Request, response: Response, next: NextFunc
   try {
     const { token } = request.body
     const user = await services.checkTokenAndActivate(token)
-
     response.status(201).json({ message: 'User was activated ', user })
   } catch (error) {
     next(error)

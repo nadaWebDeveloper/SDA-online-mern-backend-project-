@@ -34,7 +34,7 @@ export const findAllUsers = async (page: number, limit: number, search: string) 
 }
 
 export const findUserByID = async (id: string) => {
-  const user = await User.findById(id).populate('orders')
+  const user = await User.findById(id, {password:0}).populate('orders')
   if (!user) {
     throw ApiError.badRequest(404, `User with ${id} was not found`)
   }
@@ -66,9 +66,7 @@ export const checkTokenAndActivate = async (token: string) => {
     if (!token) {
       throw ApiError.badRequest(404, 'Token was not provided')
     }
-
     const decodedUser = jwt.verify(token, dev.app.jwsUserActivationKey)
-
     if (!decodedUser) {
       throw ApiError.badRequest(401, 'Token was invalid')
     }

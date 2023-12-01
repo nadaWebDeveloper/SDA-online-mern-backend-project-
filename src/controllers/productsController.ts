@@ -68,16 +68,19 @@ export const deleteProduct = async (request: Request, response: Response, next: 
 export const createProduct = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const newInput = request.body
+    const imagePath =  request.file?.path
+
     const productExist = await services.findIfProductExist(newInput, next)
     const newProduct: IProduct = new Product({
       name: newInput.name,
       price: newInput.price,
-      image: newInput.image,
       quantity: newInput.quantity,
       sold: newInput.sold,
+      image: imagePath,
       description: newInput.description,
       categories: newInput.categories,
     })
+  
     if(newProduct){
       await newProduct.save()
     }else{

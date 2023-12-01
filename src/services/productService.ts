@@ -10,15 +10,17 @@ export const findAllProduct = async (request: Request) => {
   const search = (request.query.search as string) || ''
   const { rangeId } = request.query || { $gte: 0 }
   //sort 
-  const sortName  = String(request.query.sortName) || ''
+  const sortName  = String(request.query.sortName) || 'price'
   let sortOption: Record<string, any>= {}
   let sortNum =request.query.sortNum || 1
+  const skipField = {__v: 0, updateAt: 0}
 
   let priceFilter = { $gte: 0, $lte: Number.MAX_SAFE_INTEGER }
 
   // search products
   const searchRegularExpression = new RegExp('.*' + search + '.*', 'i')
   const searchFilter = {
+    // name:{$en : 'nada'}, //return all name product except which hold same this value
     $or: [
       { name: { $regex: searchRegularExpression } },
       { description: { $regex: searchRegularExpression } },
@@ -68,7 +70,7 @@ export const findAllProduct = async (request: Request) => {
   // return results
   const allProductOnPage: IProduct[] = await Product.find({
     $and: [searchFilter, { price: priceFilter }],
-  })
+  },skipField)
     .populate('categories')
     .skip(skip)
     .limit(limit)

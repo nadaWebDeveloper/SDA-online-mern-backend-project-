@@ -46,7 +46,6 @@ const userSchema = new mongoose.Schema(
       minlength: [8, 'Password must be at least 8 characters'],
       set: (password: string) => bcrypt.hashSync(password, 10),
     },
-
     isAdmin: {
       type: Boolean,
       default: false,
