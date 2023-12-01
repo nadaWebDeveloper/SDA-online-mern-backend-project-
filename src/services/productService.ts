@@ -1,4 +1,5 @@
 import { NextFunction, Request } from 'express'
+import fs from 'fs/promises'
 
 import ApiError from '../errors/ApiError'
 import { IProduct, Product } from '../models/product'
@@ -98,6 +99,10 @@ export const findProductById = async (id: string, next: NextFunction) => {
 
 export const findAndDeleted = async (id: string, next: NextFunction) => {
   const deleteSingleProduct = await Product.findOneAndDelete({ _id: id })
+  //delete file from server
+  if(deleteSingleProduct && deleteSingleProduct.image){
+    await fs.unlink(deleteSingleProduct.image)
+  }
   if (!deleteSingleProduct) {
     throw ApiError.badRequest(404, `Product is not found with this id: ${id}`)
   }

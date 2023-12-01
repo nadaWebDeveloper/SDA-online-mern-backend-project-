@@ -1,6 +1,5 @@
 import multer, { FileFilterCallback } from 'multer'
 import {Request } from 'express'
-import ApiError from '../errors/ApiError'
 
 
  const productStorage = multer.diskStorage({
@@ -24,4 +23,4 @@ import ApiError from '../errors/ApiError'
         cb(null, true)
   }
   
-  export const upload = multer({ storage: productStorage ,fileFilter: fileFilter, limits: {fieldSize: 1024 * 1024 * 1} })
+  export const upload = multer({ storage: productStorage ,fileFilter: fileFilter, limits: {fileSize: 1024 * 1024 * 1} })
