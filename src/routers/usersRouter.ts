@@ -2,7 +2,11 @@ import express from 'express'
 
 import * as controller from '../controllers/usersController'
 import { runValidation } from '../validation/runValidation'
-import { userRegistrationValidation } from '../validation/userValidation'
+import {
+  userForgetPasswordValidation,
+  userRegistrationValidation,
+  userResetPasswordValidation,
+} from '../validation/userValidation'
 import { isAdmin, isLoggedIn, isLoggedOut } from '../middlewares/authentication'
 
 const router = express.Router()
@@ -43,10 +47,22 @@ router.put('/notadmin/:id', isLoggedIn, isAdmin, controller.downgradeUserRole)
 //DELETE --> delete a single user by ID
 router.delete('/:id', isLoggedIn, isAdmin, controller.deleteUser)
 
-//POST --> send reset email
-router.post('/forget-password', isLoggedOut, controller.forgetPassword)
+//POST --> send reset email when forget password
+router.post(
+  '/forget-password',
+  isLoggedOut,
+  userForgetPasswordValidation,
+  runValidation,
+  controller.forgetPassword
+)
 
 //POST --> reset password
-router.post('/reset-password', isLoggedOut, controller.resetPassword)
+router.post(
+  '/reset-password',
+  isLoggedOut,
+  userResetPasswordValidation,
+  runValidation,
+  controller.resetPassword
+)
 
 export default router
