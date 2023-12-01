@@ -1,14 +1,11 @@
 import { SortOrder } from 'mongoose'
-import { TokenExpiredError } from 'jsonwebtoken'
+import { JwtPayload } from 'jsonwebtoken'
 
-import { dev } from '../config'
 import ApiError from '../errors/ApiError'
-import { sendEmail } from '../utils/sendEmail'
-import { vertifyToken } from '../utils/tokenHandle'
-import { UserDocument, User } from '../models/user'
+import { IUser, User } from '../models/user'
 
 type UsersPaginationType = {
-  allUsers: UserDocument[]
+  allUsers: IUser[]
   totalPage: number
   currentPage: number
 }
@@ -31,8 +28,8 @@ export const findAllUsers = async (
   }
 
   const roleFilter = isAdmin ? { isAdmin: isAdmin } : {}
-
   const bannedUsersFilter = isBanned ? { isBanned: isBanned } : {}
+
   const filters = { $and: [roleFilter, bannedUsersFilter, searchFilter] }
   const countPage = await User.countDocuments()
   const totalPage = limit ? Math.ceil(countPage / limit) : 1
@@ -41,7 +38,7 @@ export const findAllUsers = async (
   }
   const skip = (page - 1) * limit
 
-  // const allUsers: UserDocument[] = search
+  // const allUsers = search
   //   ? await User.find({ searchFilter }, { password: 0})
   //       .populate('orders')
   //       .skip(skip)
@@ -67,10 +64,12 @@ export const findAllUsers = async (
   }
 }
 
-export const findUserByID = async (id: string): Promise<UserDocument> => {
-  const user = await User.findById(id).populate('orders')
+export const findSingleUser = async (filter: object): Promise<IUser> => {
+  const user = await User.findOne(filter, {
+    password: 0,
+  }).populate('orders')
   if (!user) {
-    throw ApiError.badRequest(404, `User with ${id} was not found`)
+    throw ApiError.badRequest(404, `User was not found`)
   }
   return user
 }
@@ -83,53 +82,24 @@ export const isUserEmailExists = async (inputEmail: string, inputId: string | nu
   }
 }
 
-export const sendTokenByEmail = (email: string, token: string) => {
-  const emailData = {
-    email: email,
-    subject: 'Activate your account',
-    html: ` 
-  <h1> Hello</h1>
-  <p>Please activate your account by <a href= "http://127.0.0.1:5050/users/activate/${token}">click here</a></p>`,
-  }
-
-  sendEmail(emailData)
-}
-
-export const checkTokenAndActivate = async (token: string) => {
-  try {
-    if (!token) {
-      throw ApiError.badRequest(404, 'Token was not provided')
-    }
-
-    const decodedUser = vertifyToken(token, dev.app.jwsUserActivationKey)
-
-    if (!decodedUser) {
-      throw ApiError.badRequest(401, 'Token was invalid')
-    }
-    const user = new User(decodedUser)
-    await user.save()
-    return user
-  } catch (error) {
-    if (error instanceof TokenExpiredError) {
-      throw ApiError.badRequest(401, 'Token was expired')
-    } else {
-      throw error
-    }
-  }
+export const createUser = async (newUser: JwtPayload): Promise<IUser> => {
+  const user = new User(newUser)
+  await user.save()
+  return user
 }
 
 export const findUserAndUpdate = async (
-  id: string,
-  inputUser: UserDocument
-): Promise<UserDocument> => {
-  const user = await User.findByIdAndUpdate(id, inputUser, { new: true })
+  filter: object,
+  inputUser: IUser | object
+): Promise<IUser> => {
+  const user = await User.findOneAndUpdate(filter, inputUser, { new: true })
   if (!user) {
     throw ApiError.badRequest(404, 'User was Not Found')
   }
   return user
 }
 
-export const updateUserRoleById = async (id: string, isAdmin: boolean): Promise<UserDocument> => {
+export const updateUserRoleById = async (id: string, isAdmin: boolean): Promise<IUser> => {
   const update = { isAdmin: isAdmin }
   const user = await User.findByIdAndUpdate(id, update, { new: true })
 
@@ -139,7 +109,7 @@ export const updateUserRoleById = async (id: string, isAdmin: boolean): Promise<
 
   return user
 }
-export const updateBanStatusById = async (id: string, isBanned: boolean): Promise<UserDocument> => {
+export const updateBanStatusById = async (id: string, isBanned: boolean): Promise<IUser> => {
   const update = { isBanned: isBanned }
   const user = await User.findByIdAndUpdate(id, update, { new: true })
 
