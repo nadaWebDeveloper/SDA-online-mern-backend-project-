@@ -10,10 +10,8 @@ const router = express.Router()
 //GET --> get all users
 router.get('/', isLoggedIn, isAdmin, controller.getAllUsers)
 
-
 // GET --> get a single user by ID
 router.get('/:id', isLoggedIn, controller.getSingleUser)
-
 
 //POST --> register a user
 router.post(
@@ -42,8 +40,13 @@ router.put('/admin/:id', isLoggedIn, isAdmin, controller.upgradeUserRole)
 //PUT --> downgrade single admin role to user
 router.put('/notadmin/:id', isLoggedIn, isAdmin, controller.downgradeUserRole)
 
-
 //DELETE --> delete a single user by ID
 router.delete('/:id', isLoggedIn, isAdmin, controller.deleteUser)
+
+//POST --> send reset email
+router.post('/forget-password', isLoggedOut, controller.forgetPassword)
+
+//POST --> reset password
+router.post('/reset-password', isLoggedOut, controller.resetPassword)
 
 export default router
