@@ -1,15 +1,12 @@
-import bcrypt from 'bcrypt'
 import mongoose, { SortOrder } from 'mongoose'
 import { Request, Response, NextFunction } from 'express'
+import { JwtPayload, TokenExpiredError } from 'jsonwebtoken'
 
 import { dev } from '../config'
 import ApiError from '../errors/ApiError'
+import { sendEmail } from '../utils/sendEmail'
 import { generateToken, vertifyToken } from '../utils/tokenHandle'
 import * as services from '../services/userService'
-
-import { JwtPayload, TokenExpiredError, JsonWebTokenError } from 'jsonwebtoken'
-import { sendEmail } from '../utils/sendEmail'
-import { User } from '../models/user'
 
 const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
@@ -64,12 +61,8 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
     const { email } = request.body
     const registedUser = request.body
 
-    if (registedUser.isBanned || registedUser.isAdmin) {
-      throw ApiError.badRequest(403, 'you do not have permission to ban user or modify its role')
-    }
-
     await services.isUserEmailExists(email)
-    const token = generateToken(request.body, dev.app.jwtUserActivationKey, '2m')
+    const token = generateToken(registedUser, dev.app.jwtUserActivationKey, '2m')
 
     const emailData = {
       email: email,
@@ -110,7 +103,7 @@ const updateUser = async (request: Request, response: Response, next: NextFuncti
     }
 
     await services.isUserEmailExists(email, id)
-    const user = await services.findUserAndUpdate(id, updatedUser)
+    const user = await services.findUserAndUpdate({ _id: id }, updatedUser)
 
     response.status(200).json({ message: `User with id: ${user.id} was updated` })
   } catch (error) {
@@ -127,7 +120,7 @@ const banUser = async (request: Request, response: Response, next: NextFunction)
     const { id } = request.params
     const user = await services.updateBanStatusById(id, true)
 
-    response.status(204).json({ message: 'User was banned' })
+    response.status(200).json({ message: `User with id: ${user.id} was banned` })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
@@ -142,7 +135,7 @@ const unBanUser = async (request: Request, response: Response, next: NextFunctio
     const { id } = request.params
     const user = await services.updateBanStatusById(id, false)
 
-    response.status(204).json({ message: 'User was Unbanned' })
+    response.status(200).json({ message: `User with id: ${user.id} was Unbanned` })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
@@ -157,7 +150,7 @@ const upgradeUserRole = async (request: Request, response: Response, next: NextF
     const { id } = request.params
     const user = await services.updateUserRoleById(id, true)
 
-    response.status(204).json({ message: 'admin permession was granted' })
+    response.status(200).json({ message: 'admin permession was granted' })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
@@ -172,7 +165,7 @@ const downgradeUserRole = async (request: Request, response: Response, next: Nex
     const { id } = request.params
     const user = await services.updateUserRoleById(id, false)
 
-    response.status(204).json({ message: 'admin permession was removed' })
+    response.status(200).json({ message: 'admin permession was removed' })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
@@ -187,7 +180,7 @@ const deleteUser = async (request: Request, response: Response, next: NextFuncti
     const { id } = request.params
     const user = await services.findUserAndDelete(id)
 
-    response.status(204).json({ message: 'User was deleted' })
+    response.status(204).json({ message: `User with id: ${id} deleted` })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       next(ApiError.badRequest(400, 'ID format is Invalid must be 24 characters'))
@@ -227,7 +220,7 @@ const resetPassword = async (request: Request, response: Response, next: NextFun
 
     const decodedData = vertifyToken(token, dev.app.jwtResetKey) as JwtPayload
 
-    const updatedUser = await User.findOneAndUpdate(
+    const updatedUser = await services.findUserAndUpdate(
       { email: decodedData.email },
       { $set: { password: password } }
     )

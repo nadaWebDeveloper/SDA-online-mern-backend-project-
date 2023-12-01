@@ -1,11 +1,7 @@
 import { SortOrder } from 'mongoose'
-import bcrypt from 'bcrypt'
-import { TokenExpiredError, JwtPayload } from 'jsonwebtoken'
+import { JwtPayload } from 'jsonwebtoken'
 
-import { dev } from '../config'
 import ApiError from '../errors/ApiError'
-import { sendEmail } from '../utils/sendEmail'
-import { vertifyToken } from '../utils/tokenHandle'
 import { IUser, User } from '../models/user'
 
 type UsersPaginationType = {
@@ -69,7 +65,9 @@ export const findAllUsers = async (
 }
 
 export const findSingleUser = async (filter: object): Promise<IUser> => {
-  const user = await User.findOne(filter).populate('orders')
+  const user = await User.findOne(filter, {
+    password: 0,
+  }).populate('orders')
   if (!user) {
     throw ApiError.badRequest(404, `User was not found`)
   }
@@ -90,8 +88,11 @@ export const createUser = async (newUser: JwtPayload): Promise<IUser> => {
   return user
 }
 
-export const findUserAndUpdate = async (id: string, inputUser: IUser): Promise<IUser> => {
-  const user = await User.findByIdAndUpdate(id, inputUser, { new: true })
+export const findUserAndUpdate = async (
+  filter: object,
+  inputUser: IUser | object
+): Promise<IUser> => {
+  const user = await User.findOneAndUpdate(filter, inputUser, { new: true })
   if (!user) {
     throw ApiError.badRequest(404, 'User was Not Found')
   }
