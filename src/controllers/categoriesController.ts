@@ -20,7 +20,7 @@ export const getAllCategories = async (
       search
     )
 
-    response.json({
+    response.status(200).json({
       message: `All categories are returned `,
       payload: {
         allCategoriesOnPage,
@@ -41,7 +41,7 @@ export const getSingleCategory = async (
   try {
     const { id } = request.params
     const category = await services.findCategoryById(id, next)
-    response.json({
+    response.status(200).json({
       message: `Single category is returned `,
       payload: category,
     })
@@ -54,7 +54,7 @@ export const deleteCategory = async (request: Request, response: Response, next:
   try {
     const { id } = request.params
     const category = await services.findAndDeleted(id, next)
-    response.json({
+    response.status(200).json({
       message: `Category with ID: ${id} is deleted`,
     })
   } catch (error) {
@@ -84,7 +84,7 @@ export const updateCategory = async (request: Request, response: Response, next:
     const updatedCategory = request.body
     const category = await services.findAndUpdated(id, next, updatedCategory)
 
-    response.json({
+    response.status(200).json({
       message: `Category with ID: ${id} is updated`,
       payload: category,
     })

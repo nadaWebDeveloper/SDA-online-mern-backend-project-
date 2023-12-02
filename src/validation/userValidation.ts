@@ -45,3 +45,21 @@ export const userLoginValidation = [
     .isLength({ min: 5 })
     .withMessage('password must be at least 5 characters'),
 ]
+
+export const userForgetPasswordValidation = [
+  check('email')
+    .trim()
+    .notEmpty()
+    .withMessage('Email must not be empty')
+    .isEmail()
+    .withMessage('Email is not valid'),
+]
+
+export const userResetPasswordValidation = [
+  check('password')
+    .trim()
+    .notEmpty()
+    .withMessage('Password must not be empty')
+    .isLength({ min: 5 })
+    .withMessage('password must be at least 5 characters'),
+]

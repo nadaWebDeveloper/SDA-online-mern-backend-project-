@@ -21,7 +21,7 @@ export const isLoggedIn = async (
       throw ApiError.badRequest(401, 'You are not logged in')
     }
 
-    const decoded = (await jwt.verify(accessToken, dev.app.jwsAccessKey)) as JwtPayload
+    const decoded = (await jwt.verify(accessToken, dev.app.jwtAccessKey)) as JwtPayload
     if (!decoded) {
       throw ApiError.badRequest(401, 'Invalid access token')
     }

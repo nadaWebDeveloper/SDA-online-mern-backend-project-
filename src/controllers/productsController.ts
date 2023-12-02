@@ -13,7 +13,7 @@ export const getAllProducts = async (request: Request, response: Response, next:
   try {
     const products = await services.findAllProduct(request)
 
-    response.json({
+    response.status(200).json({
       message: `Return all products `,
       payload: {
         products,
@@ -33,7 +33,7 @@ export const getSingleProduct = async (
 
     const singleProduct = await services.findProductById(id, next)
 
-    response.json({
+    response.status(200).json({
       message: `Return a single product `,
       payload: singleProduct,
     })
@@ -50,7 +50,7 @@ export const deleteProduct = async (request: Request, response: Response, next: 
   try {
     const { id } = request.params
     const deletedProduct = await services.findAndDeleted(id, next)
-    response.json({
+    response.status(200).json({
       message: `Delete a single product with ID: ${id}`,
     })
   } catch (error) {
@@ -157,7 +157,7 @@ console.log(imagePath);
 const productUpdated = await services.findAndUpdated(id,request ,next, updatedProduct)
 
 
-    response.json({
+    response.status(200).json({
       message: `Update a single product`,
       payload: productUpdated,
     })
