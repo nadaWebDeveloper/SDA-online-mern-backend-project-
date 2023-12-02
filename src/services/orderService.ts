@@ -5,7 +5,7 @@ import { IOrder, IOrderProduct, Order } from '../models/order'
 import { IProduct, Product } from '../models/product'
 import { User, IUser } from '../models/user'
 
-// return all orders using pagenation
+// return all orders using pagination
 export const findAllOrdersForAdmin = async (page: number, limit: number) => {
   const countPage = await Order.countDocuments()
   const totalPage = limit ? Math.ceil(countPage / limit) : 1
@@ -37,7 +37,6 @@ export const findAllOrdersForAdmin = async (page: number, limit: number) => {
     }
   }
 }
-
 // find order by id
 export const findUserOrders = async (userId: string) => {
   const userOrders = await Order.find({ user: userId })
@@ -55,7 +54,6 @@ export const findUserOrders = async (userId: string) => {
   }
   return userOrders
 }
-
 // find and delete order by id
 export const findAndDeleteOrder = async (id: string) => {
   const order = await Order.findOneAndDelete({ _id: id })
@@ -96,13 +94,8 @@ export const findAndDeleteOrder = async (id: string) => {
     throw ApiError.badRequest(500, `Process of updating user ${order.user} ended unsuccssufully`)
   }
 }
-
 // find and update order by id
-export const findAndUpdateOrder = async (
-  id: string,
-  response: Response,
-  updatedOrderStatus: String
-) => {
+export const findAndUpdateOrder = async (id: string,response: Response,updatedOrderStatus: String) => {
   if (
     updatedOrderStatus.toLocaleLowerCase() !== 'pending' &&
     updatedOrderStatus.toLocaleLowerCase() !== 'shipping' &&
@@ -126,7 +119,6 @@ export const findAndUpdateOrder = async (
   }
   return updatedOrder
 }
-
 // create new order
 export const createNewOrder = async (newOrderInput: IOrder): Promise<IOrder> => {
   if (!newOrderInput.user || !newOrderInput.products) {

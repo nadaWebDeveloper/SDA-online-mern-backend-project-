@@ -3,13 +3,9 @@ import { JwtPayload } from 'jsonwebtoken'
 
 import ApiError from '../errors/ApiError'
 import { IUser, User } from '../models/user'
+import {UsersPaginationType} from '../types'
 
-type UsersPaginationType = {
-  allUsers: IUser[]
-  totalPage: number
-  currentPage: number
-}
-
+// return all Users using pagination
 export const findAllUsers = async (
   page: number,
   limit: number,
@@ -53,7 +49,7 @@ export const findAllUsers = async (
     currentPage: page,
   }
 }
-
+// find order by user id
 export const findSingleUser = async (filter: object): Promise<IUser> => {
   const user = await User.findOne(filter, {
     password: 0,
@@ -64,21 +60,21 @@ export const findSingleUser = async (filter: object): Promise<IUser> => {
   }
   return user
 }
-
-export const isUserEmailExists = async (inputEmail: string, inputId: string | null = null) => {
+//check entered email user is exist on DB or not when a create new user
+export const findIfUserEmailExist = async (inputEmail: string, inputId: string | null = null) => {
   const user = await User.exists({ $and: [{ _id: { $ne: inputId } }, { email: inputEmail }] })
 
   if (user) {
     throw ApiError.badRequest(409, 'This email is already exists')
   }
 }
-
+// create new user
 export const createUser = async (newUser: JwtPayload): Promise<IUser> => {
   const user = new User(newUser)
   await user.save()
   return user
 }
-
+// find and update user by id
 export const findUserAndUpdate = async (
   filter: object,
   inputUser: IUser | object
@@ -89,7 +85,7 @@ export const findUserAndUpdate = async (
   }
   return user
 }
-
+//update role user to admin or user by id user
 export const updateUserRoleById = async (id: string, isAdmin: boolean): Promise<IUser> => {
   const update = { isAdmin: isAdmin }
   const user = await User.findByIdAndUpdate(id, update, { new: true })
@@ -100,6 +96,7 @@ export const updateUserRoleById = async (id: string, isAdmin: boolean): Promise<
 
   return user
 }
+//update status of user to block or unblock by id user
 export const updateBanStatusById = async (id: string, isBanned: boolean): Promise<IUser> => {
   const update = { isBanned: isBanned }
   const user = await User.findByIdAndUpdate(id, update, { new: true })
@@ -110,7 +107,8 @@ export const updateBanStatusById = async (id: string, isBanned: boolean): Promis
 
   return user
 }
-export const findUserAndDelete = async (id: string) => {
+// find and delete user by id
+export const findAndDeleteUser = async (id: string) => {
   const user = await User.findByIdAndDelete(id)
 
   if (!user) {

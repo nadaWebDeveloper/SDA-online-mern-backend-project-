@@ -9,7 +9,7 @@ import * as services from '../services/productService'
 // get all products
 export const getAllProducts = async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const products = await services.findAllProduct(request)
+    const products = await services.findAllProducts(request)
 
     response.status(200).json({
       message: `Return all products `,
@@ -21,7 +21,6 @@ export const getAllProducts = async (request: Request, response: Response, next:
     next(error)
   }
 }
-
 // get a specific product
 export const getSingleProduct = async (
   request: Request,
@@ -45,13 +44,12 @@ export const getSingleProduct = async (
     }
   }
 }
-
 // delete a specific product
 export const deleteProduct = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
 
-    const deletedProduct = await services.findAndDeleted(id, next)
+    const deletedProduct = await services.findAndDeletedProduct(id, next)
 
     response.status(200).json({
       message: `Delete a single product with ID: ${id}`,
@@ -73,7 +71,6 @@ export const deleteProduct = async (request: Request, response: Response, next: 
     }
   }
 }
-
 // create a new product
 export const createProduct = async (request: Request, response: Response, next: NextFunction) => {
   try {
@@ -115,7 +112,6 @@ export const createProduct = async (request: Request, response: Response, next: 
     }
   }
 }
-
 // update a specific product
 export const updateProduct = async (request: Request, response: Response, next: NextFunction) => {
   try {
@@ -143,14 +139,14 @@ export const updateProduct = async (request: Request, response: Response, next: 
         }
       } else if (!productImage) {
         try {
-          const productUpdated = await services.findAndUpdated(id, request, next, updatedProduct)
+          const productUpdated = await services.findAndUpdateProduct(id, request, next, updatedProduct)
         } catch (error) {
           throw ApiError.badRequest(400, `Error Adding file:${error}`)
         }
       }
     }
 
-    const productUpdated = await services.findAndUpdated(id, request, next, updatedProduct)
+    const productUpdated = await services.findAndUpdateProduct(id, request, next, updatedProduct)
 
     response.status(200).json({
       message: `Update a single product`,

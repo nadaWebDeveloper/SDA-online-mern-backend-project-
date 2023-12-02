@@ -58,7 +58,7 @@ export const deleteCategory = async (request: Request, response: Response, next:
   try {
     const { id } = request.params
 
-    const category = await services.findAndDeleted(id, next)
+    const category = await services.findAndDeletedCategory(id, next)
 
     response.status(200).json({
       message: `Category with ID: ${id} is deleted`,
@@ -94,7 +94,7 @@ export const updateCategory = async (request: Request, response: Response, next:
     const { id } = request.params
     const updatedCategory = request.body
 
-    const category = await services.findAndUpdated(id, next, updatedCategory)
+    const category = await services.findAndUpdateCategory(id, next, updatedCategory)
 
     response.status(200).json({
       message: `Category with ID: ${id} is updated`,
