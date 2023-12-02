@@ -1,24 +1,24 @@
 import bycrypt from 'bcrypt'
 import ApiError from '../errors/ApiError'
-import { UserDocument, User } from '../models/user'
+import { IUser, User } from '../models/user'
 
-export const isEmailMatch = async (inputEmail: string) => {
+export const isEmailMatch = async (inputEmail: string): Promise<IUser> => {
   const user = await User.findOne({ email: inputEmail })
 
   if (!user) {
-    throw ApiError.badRequest(404, 'Their is no match with this email adress')
+    throw ApiError.badRequest(404, 'Their is no match with this email address')
   }
   return user
 }
 
-export const isPassworMatch = async (user: UserDocument, password: string) => {
+export const isPassworMatch = async (user: IUser, password: string) => {
   const passwordCompare = await bycrypt.compare(password, user.password)
   if (!passwordCompare) {
     throw ApiError.badRequest(401, 'The password does not match')
   }
 }
 
-export const isUserBanned = (user: UserDocument) => {
+export const isUserBanned = (user: IUser) => {
   if (user.isBanned) {
     throw ApiError.badRequest(403, 'This user was banned please connecet to xxx@xx.com')
   }

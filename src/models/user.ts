@@ -1,8 +1,9 @@
-import mongoose from 'mongoose'
+import mongoose, { Document } from 'mongoose'
 import bcrypt from 'bcrypt'
+
 import { IOrder } from './order'
-export type UserDocument = Document & {
-  _id: string
+
+export interface IUser extends Document {
   firstName: string
   lastName: string
   email: string
@@ -49,7 +50,6 @@ const userSchema = new mongoose.Schema(
       minlength: [8, 'Password must be at least 8 characters'],
       set: (password: string) => bcrypt.hashSync(password, 10),
     },
-
     isAdmin: {
       type: Boolean,
       default: false,
@@ -72,4 +72,4 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
-export const User = mongoose.model<UserDocument>('Users', userSchema)
+export const User = mongoose.model<IUser>('Users', userSchema)

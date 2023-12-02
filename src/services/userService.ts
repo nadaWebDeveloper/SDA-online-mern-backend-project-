@@ -1,12 +1,23 @@
-import jwt, { TokenExpiredError } from 'jsonwebtoken'
+import { SortOrder } from 'mongoose'
+import { JwtPayload } from 'jsonwebtoken'
 
-import { dev } from '../config'
 import ApiError from '../errors/ApiError'
-import { sendEmail } from '../helper/sendEmail'
-import { UserDocument, User } from '../models/user'
+import { IUser, User } from '../models/user'
 
-export const findAllUsers = async (page: number, limit: number, search: string) => {
-  const countPage = await User.countDocuments()
+type UsersPaginationType = {
+  allUsers: IUser[]
+  totalPage: number
+  currentPage: number
+}
+
+export const findAllUsers = async (
+  page: number,
+  limit: number,
+  search: string,
+  sort: SortOrder,
+  isAdmin: string,
+  isBanned: string
+): Promise<UsersPaginationType> => {
   const searchRegularExpression = new RegExp('.*' + search + '.*', 'i')
   const searchFilter = {
     $or: [
@@ -16,15 +27,35 @@ export const findAllUsers = async (page: number, limit: number, search: string) 
     ],
   }
 
+  const roleFilter = isAdmin ? { isAdmin: isAdmin } : {}
+  const bannedUsersFilter = isBanned ? { isBanned: isBanned } : {}
+
+  const filters = { $and: [roleFilter, bannedUsersFilter, searchFilter] }
+  const countPage = await User.countDocuments()
   const totalPage = limit ? Math.ceil(countPage / limit) : 1
   if (page > totalPage) {
     page = totalPage
   }
   const skip = (page - 1) * limit
 
-  const allUsers: UserDocument[] = search
-    ? await User.find(searchFilter, { password: 0 }).populate('orders').skip(skip).limit(limit)
-    : await User.find({}, { password: 0 }).populate('orders').skip(skip).limit(limit)
+  // const allUsers = search
+  //   ? await User.find({ searchFilter }, { password: 0})
+  //       .populate('orders')
+  //       .skip(skip)
+  //       .limit(limit)
+  //   : await User.find({}, { password: 0, orders: 0 })
+  //       .populate('orders')
+  //       .skip(skip)
+  //       .limit(limit)
+  //       .sort({ firstName: sort, lastName: sort })
+
+  const allUsers = await User.find(filters, {
+    password: 0,
+  })
+    .populate('orders')
+    .skip(skip)
+    .limit(limit)
+    .sort({ firstName: sort, lastName: sort })
 
   return {
     allUsers,
@@ -33,10 +64,14 @@ export const findAllUsers = async (page: number, limit: number, search: string) 
   }
 }
 
-export const findUserByID = async (id: string) => {
-  const user = await User.findById(id).populate('orders')
+
+export const findSingleUser = async (filter: object): Promise<IUser> => {
+  const user = await User.findOne(filter, {
+    password: 0,
+  }).populate('orders')
+
   if (!user) {
-    throw ApiError.badRequest(404, `User with ${id} was not found`)
+    throw ApiError.badRequest(404, `User was not found`)
   }
   return user
 }
@@ -49,79 +84,44 @@ export const isUserEmailExists = async (inputEmail: string, inputId: string | nu
   }
 }
 
-export const sendTokenByEmail = (email: string, token: string) => {
-  const emailData = {
-    email: email,
-    subject: 'Activate your account',
-    html: ` 
-  <h1> Hello</h1>
-  <p>Please activate your account by <a href= "http://127.0.0.1:5050/users/activate/${token}">click here</a></p>`,
-  }
 
-  sendEmail(emailData)
+export const createUser = async (newUser: JwtPayload): Promise<IUser> => {
+  const user = new User(newUser)
+  await user.save()
+  return user
 }
 
-export const checkTokenAndActivate = async (token: string) => {
-  try {
-    if (!token) {
-      throw ApiError.badRequest(404, 'Token was not provided')
-    }
-
-    const decodedUser = jwt.verify(token, dev.app.jwsUserActivationKey)
-
-    if (!decodedUser) {
-      throw ApiError.badRequest(401, 'Token was invalid')
-    }
-    const user = new User(decodedUser)
-    await user.save()
-    return user
-  } catch (error) {
-    if (error instanceof TokenExpiredError) {
-      throw ApiError.badRequest(401, 'Token was expired')
-    } else {
-      throw error
-    }
-  }
-}
-
-export const findUserAndUpdate = async (id: string, inputUser: UserDocument) => {
-  const user = await User.findByIdAndUpdate(id, inputUser, { new: true })
+export const findUserAndUpdate = async (
+  filter: object,
+  inputUser: IUser | object
+): Promise<IUser> => {
+  const user = await User.findOneAndUpdate(filter, inputUser, { new: true })
   if (!user) {
     throw ApiError.badRequest(404, 'User was Not Found')
   }
   return user
 }
 
-export const banUserById = async (id: string) => {
-  const user = await User.findByIdAndUpdate(id, { isBanned: true }, { new: true })
+export const updateUserRoleById = async (id: string, isAdmin: boolean): Promise<IUser> => {
+  const update = { isAdmin: isAdmin }
+  const user = await User.findByIdAndUpdate(id, update, { new: true })
+
   if (!user) {
     throw ApiError.badRequest(404, 'User was not found')
   }
+
   return user
 }
+export const updateBanStatusById = async (id: string, isBanned: boolean): Promise<IUser> => {
+  const update = { isBanned: isBanned }
+  const user = await User.findByIdAndUpdate(id, update, { new: true })
 
-export const unBanUserById = async (id: string) => {
-  const user = await User.findByIdAndUpdate(id, { isBanned: false }, { new: true })
   if (!user) {
     throw ApiError.badRequest(404, 'User was not found')
   }
-}
 
-export const upgradeUserRoleById = async (id: string) => {
-  const user = await User.findByIdAndUpdate(id, { isAdmin: true }, { new: true })
-  if (!user) {
-    throw ApiError.badRequest(404, 'User was not found')
-  }
   return user
 }
-
-export const downgradeUserRoleById = async (id: string) => {
-  const user = await User.findByIdAndUpdate(id, { isAdmin: false }, { new: true })
-  if (!user) {
-    throw ApiError.badRequest(404, 'User was not found')
-  }
-}
-
 export const findUserAndDelete = async (id: string) => {
   const user = await User.findByIdAndDelete(id)
 
