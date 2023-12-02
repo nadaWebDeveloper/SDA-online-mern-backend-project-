@@ -4,9 +4,8 @@ import mongoose from 'mongoose'
 
 import ApiError from '../errors/ApiError'
 import { IOrder, IOrderProduct, Order } from '../models/order'
-import * as services from '../services/orderService'
-import { User, IUser } from '../models/user'
 import { IProduct, Product } from '../models/product'
+import * as services from '../services/orderService'
 
 interface CustomeRequest extends Request {
   userId?: string
@@ -37,7 +36,7 @@ export const getOrdersForAdmin = async (
   }
 }
 
-// order placement
+// place a new order
 export const handleProcessPayment = async (
   request: CustomeRequest,
   response: Response,
@@ -45,9 +44,9 @@ export const handleProcessPayment = async (
 ) => {
   try {
     const { products, payment } = request.body
+
     let totalProductPrice: number = 0
     let subtotalSums: number[] = []
-    let errors: boolean = false
 
     if (!products || !payment) {
       throw ApiError.badRequest(404, `Order must contain products and payment data`)
@@ -163,7 +162,9 @@ export const getOrdersForUser = async (
   next: NextFunction
 ) => {
   try {
-    const userId = request.params.id
+    const { userId } = request.params
+    // console.log('user id' + userId)
+
     const userOrders = await services.findUserOrders(userId)
 
     response.status(200).send({
@@ -175,7 +176,7 @@ export const getOrdersForUser = async (
   }
 }
 
-// delete an order by id
+// delete a specific order
 export const deleteOrder = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
@@ -187,13 +188,13 @@ export const deleteOrder = async (request: Request, response: Response, next: Ne
     })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
-      throw next(ApiError.badRequest(400, 'Id format is not valid'))
+      throw next(ApiError.badRequest(400, 'Id format is not valid and must be 24 characters'))
     }
     next(error)
   }
 }
 
-// update an order by id
+// update a specific order
 export const updateOrder = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params

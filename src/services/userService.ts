@@ -27,6 +27,7 @@ export const findAllUsers = async (
     ],
   }
 
+  // isAdmin and isBanned values must be boolean
   const roleFilter = isAdmin ? { isAdmin: isAdmin } : {}
   const bannedUsersFilter = isBanned ? { isBanned: isBanned } : {}
 
@@ -37,17 +38,6 @@ export const findAllUsers = async (
     page = totalPage
   }
   const skip = (page - 1) * limit
-
-  // const allUsers = search
-  //   ? await User.find({ searchFilter }, { password: 0})
-  //       .populate('orders')
-  //       .skip(skip)
-  //       .limit(limit)
-  //   : await User.find({}, { password: 0, orders: 0 })
-  //       .populate('orders')
-  //       .skip(skip)
-  //       .limit(limit)
-  //       .sort({ firstName: sort, lastName: sort })
 
   const allUsers = await User.find(filters, {
     password: 0,
@@ -63,7 +53,6 @@ export const findAllUsers = async (
     currentPage: page,
   }
 }
-
 
 export const findSingleUser = async (filter: object): Promise<IUser> => {
   const user = await User.findOne(filter, {
@@ -83,7 +72,6 @@ export const isUserEmailExists = async (inputEmail: string, inputId: string | nu
     throw ApiError.badRequest(409, 'This email is already exists')
   }
 }
-
 
 export const createUser = async (newUser: JwtPayload): Promise<IUser> => {
   const user = new User(newUser)

@@ -21,7 +21,6 @@ mongoose.set('strictQuery', false)
 mongoose.set('strictPopulate', false)
 const URL = process.env.ATLAS_URL || 'mongodb://127.0.0.1:27017/full-stack-demo-db'
 
-
 app.use(myLogger)
 app.use(cookieParser())
 app.use(express.json())

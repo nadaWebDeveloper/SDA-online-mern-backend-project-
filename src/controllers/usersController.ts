@@ -1,17 +1,18 @@
-import mongoose, { SortOrder } from 'mongoose'
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { JwtPayload, TokenExpiredError } from 'jsonwebtoken'
+import mongoose, { SortOrder } from 'mongoose'
 
 import { dev } from '../config'
 import ApiError from '../errors/ApiError'
+import * as services from '../services/userService'
 import { sendEmail } from '../utils/sendEmail'
 import { generateToken, verifyToken } from '../utils/tokenHandle'
-import * as services from '../services/userService'
 
 interface CustomeRequest extends Request {
   userId?: string
 }
 
+// get all users
 const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const limit = Number(request.query.limit) || 0
@@ -29,6 +30,7 @@ const getAllUsers = async (request: Request, response: Response, next: NextFunct
       isAdmin,
       isBanned
     )
+
     if (allUsers.length) {
       return response.status(200).json({
         message: 'users were found',
@@ -46,6 +48,7 @@ const getAllUsers = async (request: Request, response: Response, next: NextFunct
   }
 }
 
+// get a sing user
 const getSingleUser = async (request: CustomeRequest, response: Response, next: NextFunction) => {
   try {
     const id = request.userId
@@ -62,6 +65,7 @@ const getSingleUser = async (request: CustomeRequest, response: Response, next: 
   }
 }
 
+// register a new user
 const registUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { email } = request.body
@@ -74,6 +78,7 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
     await services.isUserEmailExists(email)
     const token = generateToken(registedUser, dev.app.jwtUserActivationKey, '2m')
 
+    // prepare and send email to verify user
     const emailData = {
       email: email,
       subject: 'Activate your account',
@@ -81,7 +86,6 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
     <h1> Hello</h1>
     <p>Please activate your account by <a href= "http://127.0.0.1:5050/users/activate/${token}">click here</a></p>`,
     }
-
     sendEmail(emailData)
 
     response.status(200).json({ message: 'Check your email to activate the account ', token })
@@ -90,12 +94,12 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
   }
 }
 
+// activate and create user
 const activateUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { token } = request.body
 
     const decodedUser = verifyToken(token, dev.app.jwtUserActivationKey) as JwtPayload
-
     const user = await services.createUser(decodedUser)
 
     response.status(201).json({ message: `User with id: ${user.id} was created` })
@@ -104,6 +108,7 @@ const activateUser = async (request: Request, response: Response, next: NextFunc
   }
 }
 
+// update user profile
 const updateUser = async (request: CustomeRequest, response: Response, next: NextFunction) => {
   try {
     const id = request.userId
@@ -127,9 +132,11 @@ const updateUser = async (request: CustomeRequest, response: Response, next: Nex
   }
 }
 
+// block a specific user
 const banUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
+
     const user = await services.updateBanStatusById(id, true)
 
     response.status(200).json({ message: `User with id: ${user.id} was banned` })
@@ -142,9 +149,11 @@ const banUser = async (request: Request, response: Response, next: NextFunction)
   }
 }
 
+// unblock a specific user
 const unBanUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
+
     const user = await services.updateBanStatusById(id, false)
 
     response.status(200).json({ message: `User with id: ${user.id} was Unbanned` })
@@ -157,9 +166,11 @@ const unBanUser = async (request: Request, response: Response, next: NextFunctio
   }
 }
 
+// upgrade a specific user to an admin
 const upgradeUserRole = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
+
     const user = await services.updateUserRoleById(id, true)
 
     response.status(200).json({ message: 'admin permession was granted' })
@@ -172,9 +183,11 @@ const upgradeUserRole = async (request: Request, response: Response, next: NextF
   }
 }
 
+// downgrade a specific admin to a regular user
 const downgradeUserRole = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
+
     const user = await services.updateUserRoleById(id, false)
 
     response.status(200).json({ message: 'admin permession was removed' })
@@ -187,9 +200,11 @@ const downgradeUserRole = async (request: Request, response: Response, next: Nex
   }
 }
 
+// delete a specific user
 const deleteUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
+
     const user = await services.findUserAndDelete(id)
 
     response.status(204).json({ message: `User with id: ${id} deleted` })
@@ -202,6 +217,7 @@ const deleteUser = async (request: Request, response: Response, next: NextFuncti
   }
 }
 
+// send email to reset user password
 const forgetPassword = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { email } = request.body
@@ -209,6 +225,7 @@ const forgetPassword = async (request: Request, response: Response, next: NextFu
     const user = await services.findSingleUser({ email })
 
     const token = generateToken({ email }, dev.app.jwtResetKey, '2m')
+
     const emailData = {
       email: email,
       subject: 'Reset The password',
@@ -216,7 +233,6 @@ const forgetPassword = async (request: Request, response: Response, next: NextFu
     <h1> Hello${user.firstName}</h1>
     <p>Please reset the password by <a href= "http://127.0.0.1:8080/users/reset/${token}">click here</a></p>`,
     }
-
     sendEmail(emailData)
 
     response.status(200).json({ message: 'Check your email to reset the password ', token })
@@ -225,6 +241,7 @@ const forgetPassword = async (request: Request, response: Response, next: NextFu
   }
 }
 
+// verify token and update user password
 const resetPassword = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const token = request.body.token
@@ -248,16 +265,16 @@ const resetPassword = async (request: Request, response: Response, next: NextFun
 }
 
 export {
+  activateUser,
+  banUser,
+  deleteUser,
+  downgradeUserRole,
+  forgetPassword,
   getAllUsers,
   getSingleUser,
   registUser,
-  activateUser,
-  updateUser,
-  banUser,
-  upgradeUserRole,
-  downgradeUserRole,
-  unBanUser,
-  deleteUser,
-  forgetPassword,
   resetPassword,
+  unBanUser,
+  updateUser,
+  upgradeUserRole,
 }

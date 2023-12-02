@@ -1,10 +1,11 @@
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 
 import { dev } from '../config'
+import * as services from '../services/authService'
 import setCookieResponse from '../utils/cookiesRes'
 import { generateToken } from '../utils/tokenHandle'
-import * as services from '../services/authService'
 
+// login authenticaiton
 const login = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { email, password } = request.body
@@ -22,6 +23,7 @@ const login = async (request: Request, response: Response, next: NextFunction) =
   }
 }
 
+// logout authenticaiton
 const logout = async (request: Request, response: Response, next: NextFunction) => {
   try {
     response.status(200).clearCookie('access_token')
