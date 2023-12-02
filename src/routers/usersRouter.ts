@@ -15,7 +15,7 @@ const router = express.Router()
 router.get('/', isLoggedIn, isAdmin, controller.getAllUsers)
 
 // GET --> get a single user by ID
-router.get('/:id', isLoggedIn, controller.getSingleUser)
+router.get('/profile', isLoggedIn, controller.getSingleUser)
 
 //POST --> register a user
 router.post(
@@ -30,7 +30,7 @@ router.post(
 router.post('/activate', controller.activateUser)
 
 //PUT --> update a single user by ID
-router.put('/:id', isLoggedIn, controller.updateUser)
+router.put('/profile', isLoggedIn, controller.updateUser)
 
 //PUT --> ban a single user by ID
 router.put('/ban/:id', isLoggedIn, isAdmin, controller.banUser)

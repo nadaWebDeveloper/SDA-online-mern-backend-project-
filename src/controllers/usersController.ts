@@ -5,8 +5,12 @@ import { JwtPayload, TokenExpiredError } from 'jsonwebtoken'
 import { dev } from '../config'
 import ApiError from '../errors/ApiError'
 import { sendEmail } from '../utils/sendEmail'
-import { generateToken, vertifyToken } from '../utils/tokenHandle'
+import { generateToken, verifyToken } from '../utils/tokenHandle'
 import * as services from '../services/userService'
+
+interface CustomeRequest extends Request {
+  userId?: string
+}
 
 const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
@@ -42,10 +46,12 @@ const getAllUsers = async (request: Request, response: Response, next: NextFunct
   }
 }
 
-const getSingleUser = async (request: Request, response: Response, next: NextFunction) => {
+const getSingleUser = async (request: CustomeRequest, response: Response, next: NextFunction) => {
   try {
-    const { id } = request.params
+    const id = request.userId
+
     const user = await services.findSingleUser({ _id: id })
+
     response.status(200).json({ message: 'User was found', user })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
@@ -83,7 +89,7 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
 const activateUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { token } = request.body
-    const decodedUser = vertifyToken(token, dev.app.jwtUserActivationKey) as JwtPayload
+    const decodedUser = verifyToken(token, dev.app.jwtUserActivationKey) as JwtPayload
     const user = await services.createUser(decodedUser)
 
     response.status(201).json({ message: `User with id: ${user.id} was created` })
@@ -92,9 +98,9 @@ const activateUser = async (request: Request, response: Response, next: NextFunc
   }
 }
 
-const updateUser = async (request: Request, response: Response, next: NextFunction) => {
+const updateUser = async (request: CustomeRequest, response: Response, next: NextFunction) => {
   try {
-    const { id } = request.params
+    const id = request.userId
     const { email } = request.body
     const updatedUser = request.body
 
@@ -202,7 +208,7 @@ const forgetPassword = async (request: Request, response: Response, next: NextFu
       subject: 'Reset The password',
       html: ` 
     <h1> Hello${user.firstName}</h1>
-    <p>Please reset the password by <a href= "http://127.0.0.1:5050/users/activate/${token}">click here</a></p>`,
+    <p>Please reset the password by <a href= "http://127.0.0.1:8080/users/reset/${token}">click here</a></p>`,
     }
 
     sendEmail(emailData)
@@ -218,7 +224,7 @@ const resetPassword = async (request: Request, response: Response, next: NextFun
     const token = request.body.token
     const password = request.body.password
 
-    const decodedData = vertifyToken(token, dev.app.jwtResetKey) as JwtPayload
+    const decodedData = verifyToken(token, dev.app.jwtResetKey) as JwtPayload
 
     const updatedUser = await services.findUserAndUpdate(
       { email: decodedData.email },
