@@ -22,6 +22,6 @@ router.delete(`/:id`, isLoggedIn, isAdmin, controller.deleteProduct)
 router.post('/', isLoggedIn, isAdmin, productValidation, runValidation, upload.single('image'),controller.createProduct)
 
 //PUT : /products/:id -> updateSingleProduct -> findAndUpdated
-router.put(`/:id`, isLoggedIn, isAdmin, productValidation, runValidation, controller.updateProduct)
+router.put(`/:id`, isLoggedIn, isAdmin, productValidation, runValidation, upload.single('image'), controller.updateProduct)
 
 export default router

@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import mongoose from 'mongoose'
+import fs from 'fs/promises'
+import path from 'path'
 
 import * as services from '../services/productService'
 import { Product, IProduct } from '../models/product'
@@ -106,8 +108,29 @@ export const createProduct = async (request: Request, response: Response, next: 
 export const updateProduct = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
-    const updatedProduct = request.body
+    const {updatedProduct} = request.body
+    console.log('updatedProduct: ',updatedProduct);
     const productUpdated = await services.findAndUpdated(id, next, updatedProduct)
+
+// !update file 
+
+
+  // const pathAll= 'public/images/imageProduct'
+  // const updatedImage= request.file;
+  // const filename = `${id}_image.jpg`; 
+  // const imagePath = path.join('imageProduct', filename);
+  // console.log("updatedImage: ",updatedImage);
+  // console.log('filename: ',filename);
+  // console.log("imagePath: ",imagePath);
+  //     const fileExists = await fs.access(pathAll).then(() => true).catch(() => false);
+  
+  //   if (fileExists&& updatedImage && updatedImage.buffer) {
+  //     await fs.unlink(imagePath); 
+  //     await fs.writeFile(filename, updatedImage.buffer); 
+  //     throw ApiError.badRequest(402, `File updated successfully`)
+
+  //   }
+// !
 
     response.json({
       message: `Update a single product`,
