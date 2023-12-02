@@ -6,17 +6,17 @@ export const userRegistrationValidation = [
     .notEmpty()
     .withMessage('First name must not be empty')
     .isLength({ min: 4, max: 20 })
-    .withMessage('First name must be at least 4 charachters')
+    .withMessage('First name must be at least 4 characters')
     .isLength({ max: 20 })
-    .withMessage('First name must be less than 20 chaacters'),
+    .withMessage('First name must be less than 20 characters'),
   check('lastName')
     .trim()
     .notEmpty()
     .withMessage('Last name must not be empty')
     .isLength({ min: 4, max: 20 })
-    .withMessage('Last name must be at least 4 charachters')
+    .withMessage('Last name must be at least 4 characters')
     .isLength({ max: 20 })
-    .withMessage('Last name must be less than 20 chaacters'),
+    .withMessage('Last name must be less than 20 characters'),
   check('email')
     .trim()
     .notEmpty()

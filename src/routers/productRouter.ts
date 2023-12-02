@@ -1,9 +1,11 @@
 import { Router } from 'express'
 
 import * as controller from '../controllers/productsController'
-import { productValidation } from '../validation/productsValidation'
+import { productValidation, productValidationUpdate } from '../validation/productsValidation'
 import { runValidation } from '../validation/runValidation'
 import { isAdmin, isLoggedIn } from '../middlewares/authentication'
+import { upload } from '../middlewares/uploadFile'
+
 
 const router = Router()
 
@@ -17,9 +19,9 @@ router.get(`/:id`, controller.getSingleProduct)
 router.delete(`/:id`, isLoggedIn, isAdmin, controller.deleteProduct)
 
 //POST : /products -> createSingleProduct -> findIfProductExist
-router.post('/', isLoggedIn, isAdmin, productValidation, runValidation, controller.createProduct)
+router.post('/', isLoggedIn, isAdmin,upload.single('image'), productValidation, runValidation,controller.createProduct)
 
 //PUT : /products/:id -> updateSingleProduct -> findAndUpdated
-router.put(`/:id`, isLoggedIn, isAdmin, productValidation, runValidation, controller.updateProduct)
+router.put(`/:id`, isLoggedIn, isAdmin,  upload.single('image'),productValidationUpdate, runValidation, controller.updateProduct)
 
 export default router

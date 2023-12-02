@@ -6,7 +6,7 @@ export const isEmailMatch = async (inputEmail: string): Promise<IUser> => {
   const user = await User.findOne({ email: inputEmail })
 
   if (!user) {
-    throw ApiError.badRequest(404, 'Their is no match with this email adress')
+    throw ApiError.badRequest(404, 'Their is no match with this email address')
   }
   return user
 }

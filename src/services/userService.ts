@@ -64,10 +64,12 @@ export const findAllUsers = async (
   }
 }
 
+
 export const findSingleUser = async (filter: object): Promise<IUser> => {
   const user = await User.findOne(filter, {
     password: 0,
   }).populate('orders')
+
   if (!user) {
     throw ApiError.badRequest(404, `User was not found`)
   }
@@ -81,6 +83,7 @@ export const isUserEmailExists = async (inputEmail: string, inputId: string | nu
     throw ApiError.badRequest(409, 'This email is already exists')
   }
 }
+
 
 export const createUser = async (newUser: JwtPayload): Promise<IUser> => {
   const user = new User(newUser)
