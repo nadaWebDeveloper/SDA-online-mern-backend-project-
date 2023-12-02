@@ -59,3 +59,23 @@ export const isAdmin = async (request: CustomeRequest, response: Response, next:
     next(error)
   }
 }
+
+
+// check if admin
+export const isNotAdmin = async (
+  request: CustomeRequest,
+  response: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = await User.findById(request.userId)
+    if (user?.isAdmin === false) {
+      next()
+    } else {
+      throw ApiError.badRequest(403, 'Admins can not make orders')
+    }
+  } catch (error) {
+    next(error)
+  }
+}
+

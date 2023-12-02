@@ -1,10 +1,12 @@
-import { Response } from 'express'
+import { Request, Response } from 'express'
 
 import ApiError from '../errors/ApiError'
-import { IOrder, Order } from '../models/order'
+import { IOrder, IOrderProduct, Order } from '../models/order'
+import { IProduct, Product } from '../models/product'
+import { User, UserDocument } from '../models/user'
 
 // return all orders using pagenation
-export const findAllOrders = async (page: number, limit: number) => {
+export const findAllOrdersForAdmin = async (page: number, limit: number) => {
   const countPage = await Order.countDocuments()
   const totalPage = limit ? Math.ceil(countPage / limit) : 1
   if (page > totalPage) {
@@ -13,11 +15,18 @@ export const findAllOrders = async (page: number, limit: number) => {
   const skip = (page - 1) * limit
 
   const allOrdersOnPage: IOrder[] = await Order.find()
-    .populate('products')
-    .populate('user')
+    .populate({
+      path: 'products',
+      populate: {
+        path: 'product',
+        select: 'name price description',
+      },
+    })
+    .populate('user', 'firstName lastName email')
     .skip(skip)
     .limit(limit)
     .sort({ createdAt: -1 })
+
   if (allOrdersOnPage.length === 0) {
     throw ApiError.badRequest(404, 'There are no orders found')
   } else {
@@ -30,38 +39,82 @@ export const findAllOrders = async (page: number, limit: number) => {
 }
 
 // find order by id
-export const findOrderById = async (id: string, response: Response) => {
-  const singleOrder = await Order.findOne({ _id: id })
-  if (!singleOrder) {
-    throw ApiError.badRequest(404, `Order is not found with this id: ${id}`)
-  } else {
-    return singleOrder
+export const findUserOrders = async (userId: string) => {
+  const userOrders = await Order.find({ user: userId })
+    .populate({
+      path: 'products',
+      populate: {
+        path: 'product',
+        select: 'name price description',
+      },
+    })
+    .populate('user', 'firstName lastName email')
+
+  if (userOrders.length === 0) {
+    throw ApiError.badRequest(404, 'This user has no orders yet')
   }
+  return userOrders
 }
 
 // find and delete order by id
 export const findAndDeleteOrder = async (id: string) => {
   const order = await Order.findOneAndDelete({ _id: id })
-
   if (!order) {
     throw ApiError.badRequest(404, `No order found with id ${id}`)
   }
+  order?.products.map(async (item: IOrderProduct) => {
+    const foundProduct: IProduct | null = await Product.findById(item.product)
+    if (!foundProduct) {
+      throw ApiError.badRequest(404, `Product is not found with this id: ${item.product}`)
+    }
+    const updatedQuantityValue = foundProduct.quantity + item.quantity
+    const updatedSoldValue = foundProduct.sold - item.quantity
+    const updatedProduct = await Product.findByIdAndUpdate(
+      foundProduct._id,
+      { quantity: updatedQuantityValue, sold: updatedSoldValue },
+      {
+        new: true,
+      }
+    )
+    if (!updatedProduct) {
+      throw ApiError.badRequest(
+        500,
+        `Process of updating product ${item.product} ended unsuccssufully`
+      )
+    }
+    const foundUser: any = await User.findById(order.user)
+    foundUser.balance = foundUser.balance + order.payment.totalAmount
+  })
 }
 
 // find and update order by id
-export const findOrderAndUpdated = async (
+export const findAndUpdateOrder = async (
   id: string,
   response: Response,
-  updatedOrder: Request
+  updatedOrderStatus: String
 ) => {
-  const orderUpdated = await Order.findOneAndUpdate({ _id: id }, updatedOrder, { new: true })
-  if (!orderUpdated) {
-    response.status(404).json({
-      message: `Order is not found with this id: ${id}`,
-    })
-    return
+  if (
+    updatedOrderStatus.toLocaleLowerCase() !== 'pending' &&
+    updatedOrderStatus.toLocaleLowerCase() !== 'shipping' &&
+    updatedOrderStatus.toLocaleLowerCase() !== 'shipped' &&
+    updatedOrderStatus.toLocaleLowerCase() !== 'delivered' &&
+    updatedOrderStatus.toLocaleLowerCase() !== 'canceled'
+  ) {
+    throw ApiError.badRequest(500, 'Invalid status')
   }
-  return orderUpdated
+  // update order status
+  const updatedOrder = await Order.findOneAndUpdate(
+    { _id: id },
+    { status: updatedOrderStatus.toLocaleLowerCase() },
+    {
+      new: true,
+    }
+  )
+
+  if (!updatedOrder) {
+    throw ApiError.badRequest(500, 'Updating process ended unsuccussfully')
+  }
+  return updatedOrder
 }
 
 // create new order
@@ -72,7 +125,6 @@ export const createNewOrder = async (newOrderInput: IOrder): Promise<IOrder> => 
   const newOrder: IOrder = new Order({
     products: newOrderInput.products,
     user: newOrderInput.user,
-    quantity: newOrderInput.products.length,
   })
 
   await newOrder.save()

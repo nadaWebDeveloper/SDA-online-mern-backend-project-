@@ -1,20 +1,18 @@
 import { Router } from 'express'
 
 import * as controller from '../controllers/ordersController'
-import { isAdmin, isLoggedIn } from '../middlewares/authentication'
+import { isAdmin, isLoggedIn, isNotAdmin } from '../middlewares/authentication'
 
 const router = Router()
 
-//GET --> get all orders
-router.get('/', isLoggedIn, isAdmin, controller.getAllOrders)
+//GET --> get all user orders
+router.get('/:id([0-9a-fA-F]{24})', isLoggedIn, controller.getOrdersForUser)
 
-//GET --> get all orders by user ID
+//GET --> get all orders for an admin
+router.get('/all-orders', isLoggedIn, isAdmin, controller.getOrdersForAdmin)
 
-//POST --> create an order
-router.post('/', isLoggedIn, controller.createOrder)
-
-//GET --> get a single order by ID
-router.get('/:id', isLoggedIn, controller.getSingleOrder)
+//GET --> create an order
+router.post('/process-payment', isLoggedIn, isNotAdmin, controller.handleProcessPayment)
 
 //DELETE --> delete a single order by ID
 router.delete('/:id', isLoggedIn, isAdmin, controller.deleteOrder)

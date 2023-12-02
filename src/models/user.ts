@@ -1,5 +1,8 @@
 import mongoose, { Document } from 'mongoose'
 import bcrypt from 'bcrypt'
+
+import { IOrder } from './order'
+
 export interface IUser extends Document {
   firstName: string
   lastName: string
@@ -7,7 +10,8 @@ export interface IUser extends Document {
   password: string
   isAdmin: boolean
   isBanned: boolean
-  order: mongoose.Schema.Types.ObjectId[]
+  balance: number
+  orders: IOrder['_id']
 }
 
 const userSchema = new mongoose.Schema(
@@ -54,6 +58,10 @@ const userSchema = new mongoose.Schema(
     isBanned: {
       type: Boolean,
       default: false,
+    },
+    balance: {
+      type: Number,
+      default: 0,
     },
 
     orders: {
