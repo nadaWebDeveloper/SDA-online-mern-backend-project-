@@ -5,7 +5,7 @@ import mongoose from 'mongoose'
 import ApiError from '../errors/ApiError'
 import { IOrder, IOrderProduct, Order } from '../models/order'
 import * as services from '../services/orderService'
-import { User, UserDocument } from '../models/user'
+import { User, IUser } from '../models/user'
 import { IProduct, Product } from '../models/product'
 
 interface CustomeRequest extends Request {
@@ -147,7 +147,7 @@ export const handleProcessPayment = async (
     // await newOrder.save().then((order) => (newOrderId = order._id))
 
     // const newOrderDataWithId = Order.findById(newOrderId)
-    // const buyer: UserDocument | null = await User.findById(request.userId)
+    // const buyer: IUser | null = await User.findById(request.userId)
     // const previousOrders = buyer?.orders
     // const updatedOrders = previousOrders.push(newOrderDataWithId)
     // await User.findByIdAndUpdate(request.userId, { orders: updatedOrders }, { new: true })
@@ -213,17 +213,3 @@ export const updateOrder = async (request: Request, response: Response, next: Ne
     }
   }
 }
-
-// ******** payment processing ********
-// ? when creatin an order
-// totalProductPrice = multiply the quantity of each products with its price
-// subtract the quantity of the item form the original quantity
-// finalTotalPrice = sum all totalProductPrice(s)
-// (optional): add tax
-
-// ? when deleting an order
-// add a balance field in the user -> store the returend order price
-// reincrease the quantity of each product
-
-// ! last error occured:
-// the quantities are subtracted when creating an order but total amount is not calculated

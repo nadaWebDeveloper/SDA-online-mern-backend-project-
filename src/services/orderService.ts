@@ -3,7 +3,7 @@ import { Request, Response } from 'express'
 import ApiError from '../errors/ApiError'
 import { IOrder, IOrderProduct, Order } from '../models/order'
 import { IProduct, Product } from '../models/product'
-import { User, UserDocument } from '../models/user'
+import { User, IUser } from '../models/user'
 
 // return all orders using pagenation
 export const findAllOrdersForAdmin = async (page: number, limit: number) => {
@@ -82,9 +82,19 @@ export const findAndDeleteOrder = async (id: string) => {
         `Process of updating product ${item.product} ended unsuccssufully`
       )
     }
-    const foundUser: any = await User.findById(order.user)
-    foundUser.balance = foundUser.balance + order.payment.totalAmount
   })
+  const foundUser: any = await User.findById(order.user)
+  const updatedBalance = foundUser.balance + order.payment.totalAmount
+  const updatedUser = await User.findOneAndUpdate(
+    { _id: order.user },
+    { balance: updatedBalance },
+    {
+      new: true,
+    }
+  )
+  if (!updatedUser) {
+    throw ApiError.badRequest(500, `Process of updating user ${order.user} ended unsuccssufully`)
+  }
 }
 
 // find and update order by id
