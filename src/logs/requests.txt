@@ -900,3 +900,8 @@ Method: POST, Path: /auth/login, Date: 12/2/2023, Time: 7:00:57 PM
 Method: GET, Path: /users/profile, Date: 12/2/2023, Time: 7:01:28 PM
 Method: PUT, Path: /users/profile, Date: 12/2/2023, Time: 7:01:45 PM
 Method: GET, Path: /users/profile, Date: 12/2/2023, Time: 7:02:52 PM
+Method: POST, Path: /auth/logout, Date: 12/2/2023, Time: 8:37:53 PM
+Method: POST, Path: /auth/login, Date: 12/2/2023, Time: 8:38:02 PM
+Method: POST, Path: /auth/login, Date: 12/2/2023, Time: 8:38:13 PM
+Method: POST, Path: /auth/login, Date: 12/2/2023, Time: 8:38:15 PM
+Method: POST, Path: /auth/login, Date: 12/2/2023, Time: 8:38:16 PM
