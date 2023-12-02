@@ -61,6 +61,20 @@ export const isAdmin = async (request: CustomeRequest, response: Response, next:
   }
 }
 
-// create cookies
-// get user data and find if it matches the database based on his id recieved from the token (get request.userId)
-// add isAdmin middleware to the users, products, categoreies and orders necessery routes
+// check if admin
+export const isNotAdmin = async (
+  request: CustomeRequest,
+  response: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = await User.findById(request.userId)
+    if (user?.isAdmin === false) {
+      next()
+    } else {
+      throw ApiError.badRequest(403, 'Admins can not make orders')
+    }
+  } catch (error) {
+    next(error)
+  }
+}
