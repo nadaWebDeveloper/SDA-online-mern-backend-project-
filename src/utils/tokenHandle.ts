@@ -14,7 +14,7 @@ export const generateToken = (payload: object, jwtSecret: string, expiresIn = '1
   })
 }
 
-export const vertifyToken = (token: string, jwtSecret: string) => {
+export const verifyToken = (token: string, jwtSecret: string) => {
   if (!jwtSecret || jwtSecret == '') {
     throw ApiError.badRequest(400, 'jwt Secret key must be provided')
   }

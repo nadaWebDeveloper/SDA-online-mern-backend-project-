@@ -1,15 +1,15 @@
+import { JwtPayload } from 'jsonwebtoken'
 import { NextFunction, Request, Response } from 'express'
-import jwt, { JwtPayload } from 'jsonwebtoken'
 
-import ApiError from '../errors/ApiError'
-import { User } from '../models/user'
 import { dev } from '../config'
+import { User } from '../models/user'
+import ApiError from '../errors/ApiError'
+import { verifyToken } from '../utils/tokenHandle'
 
 interface CustomeRequest extends Request {
   userId?: string
 }
 
-// check if logged in
 export const isLoggedIn = async (
   request: CustomeRequest,
   response: Response,
@@ -21,7 +21,7 @@ export const isLoggedIn = async (
       throw ApiError.badRequest(401, 'You are not logged in')
     }
 
-    const decoded = (await jwt.verify(accessToken, dev.app.jwtAccessKey)) as JwtPayload
+    const decoded = verifyToken(accessToken, dev.app.jwtAccessKey) as JwtPayload
     if (!decoded) {
       throw ApiError.badRequest(401, 'Invalid access token')
     }
@@ -47,7 +47,6 @@ export const isLoggedOut = async (request: Request, response: Response, next: Ne
   }
 }
 
-// check if admin
 export const isAdmin = async (request: CustomeRequest, response: Response, next: NextFunction) => {
   try {
     const user = await User.findById(request.userId)
@@ -60,7 +59,3 @@ export const isAdmin = async (request: CustomeRequest, response: Response, next:
     next(error)
   }
 }
-
-// create cookies
-// get user data and find if it matches the database based on his id recieved from the token (get request.userId)
-// add isAdmin middleware to the users, products, categoreies and orders necessery routes
