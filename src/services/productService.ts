@@ -2,6 +2,7 @@ import { NextFunction, Request } from 'express'
 
 import ApiError from '../errors/ApiError'
 import { IProduct, Product } from '../models/product'
+import { deleteImage } from '../helper/deleteImageHelper'
 
 
 export const findAllProduct = async (request: Request) => {
@@ -10,15 +11,17 @@ export const findAllProduct = async (request: Request) => {
   const search = (request.query.search as string) || ''
   const { rangeId } = request.query || { $gte: 0 }
   //sort 
-  const sortName  = String(request.query.sortName) || ''
+  const sortName  = String(request.query.sortName) || 'price'
   let sortOption: Record<string, any>= {}
   let sortNum =request.query.sortNum || 1
+  const skipField = {__v: 0, updateAt: 0}
 
   let priceFilter = { $gte: 0, $lte: Number.MAX_SAFE_INTEGER }
 
   // search products
   const searchRegularExpression = new RegExp('.*' + search + '.*', 'i')
   const searchFilter = {
+    // name:{$en : 'nada'}, //return all name product except which hold same this value
     $or: [
       { name: { $regex: searchRegularExpression } },
       { description: { $regex: searchRegularExpression } },
@@ -68,7 +71,7 @@ export const findAllProduct = async (request: Request) => {
   // return results
   const allProductOnPage: IProduct[] = await Product.find({
     $and: [searchFilter, { price: priceFilter }],
-  })
+  },skipField)
     .populate('categories')
     .skip(skip)
     .limit(limit)
@@ -96,6 +99,10 @@ export const findProductById = async (id: string, next: NextFunction) => {
 
 export const findAndDeleted = async (id: string, next: NextFunction) => {
   const deleteSingleProduct = await Product.findOneAndDelete({ _id: id })
+  //delete file from server
+  if(deleteSingleProduct && deleteSingleProduct.image){
+    await deleteImage(deleteSingleProduct.image)
+  }
   if (!deleteSingleProduct) {
     throw ApiError.badRequest(404, `Product is not found with this id: ${id}`)
   }
@@ -104,6 +111,7 @@ export const findAndDeleted = async (id: string, next: NextFunction) => {
 
 export const findIfProductExist = async (newInput: IProduct, next: NextFunction) => {
   const nameInput = newInput.name
+  console.log("nameInput: ",nameInput);
   const productExist = await Product.exists({ name: nameInput })
   if (productExist) {
     throw ApiError.badRequest(409, `Product already exist with this Name: ${nameInput}`)
@@ -111,11 +119,12 @@ export const findIfProductExist = async (newInput: IProduct, next: NextFunction)
   return productExist
 }
 
-export const findAndUpdated = async (id: string, next: NextFunction, updatedProduct: Request) => {
+export const findAndUpdated = async (id: string,request: Request, next: NextFunction, updatedProduct: Request) => {
   const productUpdated = await Product.findByIdAndUpdate(id, updatedProduct, {
     new: true,
     runValidators: true,
   })
+
   if (!productUpdated) {
     throw ApiError.badRequest(404, `Product is not found with this id: ${id}`)
   }

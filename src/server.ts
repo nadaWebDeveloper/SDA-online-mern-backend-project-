@@ -26,6 +26,7 @@ app.use(myLogger)
 app.use(cookieParser())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(express.static('imageUser'))
 
 app.use('/products', productsRouter)
 app.use('/categories', categoriesRouter)
