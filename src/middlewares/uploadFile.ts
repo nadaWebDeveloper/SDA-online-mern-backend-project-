@@ -7,7 +7,7 @@ import {Request } from 'express'
       cb(null, 'public/images/imageProduct')
     },
     filename: function (req: Request, file: Express.Multer.File, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    const uniqueSuffix = Date.now() + '-' + file.originalname
       cb(null, uniqueSuffix)
     }
   })

@@ -1,5 +1,4 @@
 import { NextFunction, Request } from 'express'
-import fs from 'fs/promises'
 
 import ApiError from '../errors/ApiError'
 import { IProduct, Product } from '../models/product'
@@ -112,6 +111,7 @@ export const findAndDeleted = async (id: string, next: NextFunction) => {
 
 export const findIfProductExist = async (newInput: IProduct, next: NextFunction) => {
   const nameInput = newInput.name
+  console.log("nameInput: ",nameInput);
   const productExist = await Product.exists({ name: nameInput })
   if (productExist) {
     throw ApiError.badRequest(409, `Product already exist with this Name: ${nameInput}`)
@@ -119,7 +119,7 @@ export const findIfProductExist = async (newInput: IProduct, next: NextFunction)
   return productExist
 }
 
-export const findAndUpdated = async (id: string, next: NextFunction, updatedProduct: Request) => {
+export const findAndUpdated = async (id: string,request: Request, next: NextFunction, updatedProduct: Request) => {
   const productUpdated = await Product.findByIdAndUpdate(id, updatedProduct, {
     new: true,
     runValidators: true,
