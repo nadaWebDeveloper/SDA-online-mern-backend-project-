@@ -2,6 +2,8 @@ import { Router } from 'express'
 
 import * as controller from '../controllers/ordersController'
 import { isAdmin, isLoggedIn, isNotAdmin } from '../middlewares/authentication'
+import { orderValidation } from '../validation/ordersValidation'
+import { runValidation } from '../validation/runValidation'
 
 const router = Router()
 
@@ -12,7 +14,14 @@ router.get('/', isLoggedIn, isNotAdmin, controller.getOrdersForUser)
 router.get('/all-orders', isLoggedIn, isAdmin, controller.getOrdersForAdmin)
 
 //GET --> create an order
-router.post('/process-payment', isLoggedIn, isNotAdmin, controller.handleProcessPayment)
+router.post(
+  '/process-payment',
+  isLoggedIn,
+  isNotAdmin,
+  orderValidation,
+  runValidation,
+  controller.handleProcessPayment
+)
 
 //DELETE --> delete a single order by ID
 router.delete('/:id([0-9a-fA-F]{24})', isLoggedIn, isAdmin, controller.deleteOrder)
