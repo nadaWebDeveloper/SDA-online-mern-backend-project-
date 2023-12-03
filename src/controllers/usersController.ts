@@ -263,5 +263,3 @@ export const resetPassword = async (request: Request, response: Response, next: 
     }
   }
 }
-
-

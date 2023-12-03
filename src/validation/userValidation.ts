@@ -15,8 +15,8 @@ export const userRegistrationValidation = [
     .withMessage('Last name must not be empty')
     .isLength({ min: 3, max: 20 })
     .withMessage('Last name must be at least 3 charachters')
-    .isLength({ min: 4, max: 20 })
-    .withMessage('Last name must be at least 4 characters')
+    .isLength({ min: 3, max: 20 })
+    .withMessage('Last name must be at least 3 characters')
     .isLength({ max: 20 })
     .withMessage('Last name must be less than 20 characters'),
   check('email')
