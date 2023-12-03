@@ -1,5 +1,5 @@
-import { SortOrder } from 'mongoose'
 import { JwtPayload } from 'jsonwebtoken'
+import { SortOrder } from 'mongoose'
 
 import ApiError from '../errors/ApiError'
 import { IUser, User } from '../models/user'
@@ -42,7 +42,6 @@ export const findAllUsers = async (
   const allUsers = await User.find(filters, {
     password: 0,
   })
-    .populate('orders')
     .skip(skip)
     .limit(limit)
     .sort({ firstName: sort, lastName: sort })

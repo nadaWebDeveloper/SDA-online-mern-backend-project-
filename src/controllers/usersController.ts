@@ -276,5 +276,5 @@ export {
   resetPassword,
   unBanUser,
   updateUser,
-  upgradeUserRole,
+  upgradeUserRole
 }
