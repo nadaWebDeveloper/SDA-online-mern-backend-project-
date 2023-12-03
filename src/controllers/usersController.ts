@@ -49,7 +49,11 @@ export const getAllUsers = async (request: Request, response: Response, next: Ne
 }
 
 // get a sing user
-export const getSingleUser = async (request: CustomeRequest, response: Response, next: NextFunction) => {
+export const getSingleUser = async (
+  request: CustomeRequest,
+  response: Response,
+  next: NextFunction
+) => {
   try {
     const id = request.userId
 
@@ -109,7 +113,11 @@ export const activateUser = async (request: Request, response: Response, next: N
 }
 
 // update user profile
-export const updateUser = async (request: CustomeRequest, response: Response, next: NextFunction) => {
+export const updateUser = async (
+  request: CustomeRequest,
+  response: Response,
+  next: NextFunction
+) => {
   try {
     const id = request.userId
     const { email } = request.body
@@ -184,7 +192,11 @@ export const upgradeUserRole = async (request: Request, response: Response, next
 }
 
 // downgrade a specific admin to a regular user
-export const downgradeUserRole = async (request: Request, response: Response, next: NextFunction) => {
+export const downgradeUserRole = async (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = request.params
 
