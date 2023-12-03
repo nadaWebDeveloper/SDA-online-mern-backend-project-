@@ -3,6 +3,7 @@ import { NextFunction } from 'express'
 import ApiError from '../errors/ApiError'
 import { ICategory, Category } from '../models/category'
 
+// return all Categories using pagination
 export const findAllCategories = async (page: number, limit: number, search: string) => {
   //how many have categories
   const countPage = await Category.countDocuments()
@@ -20,7 +21,7 @@ export const findAllCategories = async (page: number, limit: number, search: str
     currentPage: page,
   }
 }
-
+// find category by id
 export const findCategoryById = async (id: string, next: NextFunction) => {
   const singleCategory = await Category.findOne({ _id: id })
   if (!singleCategory) {
@@ -29,8 +30,8 @@ export const findCategoryById = async (id: string, next: NextFunction) => {
   }
   return singleCategory
 }
-
-export const findAndDeleted = async (id: string, next: NextFunction) => {
+// find and delete category by id
+export const findAndDeletedCategory = async (id: string, next: NextFunction) => {
   const deleteSingleCategory = await Category.findOneAndDelete({ _id: id })
   if (!deleteSingleCategory) {
     next(ApiError.badRequest(404, `Category is not found with this id: ${id}`))
@@ -38,7 +39,7 @@ export const findAndDeleted = async (id: string, next: NextFunction) => {
   }
   return deleteSingleCategory
 }
-
+//check entered category is exist on DB or not when a create new category
 export const findIfCategoryExist = async (newInput: ICategory, next: NextFunction) => {
   const name = newInput.name
   const categoryExist = await Category.exists({ name: name })
@@ -47,8 +48,8 @@ export const findIfCategoryExist = async (newInput: ICategory, next: NextFunctio
   }
   return categoryExist
 }
-
-export const findAndUpdated = async (id: string, next: NextFunction, updatedProduct: Request) => {
+// find and update category by id
+export const findAndUpdateCategory = async (id: string, next: NextFunction, updatedProduct: Request) => {
   const categoryUpdated = await Category.findOneAndUpdate({ _id: id }, updatedProduct, {
     new: true,
   })

@@ -4,8 +4,8 @@ import ApiError from '../errors/ApiError'
 import { IProduct, Product } from '../models/product'
 import { deleteImage } from '../helper/deleteImageHelper'
 
-
-export const findAllProduct = async (request: Request) => {
+// return all products using pagination
+export const findAllProducts = async (request: Request) => {
   const limit = Number(request.query.limit) || 0
   let page = Number(request.query.page) || 1
   const search = (request.query.search as string) || ''
@@ -88,7 +88,7 @@ export const findAllProduct = async (request: Request) => {
     currentPage: page,
   }
 }
-
+// find order by id
 export const findProductById = async (id: string, next: NextFunction) => {
   const singleProduct = await Product.findOne({ _id: id })
   if (!singleProduct) {
@@ -96,8 +96,8 @@ export const findProductById = async (id: string, next: NextFunction) => {
   }
   return singleProduct
 }
-
-export const findAndDeleted = async (id: string, next: NextFunction) => {
+// find and delete product by id
+export const findAndDeletedProduct = async (id: string, next: NextFunction) => {
   const deleteSingleProduct = await Product.findOneAndDelete({ _id: id })
   //delete file from server
   if(deleteSingleProduct && deleteSingleProduct.image){
@@ -108,7 +108,7 @@ export const findAndDeleted = async (id: string, next: NextFunction) => {
   }
   return deleteSingleProduct
 }
-
+//check entered product is exist on DB or not when a create new product
 export const findIfProductExist = async (newInput: IProduct, next: NextFunction) => {
   const nameInput = newInput.name
   console.log("nameInput: ",nameInput);
@@ -118,8 +118,8 @@ export const findIfProductExist = async (newInput: IProduct, next: NextFunction)
   }
   return productExist
 }
-
-export const findAndUpdated = async (id: string,request: Request, next: NextFunction, updatedProduct: Request) => {
+// find and update product by id
+export const findAndUpdateProduct = async (id: string,request: Request, next: NextFunction, updatedProduct: Request) => {
   const productUpdated = await Product.findByIdAndUpdate(id, updatedProduct, {
     new: true,
     runValidators: true,

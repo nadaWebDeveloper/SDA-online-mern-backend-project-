@@ -10,7 +10,7 @@ interface CustomeRequest extends Request {
   userId?: string
 }
 
-// return all orders using pagenation
+// return all orders using pagination
 export const findAllOrdersForAdmin = async (page: number, limit: number) => {
   const countPage = await Order.countDocuments()
   const totalPage = limit ? Math.ceil(countPage / limit) : 1
@@ -42,7 +42,6 @@ export const findAllOrdersForAdmin = async (page: number, limit: number) => {
     }
   }
 }
-
 // find order by id
 export const findUserOrders = async (userId: string) => {
   const userOrders = await Order.find({ user: userId })
@@ -60,7 +59,6 @@ export const findUserOrders = async (userId: string) => {
   }
   return userOrders
 }
-
 // find and delete order by id
 export const findAndDeleteOrder = async (id: string, next: NextFunction) => {
   try {
@@ -116,7 +114,6 @@ export const findAndDeleteOrder = async (id: string, next: NextFunction) => {
     }
   }
 }
-
 // find and update order by id
 export const findAndUpdateOrder = async (
   id: string,
@@ -124,6 +121,7 @@ export const findAndUpdateOrder = async (
   updatedOrderStatus: String,
   next: NextFunction
 ) => {
+
   if (
     updatedOrderStatus.toLocaleLowerCase() !== 'pending' &&
     updatedOrderStatus.toLocaleLowerCase() !== 'shipping' &&
@@ -159,6 +157,7 @@ export const findAndUpdateOrder = async (
     }
   }
 }
+
 
 // find and update product
 export const findAndUpdateProducts = async (
