@@ -6,25 +6,25 @@ import setCookieResponse from '../utils/cookiesRes'
 import { generateToken } from '../utils/tokenHandle'
 
 // login authenticaiton
-const login = async (request: Request, response: Response, next: NextFunction) => {
+export const login = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { email, password } = request.body
 
     const user = await services.isEmailMatch(email)
-    await services.isPassworMatch(user, password)
+    await services.isPasswordMatch(user, password)
     services.isUserBanned(user)
 
     const accessToken = generateToken({ _id: user.id }, dev.app.jwtAccessKey, '15m')
     setCookieResponse(response, accessToken)
 
-    response.status(200).json({ message: `you logged in as ${user.isAdmin ? 'Admin' : ''}` })
+    response.status(200).json({ message: `you logged in ${user.isAdmin ? 'as an Admin' : ''}` })
   } catch (error) {
     next(error)
   }
 }
 
 // logout authenticaiton
-const logout = async (request: Request, response: Response, next: NextFunction) => {
+export const logout = async (request: Request, response: Response, next: NextFunction) => {
   try {
     response.status(200).clearCookie('access_token')
     response.status(200).json({ message: 'you logged out ' })
@@ -32,5 +32,3 @@ const logout = async (request: Request, response: Response, next: NextFunction) 
     next(error)
   }
 }
-
-export { login, logout }

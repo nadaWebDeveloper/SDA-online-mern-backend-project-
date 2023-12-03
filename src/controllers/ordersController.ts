@@ -3,8 +3,6 @@ import { NextFunction, Request, Response } from 'express'
 import mongoose from 'mongoose'
 
 import ApiError from '../errors/ApiError'
-import { IOrder, IOrderProduct, Order } from '../models/order'
-import { IProduct, Product } from '../models/product'
 import * as services from '../services/orderService'
 
 interface CustomeRequest extends Request {
@@ -22,14 +20,11 @@ export const getOrdersForAdmin = async (
     const page = Number(request.query.page) || 1
 
     // return all orders with pagenation feature
-    const { allOrdersOnPage, totalPage, currentPage } = await services.findAllOrdersForAdmin(
-      page,
-      limit
-    )
+    const allOrdersOnPage = await services.findAllOrdersForAdmin(page, limit, next)
 
     response.status(200).send({
       message: `Return all orders for the admin`,
-      payload: { allOrdersOnPage, totalPage, currentPage },
+      payload: allOrdersOnPage,
     })
   } catch (error) {
     next(error)
@@ -52,87 +47,21 @@ export const handleProcessPayment = async (
       throw ApiError.badRequest(404, `Order must contain products and payment data`)
     }
     // updataing the qunatity and sold values of each purchased product and calculating the total price of each product
-    const requests = products.map(async (item: IOrderProduct) => {
-      try {
-        const foundProduct: IProduct | null = await Product.findById(item.product)
-        // throw error if product not found or quantity exceeded the maximum limit
-        if (!foundProduct) {
-          throw ApiError.badRequest(404, `Product is not found with this id: ${item.product}`)
-        } else if (foundProduct.quantity < item.quantity) {
-          throw ApiError.badRequest(
-            500,
-            `Quantity of product ${item.product} has exceeded the maximum limit`
-          )
-        }
-        // update each product quantity and sold value
-        const updatedQuantityValue = foundProduct.quantity - item.quantity
-        const updatedSoldValue = foundProduct.sold + item.quantity
-        const updatedProduct = await Product.findByIdAndUpdate(
-          foundProduct._id,
-          { quantity: updatedQuantityValue, sold: updatedSoldValue },
-          {
-            new: true,
-          }
-        )
-        if (!updatedProduct) {
-          throw ApiError.badRequest(
-            500,
-            `Process of updating product ${item.product} ended unsuccssufully`
-          )
-        }
-        // calculate total product price
-        totalProductPrice = foundProduct?.price && foundProduct.price * item.quantity
-        console.log('totalProductPrice: ' + totalProductPrice)
-        subtotalSums.push(totalProductPrice)
-        console.log('subtotalSums in map: ' + subtotalSums)
-      } catch (error) {
-        next(error)
-      }
-    })
-    // calculate total payment amount
-    if (requests) {
-      return Promise.all(requests).then(async () => {
+    const updateProductsData = await services.findAndUpdateProducts(
+      products,
+      subtotalSums,
+      totalProductPrice,
+      next
+    )
+
+    if (updateProductsData) {
+      return Promise.all(updateProductsData).then(async () => {
         try {
-          console.log('subtotalSums after map: ' + subtotalSums)
-          const totalOrderPrice =
-            subtotalSums.length > 0 &&
-            subtotalSums.reduce((firstProductTotal, secondProductTotal) => {
-              return firstProductTotal + secondProductTotal
-            }, 0)
-          console.log('totalOrderPrice after map: ' + totalOrderPrice)
-
-          // check payment method value
-          if (
-            payment.method.toLocaleLowerCase() !== 'cash-on-delivery' &&
-            payment.method.toLocaleLowerCase() !== 'credit-card' &&
-            payment.method.toLocaleLowerCase() !== 'apple-pay' &&
-            payment.method.toLocaleLowerCase() !== 'stc-pay'
-          ) {
-            throw ApiError.badRequest(500, 'Invalid method')
-          }
-          // create a new order
-          const newOrder: IOrder = new Order({
-            products:
-              products.length > 0 &&
-              products.map((item: IOrderProduct) => ({
-                product: item.product,
-                quantity: item.quantity,
-              })),
-            payment: {
-              method: payment.method,
-              totalAmount: totalOrderPrice,
-            },
-            user: request.userId,
-          })
-
-          await newOrder.save(function (err, order) {
-            if (err) {
-              throw ApiError.badRequest(500, 'Process ended unsuccssufully')
-            }
-          })
-
-          response.status(200).send({
-            message: 'Order placed succsussfully',
+          // calculate total payment amount
+          await services.handlePayment(request, subtotalSums, payment, products, next).then(() => {
+            response.status(201).send({
+              message: 'Order placed succsussfully',
+            })
           })
         } catch (error) {
           next(error)
@@ -141,15 +70,6 @@ export const handleProcessPayment = async (
     } else {
       throw ApiError.badRequest(500, 'Process ended unsuccssufully')
     }
-
-    // let newOrderId
-    // await newOrder.save().then((order) => (newOrderId = order._id))
-
-    // const newOrderDataWithId = Order.findById(newOrderId)
-    // const buyer: IUser | null = await User.findById(request.userId)
-    // const previousOrders = buyer?.orders
-    // const updatedOrders = previousOrders.push(newOrderDataWithId)
-    // await User.findByIdAndUpdate(request.userId, { orders: updatedOrders }, { new: true })
   } catch (error) {
     next(error)
   }
@@ -162,11 +82,10 @@ export const getOrdersForUser = async (
   next: NextFunction
 ) => {
   try {
-    const { userId } = request.params
-    // console.log('user id' + userId)
-
-    const userOrders = await services.findUserOrders(userId)
-
+    const userOrders = await services.findUserOrders(request, next)
+    if (userOrders?.length === 0) {
+      throw ApiError.badRequest(400, 'Process ended unsuccussfully')
+    }
     response.status(200).send({
       message: 'Orders are returend',
       payload: userOrders,
@@ -181,14 +100,14 @@ export const deleteOrder = async (request: Request, response: Response, next: Ne
   try {
     const { id } = request.params
 
-    await services.findAndDeleteOrder(id)
+    await services.findAndDeleteOrder(id, next)
 
-    response.status(200).send({
+    response.status(204).send({
       message: `Deleted order with id ${id}`,
     })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
-      throw next(ApiError.badRequest(400, 'Id format is not valid and must be 24 characters'))
+      next(ApiError.badRequest(400, 'Id format is not valid and must be 24 characters'))
     }
     next(error)
   }
@@ -200,15 +119,20 @@ export const updateOrder = async (request: Request, response: Response, next: Ne
     const { id } = request.params
     const updatedOrderStatus = request.body.status as String
 
-    const updatedOrder = await services.findAndUpdateOrder(id, response, updatedOrderStatus)
+    if (!updatedOrderStatus) {
+      throw ApiError.badRequest(400, `Provide order status`)
+    }
 
-    response.status(200).send({
-      message: `Updated order status succussfully`,
-      payload: updatedOrder,
-    })
+    const updatedOrder = await services.findAndUpdateOrder(id, response, updatedOrderStatus, next)
+    if (updatedOrder) {
+      response.status(200).send({
+        message: `Updated order status succussfully`,
+        payload: updatedOrder,
+      })
+    }
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
-      throw ApiError.badRequest(400, `ID format is Invalid must be 24 characters`)
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
     } else {
       next(error)
     }

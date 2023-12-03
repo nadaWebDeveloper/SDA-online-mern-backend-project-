@@ -13,7 +13,7 @@ interface CustomeRequest extends Request {
 }
 
 // get all users
-const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
+export const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const limit = Number(request.query.limit) || 0
     const page = Number(request.query.page) || 1
@@ -49,7 +49,11 @@ const getAllUsers = async (request: Request, response: Response, next: NextFunct
 }
 
 // get a sing user
-const getSingleUser = async (request: CustomeRequest, response: Response, next: NextFunction) => {
+export const getSingleUser = async (
+  request: CustomeRequest,
+  response: Response,
+  next: NextFunction
+) => {
   try {
     const id = request.userId
 
@@ -58,7 +62,7 @@ const getSingleUser = async (request: CustomeRequest, response: Response, next: 
     response.status(200).json({ message: 'User was found', user })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
-      next(ApiError.badRequest(400, 'Id format is not valid'))
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
     } else {
       next(error)
     }
@@ -66,7 +70,7 @@ const getSingleUser = async (request: CustomeRequest, response: Response, next: 
 }
 
 // register a new user
-const registUser = async (request: Request, response: Response, next: NextFunction) => {
+export const registUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { email } = request.body
     const registedUser = request.body
@@ -75,7 +79,7 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
       throw ApiError.badRequest(403, 'you do not have permission to ban user or modify its role')
     }
 
-    await services.isUserEmailExists(email)
+    await services.findIfUserEmailExist(email)
     const token = generateToken(registedUser, dev.app.jwtUserActivationKey, '2m')
 
     // prepare and send email to verify user
@@ -95,7 +99,7 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
 }
 
 // activate and create user
-const activateUser = async (request: Request, response: Response, next: NextFunction) => {
+export const activateUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { token } = request.body
 
@@ -109,7 +113,11 @@ const activateUser = async (request: Request, response: Response, next: NextFunc
 }
 
 // update user profile
-const updateUser = async (request: CustomeRequest, response: Response, next: NextFunction) => {
+export const updateUser = async (
+  request: CustomeRequest,
+  response: Response,
+  next: NextFunction
+) => {
   try {
     const id = request.userId
     const { email } = request.body
@@ -119,7 +127,7 @@ const updateUser = async (request: CustomeRequest, response: Response, next: Nex
       throw ApiError.badRequest(403, 'you do not have permission to ban users or modify thier role')
     }
 
-    await services.isUserEmailExists(email, id)
+    await services.findIfUserEmailExist(email, id)
     const user = await services.findUserAndUpdate({ _id: id }, updatedUser)
 
     response.status(200).json({ message: `User with id: ${user.id} was updated` })
@@ -133,7 +141,7 @@ const updateUser = async (request: CustomeRequest, response: Response, next: Nex
 }
 
 // block a specific user
-const banUser = async (request: Request, response: Response, next: NextFunction) => {
+export const banUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
 
@@ -150,7 +158,7 @@ const banUser = async (request: Request, response: Response, next: NextFunction)
 }
 
 // unblock a specific user
-const unBanUser = async (request: Request, response: Response, next: NextFunction) => {
+export const unBanUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
 
@@ -167,7 +175,7 @@ const unBanUser = async (request: Request, response: Response, next: NextFunctio
 }
 
 // upgrade a specific user to an admin
-const upgradeUserRole = async (request: Request, response: Response, next: NextFunction) => {
+export const upgradeUserRole = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
 
@@ -184,7 +192,11 @@ const upgradeUserRole = async (request: Request, response: Response, next: NextF
 }
 
 // downgrade a specific admin to a regular user
-const downgradeUserRole = async (request: Request, response: Response, next: NextFunction) => {
+export const downgradeUserRole = async (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = request.params
 
@@ -201,11 +213,11 @@ const downgradeUserRole = async (request: Request, response: Response, next: Nex
 }
 
 // delete a specific user
-const deleteUser = async (request: Request, response: Response, next: NextFunction) => {
+export const deleteUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
 
-    const user = await services.findUserAndDelete(id)
+    const user = await services.findAndDeleteUser(id)
 
     response.status(204).json({ message: `User with id: ${id} deleted` })
   } catch (error) {
@@ -218,7 +230,7 @@ const deleteUser = async (request: Request, response: Response, next: NextFuncti
 }
 
 // send email to reset user password
-const forgetPassword = async (request: Request, response: Response, next: NextFunction) => {
+export const forgetPassword = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { email } = request.body
 
@@ -242,7 +254,7 @@ const forgetPassword = async (request: Request, response: Response, next: NextFu
 }
 
 // verify token and update user password
-const resetPassword = async (request: Request, response: Response, next: NextFunction) => {
+export const resetPassword = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const token = request.body.token
     const password = request.body.password
@@ -262,19 +274,4 @@ const resetPassword = async (request: Request, response: Response, next: NextFun
       next(error)
     }
   }
-}
-
-export {
-  activateUser,
-  banUser,
-  deleteUser,
-  downgradeUserRole,
-  forgetPassword,
-  getAllUsers,
-  getSingleUser,
-  registUser,
-  resetPassword,
-  unBanUser,
-  updateUser,
-  upgradeUserRole,
 }

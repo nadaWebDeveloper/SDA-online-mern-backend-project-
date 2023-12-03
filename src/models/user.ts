@@ -11,7 +11,6 @@ export interface IUser extends Document {
   isAdmin: boolean
   isBanned: boolean
   balance: number
-  orders: IOrder['_id']
 }
 
 const userSchema = new mongoose.Schema(
@@ -62,11 +61,6 @@ const userSchema = new mongoose.Schema(
     balance: {
       type: Number,
       default: 0,
-    },
-
-    orders: {
-      type: [mongoose.Schema.Types.ObjectId],
-      ref: 'Orders',
     },
   },
   { timestamps: true }

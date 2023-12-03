@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from 'express'
 
 import { Category, ICategory } from '../models/category'
 import * as services from '../services/categoryService'
+import ApiError from '../errors/ApiError'
+import mongoose from 'mongoose'
 
 // get all categories
 export const getAllCategories = async (
@@ -49,7 +51,11 @@ export const getSingleCategory = async (
       payload: category,
     })
   } catch (error) {
-    next(error)
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
+      next(error)
+    }
   }
 }
 
@@ -58,13 +64,17 @@ export const deleteCategory = async (request: Request, response: Response, next:
   try {
     const { id } = request.params
 
-    const category = await services.findAndDeleted(id, next)
+    const category = await services.findAndDeletedCategory(id, next)
 
     response.status(200).json({
       message: `Category with ID: ${id} is deleted`,
     })
   } catch (error) {
-    next(error)
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
+      next(error)
+    }
   }
 }
 
@@ -94,13 +104,17 @@ export const updateCategory = async (request: Request, response: Response, next:
     const { id } = request.params
     const updatedCategory = request.body
 
-    const category = await services.findAndUpdated(id, next, updatedCategory)
+    const category = await services.findAndUpdateCategory(id, next, updatedCategory)
 
     response.status(200).json({
       message: `Category with ID: ${id} is updated`,
       payload: category,
     })
   } catch (error) {
-    next(error)
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
+      next(error)
+    }
   }
 }

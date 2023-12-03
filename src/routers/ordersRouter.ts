@@ -8,7 +8,7 @@ import { runValidation } from '../validation/runValidation'
 const router = Router()
 
 //GET --> get all user orders
-router.get('/:userId([0-9a-fA-F]{24})', isLoggedIn, controller.getOrdersForUser)
+router.get('/', isLoggedIn, isNotAdmin, controller.getOrdersForUser)
 
 //GET --> get all orders for an admin
 router.get('/all-orders', isLoggedIn, isAdmin, controller.getOrdersForAdmin)
@@ -24,9 +24,9 @@ router.post(
 )
 
 //DELETE --> delete a single order by ID
-router.delete('/:id', isLoggedIn, isAdmin, controller.deleteOrder)
+router.delete('/:id([0-9a-fA-F]{24})', isLoggedIn, isAdmin, controller.deleteOrder)
 
 //PUT --> update a single order by ID
-router.put('/:id', isLoggedIn, isAdmin, controller.updateOrder)
+router.put('/:id([0-9a-fA-F]{24})', isLoggedIn, isAdmin, controller.updateOrder)
 
 export default router
