@@ -20,14 +20,11 @@ export const getOrdersForAdmin = async (
     const page = Number(request.query.page) || 1
 
     // return all orders with pagenation feature
-    const { allOrdersOnPage, totalPage, currentPage } = await services.findAllOrdersForAdmin(
-      page,
-      limit
-    )
+    const allOrdersOnPage = await services.findAllOrdersForAdmin(page, limit, next)
 
     response.status(200).send({
       message: `Return all orders for the admin`,
-      payload: { allOrdersOnPage, totalPage, currentPage },
+      payload: allOrdersOnPage,
     })
   } catch (error) {
     next(error)
@@ -53,15 +50,16 @@ export const handleProcessPayment = async (
     const updateProductsData = await services.findAndUpdateProducts(
       products,
       subtotalSums,
-      totalProductPrice
+      totalProductPrice,
+      next
     )
 
     if (updateProductsData) {
       return Promise.all(updateProductsData).then(async () => {
         try {
           // calculate total payment amount
-          await services.handlePayment(request, subtotalSums, payment, products).then(() => {
-            response.status(200).send({
+          await services.handlePayment(request, subtotalSums, payment, products, next).then(() => {
+            response.status(201).send({
               message: 'Order placed succsussfully',
             })
           })
@@ -84,15 +82,18 @@ export const getOrdersForUser = async (
   next: NextFunction
 ) => {
   try {
-    const { userId } = request.params
-
-    const userOrders = await services.findUserOrders(userId)
-
+    const userOrders = await services.findUserOrders(request, next)
+    if (userOrders?.length === 0) {
+      throw ApiError.badRequest(400, 'Process ended unsuccussfully')
+    }
     response.status(200).send({
       message: 'Orders are returend',
       payload: userOrders,
     })
   } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, 'Id format is not valid and must be 24 characters'))
+    }
     next(error)
   }
 }
@@ -104,12 +105,12 @@ export const deleteOrder = async (request: Request, response: Response, next: Ne
 
     await services.findAndDeleteOrder(id, next)
 
-    response.status(200).send({
+    response.status(204).send({
       message: `Deleted order with id ${id}`,
     })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
-      throw ApiError.badRequest(400, 'Id format is not valid and must be 24 characters')
+      next(ApiError.badRequest(400, 'Id format is not valid and must be 24 characters'))
     }
     next(error)
   }
@@ -126,9 +127,15 @@ export const updateOrder = async (request: Request, response: Response, next: Ne
     }
 
     const updatedOrder = await services.findAndUpdateOrder(id, response, updatedOrderStatus, next)
+    if (updatedOrder) {
+      response.status(200).send({
+        message: `Updated order status succussfully`,
+        payload: updatedOrder,
+      })
+    }
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
-      throw ApiError.badRequest(400, `ID format is Invalid must be 24 characters`)
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
     } else {
       next(error)
     }
