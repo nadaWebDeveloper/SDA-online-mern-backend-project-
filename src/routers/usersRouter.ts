@@ -14,11 +14,23 @@ router.get('/', isLoggedIn, isAdmin, controller.getAllUsers)
 //GET --> get a single user by ID
 router.get('/profile', isLoggedIn, controller.getSingleUser)
 //POST --> register a user
-router.post('/register',isLoggedOut, validation.userRegistrationValidation, runValidation, controller.registUser)
+router.post(
+  '/register',
+  isLoggedOut,
+  validation.userRegistrationValidation,
+  runValidation,
+  controller.registUser
+)
 //POST --> activate a user
 router.post('/activate', controller.activateUser)
 //PUT --> update a single user by ID
-router.put('/profile', isLoggedIn, controller.updateUser)
+router.put(
+  '/profile',
+  isLoggedIn,
+  validation.userUpdatenValidation,
+  runValidation,
+  controller.updateUser
+)
 //PUT --> ban a single user by ID
 router.put('/ban/:id', isLoggedIn, isAdmin, controller.banUser)
 //PUT --> unban a single user by ID
@@ -30,8 +42,20 @@ router.put('/notadmin/:id', isLoggedIn, isAdmin, controller.downgradeUserRole)
 //DELETE --> delete a single user by ID
 router.delete('/:id', isLoggedIn, isAdmin, controller.deleteUser)
 //POST --> send reset email when forget password
-router.post('/forget-password',isLoggedOut,validation.userForgetPasswordValidation,runValidation,controller.forgetPassword)
+router.post(
+  '/forget-password',
+  isLoggedOut,
+  validation.userForgetPasswordValidation,
+  runValidation,
+  controller.forgetPassword
+)
 //POST --> reset password
-router.post('/reset-password',isLoggedOut, validation.userResetPasswordValidation,runValidation,controller.resetPassword)
+router.post(
+  '/reset-password',
+  isLoggedOut,
+  validation.userResetPasswordValidation,
+  runValidation,
+  controller.resetPassword
+)
 
 export default router
