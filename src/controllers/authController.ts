@@ -32,4 +32,3 @@ export const logout = async (request: Request, response: Response, next: NextFun
     next(error)
   }
 }
-

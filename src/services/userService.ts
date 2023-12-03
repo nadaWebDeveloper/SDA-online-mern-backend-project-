@@ -3,7 +3,7 @@ import { SortOrder } from 'mongoose'
 
 import ApiError from '../errors/ApiError'
 import { IUser, User } from '../models/user'
-import {UsersPaginationType} from '../types'
+import { UsersPaginationType } from '../types'
 
 // return all Users using pagination
 export const findAllUsers = async (
@@ -52,14 +52,14 @@ export const findAllUsers = async (
 export const findSingleUser = async (filter: object): Promise<IUser> => {
   const user = await User.findOne(filter, {
     password: 0,
-  }).populate('orders')
+  })
 
   if (!user) {
     throw ApiError.badRequest(404, `User was not found`)
   }
   return user
 }
-//check entered email user is exist on DB or not when a create new user
+//throw error if entered user email is already used by other users on DB
 export const findIfUserEmailExist = async (inputEmail: string, inputId: string | null = null) => {
   const user = await User.exists({ $and: [{ _id: { $ne: inputId } }, { email: inputEmail }] })
 
