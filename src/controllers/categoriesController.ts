@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from 'express'
 
 import { Category, ICategory } from '../models/category'
 import * as services from '../services/categoryService'
+import ApiError from '../errors/ApiError'
+import mongoose from 'mongoose'
 
 // get all categories
 export const getAllCategories = async (
@@ -49,7 +51,11 @@ export const getSingleCategory = async (
       payload: category,
     })
   } catch (error) {
-    next(error)
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
+      next(error)
+    }
   }
 }
 
@@ -64,7 +70,11 @@ export const deleteCategory = async (request: Request, response: Response, next:
       message: `Category with ID: ${id} is deleted`,
     })
   } catch (error) {
-    next(error)
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
+      next(error)
+    }
   }
 }
 
@@ -101,6 +111,10 @@ export const updateCategory = async (request: Request, response: Response, next:
       payload: category,
     })
   } catch (error) {
-    next(error)
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
+      next(error)
+    }
   }
 }

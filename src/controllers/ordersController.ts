@@ -91,9 +91,6 @@ export const getOrdersForUser = async (
       payload: userOrders,
     })
   } catch (error) {
-    if (error instanceof mongoose.Error.CastError) {
-      next(ApiError.badRequest(400, 'Id format is not valid and must be 24 characters'))
-    }
     next(error)
   }
 }
