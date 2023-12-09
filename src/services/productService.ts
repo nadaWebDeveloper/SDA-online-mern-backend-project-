@@ -119,7 +119,7 @@ export const findIfProductExist = async (newInput: IProduct, next: NextFunction)
   return productExist
 }
 
-export const findAndUpdated = async (id: string,request: Request, next: NextFunction, updatedProduct: Request) => {
+export const findAndUpdateProduct = async (id: string,request: Request, next: NextFunction, updatedProduct: Request) => {
   const productUpdated = await Product.findByIdAndUpdate(id, updatedProduct, {
     new: true,
     runValidators: true,

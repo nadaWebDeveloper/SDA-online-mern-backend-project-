@@ -1,21 +1,5 @@
-import { check, validationResult } from 'express-validator'
-import { NextFunction, Request, Response } from 'express'
-import ApiError from '../errors/ApiError';
+import { check } from 'express-validator'
 
-
-
-// const myValidation = async  (request: Request, response: Response, next: NextFunction)=>{
-//     const has_errors = validationResult( request );
-//     if(!has_errors.isEmpty()){
-//         // Show your error message here, i.e,
-//         throw(ApiError.badRequest(400, `Invalid document${has_errors}`))
-//     }
-//     next();
-// }
-
-// module.exports = {
-//     myValidation
-// }
 
 
 export const productValidation = [
@@ -26,21 +10,20 @@ export const productValidation = [
     .isLength({ min: 3 })
     .withMessage('Name must be at least 3 characters')
     .isLength({ max: 150 })
-    .withMessage('Name must be less than 150 characters')
-    ,
+    .withMessage('Name must be less than 150 characters'),
   check('price')
     .trim()
     .notEmpty()
     .withMessage('Price must not be empty')
     .isFloat({ min: 1 })
     .withMessage('Price Must be a positive number'),
-  check('image')
-    .trim()
-    .notEmpty()
-    .withMessage('Image must not be empty')
-    ?.isURL()
-    .not()
-    .withMessage('Image must be in a URL format'),
+  // check('image')
+  //   .trim()
+  //   .notEmpty()
+  //   .withMessage('Image must not be empty')
+  //   ?.isURL()
+  //   .not()
+  //   .withMessage('Image must be in a URL format'),
   check('description')
     .trim()
     .notEmpty()
