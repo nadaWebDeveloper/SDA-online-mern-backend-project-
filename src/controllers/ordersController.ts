@@ -3,98 +3,136 @@ import { NextFunction, Request, Response } from 'express'
 import mongoose from 'mongoose'
 
 import ApiError from '../errors/ApiError'
-import { IOrder, Order } from '../models/order'
 import * as services from '../services/orderService'
 
-// get all orders
-export const getAllOrders = async (request: Request, response: Response, next: NextFunction) => {
+interface CustomeRequest extends Request {
+  userId?: string
+}
+
+// get all orders for admin
+export const getOrdersForAdmin = async (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
   try {
     const limit = Number(request.query.limit) || 0
     const page = Number(request.query.page) || 1
 
     // return all orders with pagenation feature
-    const { allOrdersOnPage, totalPage, currentPage } = await services.findAllOrders(page, limit)
+    const allOrdersOnPage = await services.findAllOrdersForAdmin(page, limit, next)
 
     response.status(200).send({
-      message: `Orders were found`,
-      payload: { allOrdersOnPage, totalPage, currentPage },
+      message: `Return all orders for the admin`,
+      payload: allOrdersOnPage,
     })
   } catch (error) {
     next(error)
   }
 }
 
-// get a single order
-export const getSingleOrder = async (request: Request, response: Response, next: NextFunction) => {
+// place a new order
+export const handleProcessPayment = async (
+  request: CustomeRequest,
+  response: Response,
+  next: NextFunction
+) => {
   try {
-    const { id } = request.params
+    const { products, payment } = request.body
 
-    // find an order by its id
-    const singleOrder: IOrder = await services.findOrderById(id, response)
+    let totalProductPrice: number = 0
+    let subtotalSums: number[] = []
 
-    response.status(200).send({
-      message: `Reutrn an order with id ${id}`,
-      payload: singleOrder,
-    })
-  } catch (error) {
-    if (error instanceof mongoose.Error.CastError) {
-      throw ApiError.badRequest(400, `ID format is Invalid must be 24 characters`)
-    } else {
-      next(error)
+    if (!products || !payment) {
+      throw ApiError.badRequest(404, `Order must contain products and payment data`)
     }
+    // updataing the qunatity and sold values of each purchased product and calculating the total price of each product
+    const updateProductsData = await services.findAndUpdateProducts(
+      products,
+      subtotalSums,
+      totalProductPrice,
+      next
+    )
+
+    if (updateProductsData) {
+      return Promise.all(updateProductsData).then(async () => {
+        try {
+          // calculate total payment amount
+          await services.handlePayment(request, subtotalSums, payment, products, next).then(() => {
+            response.status(201).send({
+              message: 'Order placed succsussfully',
+            })
+          })
+        } catch (error) {
+          next(error)
+        }
+      })
+    } else {
+      throw ApiError.badRequest(500, 'Process ended unsuccssufully')
+    }
+  } catch (error) {
+    next(error)
   }
 }
 
-// create a new order
-export const createOrder = async (request: Request, response: Response, next: NextFunction) => {
+// get all orders of a specific user
+export const getOrdersForUser = async (
+  request: CustomeRequest,
+  response: Response,
+  next: NextFunction
+) => {
   try {
-    const newOrderInput = request.body
-    const newOrder = await services.createNewOrder(newOrderInput)
-
-    response.status(201).send({
-      message: 'Order is created',
-      payload: newOrder,
+    const userOrders = await services.findUserOrders(request, next)
+    if (userOrders?.length === 0) {
+      throw ApiError.badRequest(400, 'Process ended unsuccussfully')
+    }
+    response.status(200).send({
+      message: 'Orders are returend',
+      payload: userOrders,
     })
   } catch (error) {
     next(error)
   }
 }
 
-// delete an order by id
+// delete a specific order
 export const deleteOrder = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
 
-    await services.findAndDeleteOrder(id)
+    await services.findAndDeleteOrder(id, next)
 
-    response.status(200).send({
+    response.status(204).send({
       message: `Deleted order with id ${id}`,
-      payload: {},
     })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
-      throw next(ApiError.badRequest(400, 'Id format is not valid'))
+      next(ApiError.badRequest(400, 'Id format is not valid and must be 24 characters'))
     }
     next(error)
   }
 }
 
-// update an order by id
+// update a specific order
 export const updateOrder = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
-    const updatedOrder = request.body
+    const updatedOrderStatus = request.body.status as String
 
-    // update order if it exists
-    const order: IOrder | undefined = await services.findOrderAndUpdated(id, response, updatedOrder)
+    if (!updatedOrderStatus) {
+      throw ApiError.badRequest(400, `Provide order status`)
+    }
 
-    response.status(200).send({
-      message: `Updated order with id ${id}`,
-      payload: order,
-    })
+    const updatedOrder = await services.findAndUpdateOrder(id, response, updatedOrderStatus, next)
+    if (updatedOrder) {
+      response.status(200).send({
+        message: `Updated order status succussfully`,
+        payload: updatedOrder,
+      })
+    }
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
-      throw ApiError.badRequest(400, `ID format is Invalid must be 24 characters`)
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
     } else {
       next(error)
     }

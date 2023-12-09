@@ -1,17 +1,15 @@
 import { NextFunction, Request, Response } from 'express'
-import mongoose from 'mongoose'
 import fs from 'fs/promises'
+import mongoose from 'mongoose'
 
-import path from 'path'
-
-import * as services from '../services/productService'
-import { Product, IProduct } from '../models/product'
 import ApiError from '../errors/ApiError'
+import { IProduct, Product } from '../models/product'
+import * as services from '../services/productService'
 
-// * GET : /products -> getAllProducts
+// get all products
 export const getAllProducts = async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const products = await services.findAllProduct(request)
+    const products = await services.findAllProducts(request)
 
     response.status(200).json({
       message: `Return all products `,
@@ -20,9 +18,10 @@ export const getAllProducts = async (request: Request, response: Response, next:
       },
     })
   } catch (error) {
-      next(error)
-}}
-  
+    next(error)
+  }
+}
+// get a specific product
 export const getSingleProduct = async (
   request: Request,
   response: Response,
@@ -45,29 +44,34 @@ export const getSingleProduct = async (
     }
   }
 }
-
+// delete a specific product
 export const deleteProduct = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
-    const deletedProduct = await services.findAndDeleted(id, next)
+
+    const deletedProduct = await services.findAndDeletedProduct(id, next)
+
     response.status(200).json({
       message: `Delete a single product with ID: ${id}`,
     })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       if (error.path === '_id' && error.kind === 'ObjectId') {
-        next(ApiError.badRequest(400, `Invalid ID format: ID format is Invalid must be 24 characters on schema  feild : ${ error.path} : ${error.message}`))
+        next(
+          ApiError.badRequest(
+            400,
+            `Invalid ID format: ID format is Invalid must be 24 characters on schema  feild : ${error.path} : ${error.message}`
+          )
+        )
       } else {
         next(ApiError.badRequest(400, `Invalid data format. Please check your input`))
-
       }
-    }
-     else {
+    } else {
       next(error)
     }
   }
 }
-
+// create a new product
 export const createProduct = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const newInput = request.body
@@ -90,6 +94,7 @@ export const createProduct = async (request: Request, response: Response, next: 
     }else if(!imagePath){
       console.log('No Image Yet!');
           next()   
+
     }
 
     if (newProduct) {
@@ -134,12 +139,14 @@ export const updateProduct = async (request: Request, response: Response, next: 
         } catch (error) {
           throw ApiError.badRequest(400, `Error deleting file:${error}`)
         }
+
       } 
       else if(!productImage){
              next()
       }
     }
     const productUpdated = await services.findAndUpdateProduct(id, request, next, updatedProduct)
+
     response.status(200).json({
       message: `Update a single product`,
       payload: productUpdated,
@@ -152,4 +159,3 @@ export const updateProduct = async (request: Request, response: Response, next: 
     }
   }
 }
-

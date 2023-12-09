@@ -1,14 +1,19 @@
-import mongoose, { SortOrder } from 'mongoose'
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { JwtPayload, TokenExpiredError } from 'jsonwebtoken'
+import mongoose, { SortOrder } from 'mongoose'
 
 import { dev } from '../config'
 import ApiError from '../errors/ApiError'
-import { sendEmail } from '../utils/sendEmail'
-import { generateToken, vertifyToken } from '../utils/tokenHandle'
 import * as services from '../services/userService'
+import { sendEmail } from '../utils/sendEmail'
+import { generateToken, verifyToken } from '../utils/tokenHandle'
 
-const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
+interface CustomeRequest extends Request {
+  userId?: string
+}
+
+// get all users
+export const getAllUsers = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const limit = Number(request.query.limit) || 0
     const page = Number(request.query.page) || 1
@@ -25,6 +30,7 @@ const getAllUsers = async (request: Request, response: Response, next: NextFunct
       isAdmin,
       isBanned
     )
+
     if (allUsers.length) {
       return response.status(200).json({
         message: 'users were found',
@@ -42,49 +48,49 @@ const getAllUsers = async (request: Request, response: Response, next: NextFunct
   }
 }
 
-const getSingleUser = async (request: Request, response: Response, next: NextFunction) => {
+// get a sing user
+export const getSingleUser = async (
+  request: CustomeRequest,
+  response: Response,
+  next: NextFunction
+) => {
   try {
-    const { id } = request.params
+    const id = request.userId
+
     const user = await services.findSingleUser({ _id: id })
+
     response.status(200).json({ message: 'User was found', user })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
-      next(ApiError.badRequest(400, 'Id format is not valid'))
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
     } else {
       next(error)
     }
   }
 }
 
-const registUser = async (request: Request, response: Response, next: NextFunction) => {
+// register a new user
+export const registUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { email } = request.body
     const registedUser = request.body
 
- 
     if (registedUser.isBanned || registedUser.isAdmin) {
       throw ApiError.badRequest(403, 'you do not have permission to ban user or modify its role')
+    }
 
-
-    await services.isUserEmailExists(email)
+    await services.findIfUserEmailExist(email)
     const token = generateToken(registedUser, dev.app.jwtUserActivationKey, '2m')
 
+    // prepare and send email to verify user
     const emailData = {
       email: email,
       subject: 'Activate your account',
       html: ` 
     <h1> Hello</h1>
     <p>Please activate your account by <a href= "http://127.0.0.1:5050/users/activate/${token}">click here</a></p>`,
-
     }
-
-
-
-    const token = jwt.sign(registedUser, dev.app.jwsUserActivationKey, { expiresIn: '1m' })
-    services.sendTokenByEmail(email, token)
-
     sendEmail(emailData)
-
 
     response.status(200).json({ message: 'Check your email to activate the account ', token })
   } catch (error) {
@@ -92,26 +98,28 @@ const registUser = async (request: Request, response: Response, next: NextFuncti
   }
 }
 
-const activateUser = async (request: Request, response: Response, next: NextFunction) => {
+// activate and create user
+export const activateUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { token } = request.body
 
-    const user = await services.checkTokenAndActivate(token)
-    response.status(201).json({ message: 'User was activated ', user })
-
-    const decodedUser = vertifyToken(token, dev.app.jwtUserActivationKey) as JwtPayload
+    const decodedUser = verifyToken(token, dev.app.jwtUserActivationKey) as JwtPayload
     const user = await services.createUser(decodedUser)
 
     response.status(201).json({ message: `User with id: ${user.id} was created` })
-
   } catch (error) {
     next(error)
   }
 }
 
-const updateUser = async (request: Request, response: Response, next: NextFunction) => {
+// update user profile
+export const updateUser = async (
+  request: CustomeRequest,
+  response: Response,
+  next: NextFunction
+) => {
   try {
-    const { id } = request.params
+    const id = request.userId
     const { email } = request.body
     const updatedUser = request.body
 
@@ -119,7 +127,7 @@ const updateUser = async (request: Request, response: Response, next: NextFuncti
       throw ApiError.badRequest(403, 'you do not have permission to ban users or modify thier role')
     }
 
-    await services.isUserEmailExists(email, id)
+    await services.findIfUserEmailExist(email, id)
     const user = await services.findUserAndUpdate({ _id: id }, updatedUser)
 
     response.status(200).json({ message: `User with id: ${user.id} was updated` })
@@ -132,9 +140,11 @@ const updateUser = async (request: Request, response: Response, next: NextFuncti
   }
 }
 
-const banUser = async (request: Request, response: Response, next: NextFunction) => {
+// block a specific user
+export const banUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
+
     const user = await services.updateBanStatusById(id, true)
 
     response.status(200).json({ message: `User with id: ${user.id} was banned` })
@@ -147,9 +157,11 @@ const banUser = async (request: Request, response: Response, next: NextFunction)
   }
 }
 
-const unBanUser = async (request: Request, response: Response, next: NextFunction) => {
+// unblock a specific user
+export const unBanUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
+
     const user = await services.updateBanStatusById(id, false)
 
     response.status(200).json({ message: `User with id: ${user.id} was Unbanned` })
@@ -162,9 +174,11 @@ const unBanUser = async (request: Request, response: Response, next: NextFunctio
   }
 }
 
-const upgradeUserRole = async (request: Request, response: Response, next: NextFunction) => {
+// upgrade a specific user to an admin
+export const upgradeUserRole = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
+
     const user = await services.updateUserRoleById(id, true)
 
     response.status(200).json({ message: 'admin permession was granted' })
@@ -177,9 +191,15 @@ const upgradeUserRole = async (request: Request, response: Response, next: NextF
   }
 }
 
-const downgradeUserRole = async (request: Request, response: Response, next: NextFunction) => {
+// downgrade a specific admin to a regular user
+export const downgradeUserRole = async (
+  request: Request,
+  response: Response,
+  next: NextFunction
+) => {
   try {
     const { id } = request.params
+
     const user = await services.updateUserRoleById(id, false)
 
     response.status(200).json({ message: 'admin permession was removed' })
@@ -192,10 +212,12 @@ const downgradeUserRole = async (request: Request, response: Response, next: Nex
   }
 }
 
-const deleteUser = async (request: Request, response: Response, next: NextFunction) => {
+// delete a specific user
+export const deleteUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
-    const user = await services.findUserAndDelete(id)
+
+    const user = await services.findAndDeleteUser(id)
 
     response.status(204).json({ message: `User with id: ${id} deleted` })
   } catch (error) {
@@ -207,21 +229,22 @@ const deleteUser = async (request: Request, response: Response, next: NextFuncti
   }
 }
 
-const forgetPassword = async (request: Request, response: Response, next: NextFunction) => {
+// send email to reset user password
+export const forgetPassword = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { email } = request.body
 
     const user = await services.findSingleUser({ email })
 
     const token = generateToken({ email }, dev.app.jwtResetKey, '2m')
+
     const emailData = {
       email: email,
       subject: 'Reset The password',
       html: ` 
     <h1> Hello${user.firstName}</h1>
-    <p>Please reset the password by <a href= "http://127.0.0.1:5050/users/activate/${token}">click here</a></p>`,
+    <p>Please reset the password by <a href= "http://127.0.0.1:8080/users/reset/${token}">click here</a></p>`,
     }
-
     sendEmail(emailData)
 
     response.status(200).json({ message: 'Check your email to reset the password ', token })
@@ -230,12 +253,13 @@ const forgetPassword = async (request: Request, response: Response, next: NextFu
   }
 }
 
-const resetPassword = async (request: Request, response: Response, next: NextFunction) => {
+// verify token and update user password
+export const resetPassword = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const token = request.body.token
     const password = request.body.password
 
-    const decodedData = vertifyToken(token, dev.app.jwtResetKey) as JwtPayload
+    const decodedData = verifyToken(token, dev.app.jwtResetKey) as JwtPayload
 
     const updatedUser = await services.findUserAndUpdate(
       { email: decodedData.email },
@@ -250,19 +274,4 @@ const resetPassword = async (request: Request, response: Response, next: NextFun
       next(error)
     }
   }
-}
-
-export {
-  getAllUsers,
-  getSingleUser,
-  registUser,
-  activateUser,
-  updateUser,
-  banUser,
-  upgradeUserRole,
-  downgradeUserRole,
-  unBanUser,
-  deleteUser,
-  forgetPassword,
-  resetPassword,
 }

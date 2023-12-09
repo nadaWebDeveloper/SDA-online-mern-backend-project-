@@ -1,9 +1,11 @@
 import { NextFunction, Request, Response } from 'express'
 
-import * as services from '../services/categoryService'
 import { Category, ICategory } from '../models/category'
+import * as services from '../services/categoryService'
+import ApiError from '../errors/ApiError'
+import mongoose from 'mongoose'
 
-// GET -> get all categories
+// get all categories
 export const getAllCategories = async (
   request: Request,
   response: Response,
@@ -33,6 +35,7 @@ export const getAllCategories = async (
   }
 }
 
+// get a specific category
 export const getSingleCategory = async (
   request: Request,
   response: Response,
@@ -40,36 +43,53 @@ export const getSingleCategory = async (
 ) => {
   try {
     const { id } = request.params
+
     const category = await services.findCategoryById(id, next)
+
     response.status(200).json({
       message: `Single category is returned `,
       payload: category,
     })
   } catch (error) {
-    next(error)
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
+      next(error)
+    }
   }
 }
 
+// delete a specific category
 export const deleteCategory = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
-    const category = await services.findAndDeleted(id, next)
+
+    const category = await services.findAndDeletedCategory(id, next)
+
     response.status(200).json({
       message: `Category with ID: ${id} is deleted`,
     })
   } catch (error) {
-    next(error)
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
+      next(error)
+    }
   }
 }
 
+// create a new category
 export const createCategory = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const newInput = request.body
+
     const category = await services.findIfCategoryExist(newInput, next)
+
     const newProduct: ICategory = new Category({
       name: newInput.name,
     })
     await newProduct.save()
+
     response.status(201).json({
       message: `New category is created`,
     })
@@ -78,17 +98,23 @@ export const createCategory = async (request: Request, response: Response, next:
   }
 }
 
+// update a specific category
 export const updateCategory = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
     const updatedCategory = request.body
-    const category = await services.findAndUpdated(id, next, updatedCategory)
+
+    const category = await services.findAndUpdateCategory(id, next, updatedCategory)
 
     response.status(200).json({
       message: `Category with ID: ${id} is updated`,
       payload: category,
     })
   } catch (error) {
-    next(error)
+    if (error instanceof mongoose.Error.CastError) {
+      next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+    } else {
+      next(error)
+    }
   }
 }

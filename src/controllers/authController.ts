@@ -1,28 +1,30 @@
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 
 import { dev } from '../config'
+import * as services from '../services/authService'
 import setCookieResponse from '../utils/cookiesRes'
 import { generateToken } from '../utils/tokenHandle'
-import * as services from '../services/authService'
 
-const login = async (request: Request, response: Response, next: NextFunction) => {
+// login authenticaiton
+export const login = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { email, password } = request.body
 
     const user = await services.isEmailMatch(email)
-    await services.isPassworMatch(user, password)
+    await services.isPasswordMatch(user, password)
     services.isUserBanned(user)
 
     const accessToken = generateToken({ _id: user.id }, dev.app.jwtAccessKey, '15m')
     setCookieResponse(response, accessToken)
 
-    response.status(200).json({ message: `you logged in as ${user.isAdmin ? 'Admin' : ''}` })
+    response.status(200).json({ message: `you logged in ${user.isAdmin ? 'as an Admin' : ''}` })
   } catch (error) {
     next(error)
   }
 }
 
-const logout = async (request: Request, response: Response, next: NextFunction) => {
+// logout authenticaiton
+export const logout = async (request: Request, response: Response, next: NextFunction) => {
   try {
     response.status(200).clearCookie('access_token')
     response.status(200).json({ message: 'you logged out ' })
@@ -30,5 +32,3 @@ const logout = async (request: Request, response: Response, next: NextFunction) 
     next(error)
   }
 }
-
-export { login, logout }
