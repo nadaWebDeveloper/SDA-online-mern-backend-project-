@@ -9,17 +9,18 @@ import ordersRouter from './routers/ordersRouter'
 import productsRouter from './routers/productRouter'
 import categoriesRouter from './routers/categoriesRouter'
 
+import { dev } from './config'
 import ApiError from './errors/ApiError'
 import myLogger from './middlewares/logger'
 import apiErrorHandler from './middlewares/errorHandler'
 
 config()
 const app: Application = express()
-const PORT = 5050
+const PORT = dev.app.port
 
 mongoose.set('strictQuery', false)
 mongoose.set('strictPopulate', false)
-const URL = process.env.ATLAS_URL || 'mongodb://127.0.0.1:27017/full-stack-demo-db'
+const URL = dev.db.url
 
 app.use(myLogger)
 app.use(cookieParser())
@@ -50,8 +51,8 @@ mongoose
   .then(() => {
     console.log('Database connected')
   })
-  .catch((err) => {
-    console.log(`MongoDB connection error: ${err}`)
+  .catch((error) => {
+    console.log(`MongoDB connection error: ${error}`)
   })
 
 app.listen(PORT, () => {

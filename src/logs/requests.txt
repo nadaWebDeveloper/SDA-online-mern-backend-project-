@@ -357,3 +357,22 @@ Method: GET, Path: /categories/656c1ca5c373796c3b758919, Date: 12/3/2023, Time: 
 Method: GET, Path: /categories/656c1ca5c37376c3b758919, Date: 12/3/2023, Time: 9:57:31 AM
 Method: GET, Path: /categories/hgfdfghhg, Date: 12/3/2023, Time: 10:01:34 AM
 
+Method: POST, Path: /auth/login, Date: 12/12/2023, Time: 8:30:14 PM
+Method: GET, Path: /products, Date: 12/12/2023, Time: 8:30:28 PM
+Method: PUT, Path: /products/6578ef3bea1f3b419e9c611c, Date: 12/12/2023, Time: 8:31:06 PM
+Method: PUT, Path: /products/6578ef3bea1f3b419e9c611c, Date: 12/12/2023, Time: 8:32:48 PM
+Method: PUT, Path: /products/6578efdfea1f3b419e9c6126, Date: 12/12/2023, Time: 8:33:31 PM
+Method: PUT, Path: /products/6578efdfea1f3b419e9c6126, Date: 12/12/2023, Time: 8:33:44 PM
+Method: PUT, Path: /products/6578f0abea1f3b419e9c612f, Date: 12/12/2023, Time: 8:34:20 PM
+Method: PUT, Path: /products/6578f0abea1f3b419e9c612f, Date: 12/12/2023, Time: 8:34:35 PM
+Method: PUT, Path: /products/6578f1adea1f3b419e9c613e, Date: 12/12/2023, Time: 8:34:55 PM
+Method: PUT, Path: /products/6578f1adea1f3b419e9c613e, Date: 12/12/2023, Time: 8:35:12 PM
+Method: PUT, Path: /products/6578f1beea1f3b419e9c6142, Date: 12/12/2023, Time: 8:35:36 PM
+Method: PUT, Path: /products/6578f210ea1f3b419e9c614c, Date: 12/12/2023, Time: 8:36:07 PM
+Method: PUT, Path: /products/6578f210ea1f3b419e9c614c, Date: 12/12/2023, Time: 8:36:20 PM
+Method: PUT, Path: /products/6578f277ea1f3b419e9c6154, Date: 12/12/2023, Time: 8:36:38 PM
+Method: PUT, Path: /products/6578f277ea1f3b419e9c6154, Date: 12/12/2023, Time: 8:36:51 PM
+Method: PUT, Path: /products/6578f2dcea1f3b419e9c6158, Date: 12/12/2023, Time: 8:37:06 PM
+Method: PUT, Path: /products/6578f2dcea1f3b419e9c6158, Date: 12/12/2023, Time: 8:37:21 PM
+Method: PUT, Path: /products/6578f68497e1540486619cd2, Date: 12/12/2023, Time: 8:37:36 PM
+Method: PUT, Path: /products/6578f68497e1540486619cd2, Date: 12/12/2023, Time: 8:37:51 PM
