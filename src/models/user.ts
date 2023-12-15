@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt'
 import { IOrder } from './order'
 
 export interface IUser extends Document {
+  _id: string
   firstName: string
   lastName: string
   email: string

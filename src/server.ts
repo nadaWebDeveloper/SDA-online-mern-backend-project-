@@ -2,6 +2,7 @@ import express, { Application, Request, Response, NextFunction } from 'express'
 import mongoose from 'mongoose'
 import { config } from 'dotenv'
 import cookieParser from 'cookie-parser'
+import cors from 'cors'
 
 import authRouter from './routers/authRouter'
 import usersRouter from './routers/usersRouter'
@@ -13,6 +14,7 @@ import { dev } from './config'
 import ApiError from './errors/ApiError'
 import myLogger from './middlewares/logger'
 import apiErrorHandler from './middlewares/errorHandler'
+import path from 'path'
 
 config()
 const app: Application = express()
@@ -20,13 +22,16 @@ const PORT = dev.app.port
 
 mongoose.set('strictQuery', false)
 mongoose.set('strictPopulate', false)
-const URL = dev.db.url
+const URL = String(dev.db.url)
 
 app.use(myLogger)
 app.use(cookieParser())
 app.use(express.json())
+app.use(cors())
 app.use(express.urlencoded({ extended: true }))
-app.use(express.static('imageUser'))
+app.use('/public',express.static('public'))
+// app.use('/public',express.static(path.join(__dirname, '/public')))
+
 
 app.use('/products', productsRouter)
 app.use('/categories', categoriesRouter)

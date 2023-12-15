@@ -16,13 +16,13 @@ export const findAllUsers = async (
 ): Promise<UsersPaginationType> => {
   const searchRegularExpression = new RegExp('.*' + search + '.*', 'i')
   const searchFilter = {
+    //isAdmin:{$en :true},
     $or: [
       { firstName: { $regex: searchRegularExpression } },
       { lastName: { $regex: searchRegularExpression } },
       { email: { $regex: searchRegularExpression } },
     ],
   }
-
   // isAdmin and isBanned values must be boolean
   const roleFilter = isAdmin ? { isAdmin: isAdmin } : {}
   const bannedUsersFilter = isBanned ? { isBanned: isBanned } : {}

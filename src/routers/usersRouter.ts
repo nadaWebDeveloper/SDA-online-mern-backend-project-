@@ -10,7 +10,9 @@ import * as validation from '../validation/userValidation'
 const router = express.Router()
 
 //GET --> get all users
-router.get('/', isLoggedIn, isAdmin, controller.getAllUsers)
+ //router.get('/', isLoggedIn, isAdmin, controller.getAllUsers)
+router.get('/',  controller.getAllUsers)
+
 //GET --> get a single user by ID
 router.get('/profile', isLoggedIn, controller.getSingleUser)
 //POST --> register a user
@@ -32,15 +34,19 @@ router.put(
   controller.updateUser
 )
 //PUT --> ban a single user by ID
-router.put('/ban/:id', isLoggedIn, isAdmin, controller.banUser)
+//router.put('/ban/:id', isLoggedIn, isAdmin, controller.banUser)
+router.put('/ban/:id', controller.banUser)
 //PUT --> unban a single user by ID
-router.put('/unban/:id', isLoggedIn, isAdmin, controller.unBanUser)
+//router.put('/unban/:id', isLoggedIn, isAdmin, controller.unBanUser)
+router.put('/unban/:id',controller.unBanUser)
 //PUT --> upgrade single user role to admin
 router.put('/admin/:id', isLoggedIn, isAdmin, controller.upgradeUserRole)
 //PUT --> downgrade single admin role to user
 router.put('/notadmin/:id', isLoggedIn, isAdmin, controller.downgradeUserRole)
 //DELETE --> delete a single user by ID
 router.delete('/:id', isLoggedIn, isAdmin, controller.deleteUser)
+//router.delete('/:id', controller.deleteUser)
+
 //POST --> send reset email when forget password
 router.post(
   '/forget-password',

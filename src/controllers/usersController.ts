@@ -80,7 +80,7 @@ export const registUser = async (request: Request, response: Response, next: Nex
     }
 
     await services.findIfUserEmailExist(email)
-    const token = generateToken(registedUser, dev.app.jwtUserActivationKey, '2m')
+    const token = generateToken(registedUser, String(dev.app.jwtUserActivationKey), '2m')
 
     // prepare and send email to verify user
     const emailData = {
@@ -103,7 +103,7 @@ export const activateUser = async (request: Request, response: Response, next: N
   try {
     const { token } = request.body
 
-    const decodedUser = verifyToken(token, dev.app.jwtUserActivationKey) as JwtPayload
+    const decodedUser = verifyToken(token, String(dev.app.jwtUserActivationKey)) as JwtPayload
     const user = await services.createUser(decodedUser)
 
     response.status(201).json({ message: `User with id: ${user.id} was created` })
@@ -147,7 +147,7 @@ export const banUser = async (request: Request, response: Response, next: NextFu
 
     const user = await services.updateBanStatusById(id, true)
 
-    response.status(200).json({ message: `User with id: ${user.id} was banned` })
+    response.status(200).json({ message: `User: [${user.firstName}] is Blocked` })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
@@ -164,7 +164,7 @@ export const unBanUser = async (request: Request, response: Response, next: Next
 
     const user = await services.updateBanStatusById(id, false)
 
-    response.status(200).json({ message: `User with id: ${user.id} was Unbanned` })
+    response.status(200).json({ message: `User: [${user.firstName}] is unBlocked` })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
@@ -236,7 +236,7 @@ export const forgetPassword = async (request: Request, response: Response, next:
 
     const user = await services.findSingleUser({ email })
 
-    const token = generateToken({ email }, dev.app.jwtResetKey, '2m')
+    const token = generateToken({ email }, String(dev.app.jwtResetKey), '2m')
 
     const emailData = {
       email: email,
@@ -259,7 +259,7 @@ export const resetPassword = async (request: Request, response: Response, next: 
     const token = request.body.token
     const password = request.body.password
 
-    const decodedData = verifyToken(token, dev.app.jwtResetKey) as JwtPayload
+    const decodedData = verifyToken(token, String(dev.app.jwtResetKey)) as JwtPayload
 
     const updatedUser = await services.findUserAndUpdate(
       { email: decodedData.email },

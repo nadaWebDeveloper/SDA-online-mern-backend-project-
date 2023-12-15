@@ -16,7 +16,9 @@ router.get('/:id', controller.getSingleCategory)
 //POST --> create a category
 router.post('/', isLoggedIn, isAdmin, categoryValidation, runValidation, controller.createCategory)
 //DELETE --> delete a single category by ID
-router.delete('/:id', isLoggedIn, isAdmin, controller.deleteCategory)
+ //router.delete('/:id', isLoggedIn, isAdmin, controller.deleteCategory)
+router.delete('/:id', controller.deleteCategory)
+
 //PUT --> update a single category by ID
 router.put('/:id', isLoggedIn, isAdmin, categoryValidation, runValidation, controller.updateCategory)
 

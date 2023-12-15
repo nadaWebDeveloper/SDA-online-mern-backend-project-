@@ -63,11 +63,12 @@ export const getSingleCategory = async (
 export const deleteCategory = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
+    const {name} = request.query
 
     const category = await services.findAndDeletedCategory(id, next)
 
     response.status(200).json({
-      message: `Category with ID: ${id} is deleted`,
+      message: `Category [${name}] is successfully deleted`,
     })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
