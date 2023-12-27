@@ -17,7 +17,8 @@ export const login = async (request: Request, response: Response, next: NextFunc
     const accessToken = generateToken({ _id: user.id }, String(dev.app.jwtAccessKey), '15m')
     setCookieResponse(response, accessToken)
 
-    response.status(200).json({ message: `you logged in ${user.isAdmin ? 'as an Admin' : ''}` })
+    response.status(200).json({ message: `you logged in ${user.isAdmin ? 'as an Admin' : ''}`,
+    user })
   } catch (error) {
     next(error)
   }
@@ -27,7 +28,7 @@ export const login = async (request: Request, response: Response, next: NextFunc
 export const logout = async (request: Request, response: Response, next: NextFunction) => {
   try {
     response.status(200).clearCookie('access_token')
-    response.status(200).json({ message: 'you logged out ' })
+    response.status(200).json({ message: 'you logged out' })
   } catch (error) {
     next(error)
   }

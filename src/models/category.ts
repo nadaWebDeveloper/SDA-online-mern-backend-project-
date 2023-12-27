@@ -19,6 +19,8 @@ const categorySchema = new mongoose.Schema({
     trim: true,
     unique: true,
   },
-})
+},
+{ timestamps: true }
+)
 
 export const Category = mongoose.model<ICategory>('Categories', categorySchema)

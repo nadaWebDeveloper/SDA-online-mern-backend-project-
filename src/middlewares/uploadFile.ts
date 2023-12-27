@@ -3,9 +3,7 @@ import {Request } from 'express'
 
 
  const productStorage = multer.diskStorage({
-    destination: function (req :Request, file: Express.Multer.File, cb) {
-      cb(null, 'public/images/imageProduct')
-    },
+
     filename: function (req: Request, file: Express.Multer.File, cb) {
     const uniqueSuffix = Date.now() + '-' + file.originalname
       cb(null, uniqueSuffix)

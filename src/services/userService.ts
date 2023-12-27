@@ -14,6 +14,8 @@ export const findAllUsers = async (
   isAdmin: string,
   isBanned: string
 ): Promise<UsersPaginationType> => {
+  const skipField = {__v: 0, updateAt: 0, password: 0}
+
   const searchRegularExpression = new RegExp('.*' + search + '.*', 'i')
   const searchFilter = {
     //isAdmin:{$en :true},
@@ -35,9 +37,7 @@ export const findAllUsers = async (
   }
   const skip = (page - 1) * limit
 
-  const allUsers = await User.find(filters, {
-    password: 0,
-  })
+  const allUsers = await User.find(filters,skipField)
     .skip(skip)
     .limit(limit)
     .sort({ firstName: sort, lastName: sort })
@@ -47,6 +47,13 @@ export const findAllUsers = async (
     totalPage,
     currentPage: page,
   }
+}
+export const findUserById = async (id: string) => {
+  const singleProduct = await User.findOne({ _id: id })
+  if (!singleProduct) {
+    throw ApiError.badRequest(404, `Product is not found with this id: ${id}`)
+  }
+  return singleProduct
 }
 // find order by user id
 export const findSingleUser = async (filter: object): Promise<IUser> => {
@@ -69,9 +76,11 @@ export const findIfUserEmailExist = async (inputEmail: string, inputId: string |
 }
 // create new user
 export const createUser = async (newUser: JwtPayload): Promise<IUser> => {
-  const user = new User(newUser)
-  await user.save()
-  return user
+
+const user = new User(newUser)
+await user.save()
+return user
+
 }
 // find and update user by id
 export const findUserAndUpdate = async (
@@ -79,6 +88,17 @@ export const findUserAndUpdate = async (
   inputUser: IUser | object
 ): Promise<IUser> => {
   const user = await User.findOneAndUpdate(filter, inputUser, { new: true })
+  if (!user) {
+    throw ApiError.badRequest(404, 'User was Not Found')
+  }
+  return user
+}
+// find and update profile
+export const findUserAndUpdateProfile = async (
+  _id: string,
+  inputUser: IUser | object
+): Promise<IUser> => {
+  const user = await User.findByIdAndUpdate(_id, inputUser, { new: true })
   if (!user) {
     throw ApiError.badRequest(404, 'User was Not Found')
   }

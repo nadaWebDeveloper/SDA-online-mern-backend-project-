@@ -10,11 +10,10 @@ import * as validation from '../validation/userValidation'
 const router = express.Router()
 
 //GET --> get all users
- //router.get('/', isLoggedIn, isAdmin, controller.getAllUsers)
-router.get('/',  controller.getAllUsers)
-
+ router.get('/', isLoggedIn, isAdmin, controller.getAllUsers)
 //GET --> get a single user by ID
-router.get('/profile', isLoggedIn, controller.getSingleUser)
+// router.get('/profile', isLoggedIn, controller.getSingleUser)
+router.get('/profile/:id', isLoggedIn, controller.getSingleUser)
 //POST --> register a user
 router.post(
   '/register',
@@ -26,26 +25,17 @@ router.post(
 //POST --> activate a user
 router.post('/activate', controller.activateUser)
 //PUT --> update a single user by ID
-router.put(
-  '/profile',
-  isLoggedIn,
-  validation.userUpdatenValidation,
-  runValidation,
-  controller.updateUser
-)
+router.put('/editProfile/:id',isLoggedIn,validation.userUpdatenValidation,runValidation,controller.updateProfile)
 //PUT --> ban a single user by ID
-//router.put('/ban/:id', isLoggedIn, isAdmin, controller.banUser)
-router.put('/ban/:id', controller.banUser)
+router.put('/ban/:id', isLoggedIn, isAdmin, controller.banUser)
 //PUT --> unban a single user by ID
-//router.put('/unban/:id', isLoggedIn, isAdmin, controller.unBanUser)
-router.put('/unban/:id',controller.unBanUser)
+router.put('/unban/:id', isLoggedIn, isAdmin, controller.unBanUser)
 //PUT --> upgrade single user role to admin
-router.put('/admin/:id', isLoggedIn, isAdmin, controller.upgradeUserRole)
+router.put('/adminRole/:id', isLoggedIn, isAdmin, controller.upgradeUserRole)
 //PUT --> downgrade single admin role to user
 router.put('/notadmin/:id', isLoggedIn, isAdmin, controller.downgradeUserRole)
 //DELETE --> delete a single user by ID
 router.delete('/:id', isLoggedIn, isAdmin, controller.deleteUser)
-//router.delete('/:id', controller.deleteUser)
 
 //POST --> send reset email when forget password
 router.post(
@@ -56,7 +46,7 @@ router.post(
   controller.forgetPassword
 )
 //POST --> reset password
-router.post(
+router.put(
   '/reset-password',
   isLoggedOut,
   validation.userResetPasswordValidation,

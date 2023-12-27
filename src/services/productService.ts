@@ -1,8 +1,10 @@
-import { NextFunction, Request } from 'express'
+import { NextFunction, Request , Response } from 'express'
+import mongoose from 'mongoose'
 
 import ApiError from '../errors/ApiError'
 import { IProduct, Product } from '../models/product'
 import { deleteImage } from '../helper/deleteImageHelper'
+import { deleteImageFromCloudinary, uploadToCloudinary, valueWithOutExtension } from '../helper/cloudinaruHelper'
 
 // return all products using pagination
 export const findAllProducts = async (request: Request) => {
@@ -75,17 +77,25 @@ export const findAllProducts = async (request: Request) => {
     .populate('categories')
     .skip(skip)
     .limit(limit)
-     .sort(sortOption) 
+    .sort(sortOption) 
  
 
   
   if (allProductOnPage.length === 0 ) {
     throw ApiError.badRequest(404, 'No matching results')
   }
+
+  const totalProduct = allProductOnPage.length
   return {
     allProductOnPage,
     totalPage,
+    totalProduct,
     currentPage: page,
+    limit,
+    page,
+    rangeId,
+    sortName,
+    searchFilter
   }
 }
 // find order by id
@@ -98,20 +108,37 @@ export const findProductById = async (id: string, next: NextFunction) => {
 }
 // find and delete product by id
 export const findAndDeletedProduct = async (id: string, next: NextFunction) => {
-  const deleteSingleProduct = await Product.findOneAndDelete({ _id: id })
-  //delete file from server
-  if(deleteSingleProduct && deleteSingleProduct.image){
-    await deleteImage(deleteSingleProduct.image)
-  }
-  if (!deleteSingleProduct) {
-    throw ApiError.badRequest(404, `Product is not found with this id: ${id}`)
-  }
-  return deleteSingleProduct
+
+   //check if product exist or not
+   const product = await Product.findById({_id: id })
+   console.log('product exist',product);
+   if(!product){
+    throw ApiError.badRequest(404, `Product is not found`)
+   }
+
+      //if product has image then delete it from cloudinary
+      if(product && product.image){
+         const publicID = await valueWithOutExtension(product.image)
+        const deleteSingleProduct = await Product.findOneAndDelete({ _id: id })
+
+        if (!deleteSingleProduct) {
+          throw ApiError.badRequest(404, `Product is not found with this id: ${id}`)
+        }
+       
+    if(publicID){
+         await deleteImageFromCloudinary(`sda-E-Commerce/${publicID}`)
+         return deleteSingleProduct
+        }
+
+
+         }
+
+   
+
 }
 //check entered product is exist on DB or not when a create new product
 export const findIfProductExist = async (newInput: IProduct, next: NextFunction) => {
   const nameInput = newInput.name
-  console.log("nameInput: ",nameInput);
   const productExist = await Product.exists({ name: nameInput })
   if (productExist) {
     throw ApiError.badRequest(409, `Product already exist with this Name: ${nameInput}`)
@@ -120,14 +147,58 @@ export const findIfProductExist = async (newInput: IProduct, next: NextFunction)
 }
 
 // find and update product by id
-export const findAndUpdateProduct = async (id: string,request: Request, next: NextFunction, updatedProduct: Request) => {
-  const productUpdated = await Product.findByIdAndUpdate(id, updatedProduct, {
-    new: true,
-    runValidators: true,
-  })
+export const findAndUpdateProduct = async (id: string,request: Request,response: Response , next: NextFunction) => {
+ 
+try {
 
-  if (!productUpdated) {
-    throw ApiError.badRequest(404, `Product is not found with this id: ${id}`)
+  const fields = ['categories', 'description', 'name' ,'price', 'quantity' , 'sold', 'image']
+  const updated: Record<string, unknown> = {}
+  const productExist = await Product.findById(id)
+  console.log('productExist',productExist);
+  if (!productExist) {
+    throw ApiError.badRequest(404, `Product is not found`)
   }
-  return productUpdated
+
+    for (const key in request.body){
+      if(fields.includes(key)){
+        updated[key] = request.body[key]
+      }else{
+        throw ApiError.badRequest(400, ` ${key} can not be updated`)
+      }
+    }
+
+    const image = request.file?.path 
+    if(image){
+      const cloudinaryURL = await uploadToCloudinary(image, 'sda-E-Commerce')
+      updated.image = cloudinaryURL
+    }
+     const productUpdated = await Product.findByIdAndUpdate(id, updated, {
+      new: true,
+    })
+    if (!productUpdated) {
+      throw ApiError.badRequest(404, `Product is not found with this id: ${id}`)
+    }
+    
+    response.status(200).json({
+      message: `Update a single product`,
+       payload: productUpdated,
+    })
+
+    //delete image from cloudinary
+    if(productExist?.image){
+      const publicID = await valueWithOutExtension(productExist.image)
+      await deleteImageFromCloudinary(`sda-E-Commerce/${publicID}`)
+    }
+
+     //return productUpdated
+} catch (error) {
+  if (error instanceof mongoose.Error.CastError) {
+    throw ApiError.badRequest(
+      400,
+      `Invalid ID format: ID format is Invalid must be 24 characters`
+    )
+  } else {
+    next(error)
+  }
+}
 }

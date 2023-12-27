@@ -14,7 +14,6 @@ import { dev } from './config'
 import ApiError from './errors/ApiError'
 import myLogger from './middlewares/logger'
 import apiErrorHandler from './middlewares/errorHandler'
-import path from 'path'
 
 config()
 const app: Application = express()
@@ -27,10 +26,12 @@ const URL = String(dev.db.url)
 app.use(myLogger)
 app.use(cookieParser())
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}))
 app.use(express.urlencoded({ extended: true }))
 app.use('/public',express.static('public'))
-// app.use('/public',express.static(path.join(__dirname, '/public')))
 
 
 app.use('/products', productsRouter)
@@ -61,5 +62,5 @@ mongoose
   })
 
 app.listen(PORT, () => {
-  console.log(`Server running http://localhost:${PORT}`)
+  console.log(`Server running at http://localhost:${PORT}`)
 })

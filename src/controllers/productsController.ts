@@ -1,21 +1,32 @@
 import { NextFunction, Request, Response } from 'express'
-import fs from 'fs/promises'
 import mongoose from 'mongoose'
 
 import ApiError from '../errors/ApiError'
 import { IProduct, Product } from '../models/product'
 import * as services from '../services/productService'
 
+import {  uploadToCloudinary } from '../helper/cloudinaruHelper'
+          
+
+
 // get all products
 export const getAllProducts = async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const products = await services.findAllProducts(request)
+    const { allProductOnPage,totalPage, currentPage , totalProduct , limit, page , rangeId , sortName ,searchFilter} = await services.findAllProducts(request)
 
     response.status(200).json({
       message: `Return all products `,
-      payload: {
-        products,
-      },
+      allProductOnPage,
+      rangeId,
+      sortName,
+      searchFilter,
+      pagination : {
+        totalPage, 
+        currentPage,
+        totalProduct,
+        limit,
+        page,
+      }
     })
   } catch (error) {
     next(error)
@@ -48,9 +59,8 @@ export const getSingleProduct = async (
 export const deleteProduct = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
-
     const deletedProduct = await services.findAndDeletedProduct(id, next)
-
+  
     response.status(200).json({
       message: `Delete a single product with ID: ${id}`,
     })
@@ -67,6 +77,7 @@ export const deleteProduct = async (request: Request, response: Response, next: 
         next(ApiError.badRequest(400, `Invalid data format. Please check your input`))
       }
     } else {
+      console.log(error);
       next(error)
     }
   }
@@ -75,8 +86,9 @@ export const deleteProduct = async (request: Request, response: Response, next: 
 export const createProduct = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const newInput = request.body
-    const imagePath = request.file?.path
-
+    const imagePath = request.file && request.file.path
+ 
+  
     const productExist = await services.findIfProductExist(newInput, next)
 
     const newProduct: IProduct = new Product({
@@ -89,21 +101,29 @@ export const createProduct = async (request: Request, response: Response, next: 
     })
 
     if (imagePath) {
-      newProduct.image = imagePath
-      console.log('Add Image')
+     //to store image on server
+     newProduct.image = imagePath
     } else if (!imagePath) {
-      console.log('No Image Yet!')
+      next(ApiError.badRequest(400, `No Image added on DBYet!`))
     }
 
-    if (newProduct) {
-      await newProduct.save()
+    response.status(201).json({
+      message: `Create a single product` ,
+      payload:newProduct,
+      
+
+    })
+
+    if (newProduct ) {
+      //this want to save on cloudinary " image: '/var/folders/fc/8n7zg8d54tzfwsxb770tm_dw0000gn/T/1703172805923-images7.jpeg'"
+      //newProduct.image -> to store on cloudinary -> give response(URL)
+      const cloudinaryUrl = await uploadToCloudinary(newProduct.image, 'sda-E-Commerce')
+      newProduct.image = cloudinaryUrl
+     await newProduct.save()
     } else {
       next(ApiError.badRequest(400, `Invalid document`))
     }
 
-    response.status(201).json({
-      message: `Create a single product`,
-    })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       throw ApiError.badRequest(
@@ -119,35 +139,10 @@ export const createProduct = async (request: Request, response: Response, next: 
 export const updateProduct = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
-    const updatedProduct = request.body
-    const newImage = request.file?.path
+   
+    const productUpdated = await services.findAndUpdateProduct(id, request,response ,next)
 
-    let imgUrl = ''
-    if (request.file?.path) {
-      imgUrl = `${newImage}`
-      updatedProduct.image = imgUrl
-
-      //check product have image
-      const productInfo = await Product.findById(id)
-      const productImage = productInfo?.image
-
-      if (productImage) {
-        try {
-          fs.unlink(productImage)
-        } catch (error) {
-          throw ApiError.badRequest(400, `Error deleting file:${error}`)
-        }
-      } 
-      else if(!productImage){
-        console.log('add as new image');
-      }
-    }
-    const productUpdated = await services.findAndUpdateProduct(id, request, next, updatedProduct)
-
-    response.status(200).json({
-      message: `Update a single product`,
-      payload: productUpdated,
-    })
+ 
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       throw ApiError.badRequest(400, `ID format is Invalid must be 24 characters`)

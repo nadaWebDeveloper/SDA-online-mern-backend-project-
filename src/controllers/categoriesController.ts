@@ -63,12 +63,11 @@ export const getSingleCategory = async (
 export const deleteCategory = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { id } = request.params
-    const {name} = request.query
 
     const category = await services.findAndDeletedCategory(id, next)
 
     response.status(200).json({
-      message: `Category [${name}] is successfully deleted`,
+      message: `Category is successfully deleted`,
     })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
@@ -93,6 +92,7 @@ export const createCategory = async (request: Request, response: Response, next:
 
     response.status(201).json({
       message: `New category is created`,
+      payload: newProduct
     })
   } catch (error) {
     next(error)
@@ -108,7 +108,7 @@ export const updateCategory = async (request: Request, response: Response, next:
     const category = await services.findAndUpdateCategory(id, next, updatedCategory)
 
     response.status(200).json({
-      message: `Category with ID: ${id} is updated`,
+      message: `Category : ${updatedCategory.name} is updated`,
       payload: category,
     })
   } catch (error) {

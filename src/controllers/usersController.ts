@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { JwtPayload, TokenExpiredError } from 'jsonwebtoken'
+import { JsonWebTokenError, JwtPayload, TokenExpiredError } from 'jsonwebtoken'
 import mongoose, { SortOrder } from 'mongoose'
 
 import { dev } from '../config'
@@ -55,9 +55,9 @@ export const getSingleUser = async (
   next: NextFunction
 ) => {
   try {
-    const id = request.userId
+    const { id } = request.params
 
-    const user = await services.findSingleUser({ _id: id })
+    const user = await services.findUserById(id)
 
     response.status(200).json({ message: 'User was found', user })
   } catch (error) {
@@ -81,18 +81,21 @@ export const registUser = async (request: Request, response: Response, next: Nex
 
     await services.findIfUserEmailExist(email)
     const token = generateToken(registedUser, String(dev.app.jwtUserActivationKey), '2m')
-
-    // prepare and send email to verify user
     const emailData = {
       email: email,
       subject: 'Activate your account',
       html: ` 
-    <h1> Hello</h1>
-    <p>Please activate your account by <a href= "http://127.0.0.1:5050/users/activate/${token}">click here</a></p>`,
+    <h1> Hello </h1>
+    [${registedUser.firstName}]
+    <p>Please activate your account by <a href= 
+    "http://localhost:3000/user/activate/${token}">
+    click here</a></p>`,
     }
     sendEmail(emailData)
 
-    response.status(200).json({ message: 'Check your email to activate the account ', token })
+    response.status(200).json({
+     message: 'Check your email to activate your account'
+     ,token })
   } catch (error) {
     next(error)
   }
@@ -102,13 +105,27 @@ export const registUser = async (request: Request, response: Response, next: Nex
 export const activateUser = async (request: Request, response: Response, next: NextFunction) => {
   try {
     const { token } = request.body
+    if (!token) {
+      throw ApiError.badRequest(404,'Please provide a token')
+    }
 
     const decodedUser = verifyToken(token, String(dev.app.jwtUserActivationKey)) as JwtPayload
+    if (!decodedUser) {
+      throw ApiError.badRequest(401, 'Invalid token')
+    }
     const user = await services.createUser(decodedUser)
 
-    response.status(201).json({ message: `User with id: ${user.id} was created` })
+    response.status(201).json({ message: `User with Name: ${user.firstName} was created` })
   } catch (error) {
-    next(error)
+    if(error instanceof TokenExpiredError || error instanceof JsonWebTokenError){
+     const errorMessage = 
+     error instanceof TokenExpiredError
+     ? 'Token has expired'
+     : 'Invalid token';
+     throw ApiError.badRequest(401,errorMessage)
+    }else{
+      next(error)
+    }
   }
 }
 
@@ -119,18 +136,16 @@ export const updateUser = async (
   next: NextFunction
 ) => {
   try {
-    const id = request.userId
-    const { email } = request.body
+    const { id } = request.params
+    console.log('id',id);
     const updatedUser = request.body
 
     if (updatedUser.isBanned || updatedUser.isAdmin) {
       throw ApiError.badRequest(403, 'you do not have permission to ban users or modify thier role')
     }
 
-    await services.findIfUserEmailExist(email, id)
-    const user = await services.findUserAndUpdate({ _id: id }, updatedUser)
 
-    response.status(200).json({ message: `User with id: ${user.id} was updated` })
+   response.status(200).json({ message: `User is updated successfully` })
   } catch (error) {
     if (error instanceof mongoose.Error.CastError) {
       next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
@@ -138,6 +153,22 @@ export const updateUser = async (
       next(error)
     }
   }
+}
+export const updateProfile = async(request: Request, response: Response, next: NextFunction) => {
+try {
+    const { id } = request.params
+      const updatedUser = request.body
+  
+     const user = await services.findUserAndUpdateProfile(id , updatedUser)
+     response.status(200).json({ message: `User is updated successfully` , user})
+} catch (error) {
+  if (error instanceof mongoose.Error.CastError) {
+    next(ApiError.badRequest(400, `ID format is Invalid must be 24 characters`))
+  } else {
+    next(error)
+  }
+}
+
 }
 
 // block a specific user
@@ -240,10 +271,10 @@ export const forgetPassword = async (request: Request, response: Response, next:
 
     const emailData = {
       email: email,
-      subject: 'Reset The password',
+      subject: 'Reset The Password',
       html: ` 
     <h1> Hello${user.firstName}</h1>
-    <p>Please reset the password by <a href= "http://127.0.0.1:8080/users/reset/${token}">click here</a></p>`,
+    <p>Please reset the password by <a href= "http://localhost:3000/user/reset-password/${token}">Reset Password</a></p>`,
     }
     sendEmail(emailData)
 
@@ -266,7 +297,7 @@ export const resetPassword = async (request: Request, response: Response, next: 
       { $set: { password: password } }
     )
 
-    response.status(200).json({ message: 'The password was updated successfully' })
+    response.status(200).json({ message: 'The password was updated successfully' , updatedUser })
   } catch (error) {
     if (error instanceof TokenExpiredError) {
       next(ApiError.badRequest(401, 'Token was expired'))

@@ -16,13 +16,16 @@ export const isLoggedIn = async (
   next: NextFunction
 ) => {
   try {
-    const accessToken = request.cookies.access_token
+
+     const accessToken = request.cookies.access_token
+
     if (!accessToken) {
       throw ApiError.badRequest(401, 'You are not logged in')
     }
 
     const decoded = verifyToken(accessToken, String(dev.app.jwtAccessKey)) as JwtPayload
     if (!decoded) {
+      console.log('Invalid access token');
       throw ApiError.badRequest(401, 'Invalid access token')
     }
 
@@ -59,7 +62,6 @@ export const isAdmin = async (request: CustomeRequest, response: Response, next:
     next(error)
   }
 }
-
 
 // check if admin
 export const isNotAdmin = async (
